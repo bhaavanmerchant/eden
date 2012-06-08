@@ -25,6 +25,12 @@ Slot:
 <table id="r_table">
 <tr><td>Role</td><td>Day 1</td><td>Day 2</td><td>Day 3</td><td>Day 4</td><td>Day 5</td><td>Day 6</td><td>Day 7</td>
 </tr>
+{{for x in alloted_roles:}}
+<tr><td>{{=x}}</td>
+{{for x in range(7):}}<td>{{=IMG(_src='/eden/static/media/plus.png',_alt='addv',_class='addv')}}</td>{{pass}}
+</tr>
+{{pass}}
+
 {{for x in range(numb):}}
 <tr><td><select>
 {{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}

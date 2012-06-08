@@ -1,3 +1,11 @@
-#table_r{
-color:#555;
+#r_tablearea{
+background:#555;
+border-radius:10px;
+padding:20px;
+}
+#r_table{
+width:900px;
+}
+#selectarea{
+width:900px;
 }
