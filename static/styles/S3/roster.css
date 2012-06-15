@@ -1,11 +1,28 @@
 #r_tablearea{
 background:#555;
 border-radius:10px;
+width:900px;
 padding:20px;
 }
 #r_table{
 width:900px;
+padding:50px;
 }
 #selectarea{
 width:900px;
+}
+#addrow{
+position:relative;
+left:80px;
+}
+#r_varea{
+width:120px;
+background:#555;
+border-radius:10px;
+padding: 20px;
+position: absolute;
+}
+#maincontent{
+overflow:auto;
+height:500px;
 }
