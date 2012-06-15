@@ -8,8 +8,6 @@
     @requires: U{B{I{gluon}} <http://web2py.com>}
     @requires: U{B{I{lxml}} <http://codespeak.net/lxml>}
 
-    @author: Dominic König <dominic[at]aidiq.com>
-
     @copyright: 2009-2012 (c) Sahana Software Foundation
     @license: MIT
 
@@ -924,19 +922,19 @@ class S3CRUD(S3Method):
                 title = crud_string(r.tablename, "title_display")
             else:
                 title = crud_string(self.tablename, "title_list")
-            subtitle = crud_string(self.tablename, "subtitle_list")
+            #subtitle = crud_string(self.tablename, "subtitle_list")
             output["title"] = title
-            output["subtitle"] = subtitle
+            #output["subtitle"] = subtitle
 
             # Empty table - or just no match?
             if not items:
                 if "deleted" in self.table:
                     available_records = current.db(self.table.deleted == False)
                 else:
-                    available_records = current.db(self.table.id > 0)
+                    available_records = current.db(self.table._id > 0)
                 #if available_records.count():
                 # This is faster:
-                if available_records.select(self.table.id,
+                if available_records.select(self.table._id,
                                             limitby=(0, 1)).first():
                     items = crud_string(self.tablename, "msg_no_match")
                 else:
@@ -944,7 +942,7 @@ class S3CRUD(S3Method):
                 if r.component and "showadd_btn" in output:
                     # Hide the list and show the form by default
                     del output["showadd_btn"]
-                    del output["subtitle"]
+                    #del output["subtitle"]
                     items = ""
                     s3.no_formats = True
 
@@ -1291,6 +1289,9 @@ class S3CRUD(S3Method):
                         response.error = "%s\n%s: %s" % \
                             (response.error, fieldname, form.errors[fieldname])
 
+            elif request.http == "POST":
+                response.error = current.T("Invalid form (re-opened in another window?)")
+
         if not logged and not form.errors:
             audit("read", prefix, name,
                   record=record_id, representation=format)
@@ -1620,7 +1621,11 @@ class S3CRUD(S3Method):
                 # Check which records can be deleted
                 query = auth.s3_accessible_query("delete", table)
                 rows = db(query).select(table._id)
-                restrict = [str(row.id) for row in rows]
+                restrict = []
+                for row in rows:
+                    row_id = row.get("id", None)
+                    if row_id:
+                        restrict.append(str(row_id))
                 s3crud.action_button(labels.DELETE, delete_url,
                                      _class="delete-btn", restrict=restrict)
             else:

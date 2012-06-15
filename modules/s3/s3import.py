@@ -833,7 +833,7 @@ class S3Importer(S3CRUD):
         s3.filter = (self.table.job_id == job_id) & \
                     (self.table.tablename == self.controller_tablename)
 
-        # get a list of the records that have an error of None
+        # Get a list of the records that have an error of None
         query =  (self.table.job_id == job_id) & \
                  (self.table.tablename == self.controller_tablename)
         rows = current.db(query).select(self.table.id, self.table.error)
@@ -855,7 +855,7 @@ class S3Importer(S3CRUD):
         if self.request.representation == "aadata":
             return output
 
-        # Highlight rows in erro in red
+        # Highlight rows in error in red
         s3.dataTableStyleWarning = error_list
 
         s3.dataTableSelectable = True
@@ -1424,7 +1424,19 @@ class S3Importer(S3CRUD):
         if errors:
             details.append(TFOOT(TR(TH("%s:" % T("Errors")),
                                    TD(UL([LI(e) for e in errors])))))
-        output.append(details)
+        if rows == [] and components == []:
+            # At this stage we don't have anything to display to see if we can
+            # find something to show. This could be the case when a table being
+            # imported is a resolver for a many to many relationship
+            refdetail = TABLE(_class="importItem [id]")
+            references = element.findall("reference")
+            for reference in references:
+                tuid = reference.get("tuid")
+                resource = reference.get("resource")
+                refdetail.append(TR(TD(resource), TD(tuid)))
+            output.append(refdetail)
+        else:
+            output.append(details)
         return str(output)
 
     # -------------------------------------------------------------------------
@@ -2640,6 +2652,8 @@ class S3ImportJob():
         self.job_table = None
         self.item_table = None
 
+        self.count = 0 # number of records imported
+
         # Import strategy
         self.strategy = strategy
         if self.strategy is None:
@@ -3045,6 +3059,8 @@ class S3ImportJob():
                     self.error_tree.append(deepcopy(element))
                 if not ignore_errors:
                     return False
+            elif item.tablename == self.table._tablename:
+                self.count += 1
         return True
 
     # -------------------------------------------------------------------------

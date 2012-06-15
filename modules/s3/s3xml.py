@@ -529,7 +529,8 @@ class S3XML(S3Codec):
                 ktablename = krecord.instance_type
                 uid = krecord[UID]
                 if ktablename == tablename and \
-                   UID in record and record[UID] == uid:
+                   UID in record and record[UID] == uid and \
+                   not current.manager.show_ids:
                     continue
                 uids = [uid]
             else:
@@ -664,16 +665,20 @@ class S3XML(S3Codec):
         popup_url = None
         tooltips = {}
         latlons = {}
+        wkts = {}
+        geojsons = {}
         if marker:
             try:
                 # Dict (provided by Feature Layers)
-                _marker = marker["marker"]
+                _marker = marker.get("marker", None)
                 if _marker:
                     marker_url = "%s/%s" % (download_url, _marker)
-                symbol = marker["gps_marker"] or symbol
-                popup_url = marker["popup_url"]
-                tooltips = marker["tooltips"]
-                latlons = marker["latlons"]
+                symbol = marker.get("gps_marker", None) or symbol
+                popup_url = marker.get("popup_url", None)
+                tooltips = marker.get("tooltips", None)
+                latlons = marker.get("latlons", None)
+                wkts = marker.get("wkts", None)
+                geojsons = marker.get("geojsons", None)
             except:
                 # String (provided by ?)
                 marker_url = "%s/gis_marker.image.%s.png" % (download_url, marker)
@@ -701,16 +706,27 @@ class S3XML(S3Codec):
 
             LatLon = None
             WKT = None
+            # Use the value calculated in gis.get_marker_and_popup/get_theme_wkt if we can
             if latlons:
-                # Use the value calculated in gis.get_marker_and_tooltip()
                 LatLon = latlons[tablename][record.id]
                 lat = LatLon[0]
                 lon = LatLon[1]
+            elif geojsons:
+                WKT = True
+                geojson = geojsons[tablename].get(record.id, None)
+                if geojson:
+                    # Output the GeoJSON directly into the XML, so that XSLT can simply drop in
+                    geometry = etree.SubElement(element, "geometry")
+                    geometry.set("value", geojson)
+            elif wkts:
+                WKT = True
+                wkt = wkts[tablename][record.id]
+                # Convert the WKT in XSLT
+                attr[ATTRIBUTE.wkt] = wkt
 
             elif "polygons" in get_vars:
-                # Display Polygons not Points
-                # e.g. Theme Layers
-                # @ToDo: Move this to GIS & do it 1/layer instead of 1/record
+                # Calculate the Polygons 1/feature since we didn't do it earlier
+                # - no current case for this
                 if WKTFIELD in fields:
                     query = (ktable.id == r_id)
                     if settings.get_gis_spatialdb():
@@ -735,8 +751,7 @@ class S3XML(S3Codec):
                         WKT = db(query).select(ktable[WKTFIELD],
                                                limitby=(0, 1))
                         if WKT:
-                            WKT = WKT.first()
-                            wkt = WKT[WKTFIELD]
+                            wkt = WKT.first()[WKTFIELD]
                             if wkt is None:
                                 continue
                             if current.auth.permission.format == "geojson":

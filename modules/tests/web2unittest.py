@@ -88,7 +88,11 @@ class SeleniumUnitTest(Web2UnitTest):
                     for option in el.find_elements_by_tag_name("option"):
                         if option.text == el_value:
                             option.click()
-                            raw_value = int(option.get_attribute("value"))
+                            raw_value = option.get_attribute("value")
+                            try:
+                                raw_value = int(raw_value)
+                            except:
+                                pass
                             break
                 elif el_type == "autocomplete":
                     raw_value = self.w_autocomplete(el_value,
@@ -109,6 +113,10 @@ class SeleniumUnitTest(Web2UnitTest):
                                         details[0],
                                        )
                     raw_value = None
+                #@ToDp: Fix this statement:
+                #else:
+                #    raise "Invalid element type"
+                
             else:
                 # Normal Input field
                 el = browser.find_element_by_id(el_id)
@@ -167,7 +175,8 @@ class SeleniumUnitTest(Web2UnitTest):
         return dt_data(row_list, add_header)
 
     # -------------------------------------------------------------------------
-    def dt_find(search = "",
+    def dt_find(self,
+                search = "",
                 row = None,
                 column = None,
                 cellList = None,
@@ -187,8 +196,9 @@ class SeleniumUnitTest(Web2UnitTest):
         return dt_links(row, tableID, quiet)
 
     # -------------------------------------------------------------------------
-    def dt_action(row = 1,
-                  action = "Open",
+    def dt_action(self,
+                  row = 1,
+                  action = None,
                   column = 1,
                   tableID = "list",
                  ):

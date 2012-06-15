@@ -32,12 +32,12 @@ __all__ = ["S3OrganisationModel",
            "S3FacilityModel",
            "S3RoomModel",
            "S3OfficeModel",
-           "org_organisation_represent",
            "org_organisation_logo",
-           "org_rheader",
-           "org_site_represent",
-           "org_organisation_controller",
            "org_root_organisation",
+           "org_organisation_represent",
+           "org_site_represent",
+           "org_rheader",
+           "org_organisation_controller",
            "org_office_controller",
            ]
 
@@ -121,11 +121,10 @@ class S3OrganisationModel(S3Model):
             crud_strings[tablename] = Storage(
                 title_create = T("Add Cluster"),
                 title_display = T("Cluster Details"),
-                title_list = T("List Clusters"),
+                title_list = T("Clusters"),
                 title_update = T("Edit Cluster"),
                 title_search = T("Search Clusters"),
                 subtitle_create = T("Add New Cluster"),
-                subtitle_list = T("Clusters"),
                 label_list_button = T("List Clusters"),
                 label_create_button = T("Add New Cluster"),
                 label_delete_button = T("Delete Cluster"),
@@ -138,11 +137,10 @@ class S3OrganisationModel(S3Model):
             crud_strings[tablename] = Storage(
                 title_create = T("Add Sector"),
                 title_display = T("Sector Details"),
-                title_list = T("List Sectors"),
+                title_list = T("Sectors"),
                 title_update = T("Edit Sector"),
                 title_search = T("Search Sectors"),
                 subtitle_create = T("Add New Sector"),
-                subtitle_list = T("Sectors"),
                 label_list_button = T("List Sectors"),
                 label_create_button = T("Add New Sector"),
                 label_delete_button = T("Delete Sector"),
@@ -182,11 +180,10 @@ class S3OrganisationModel(S3Model):
             # crud_strings[tablename] = Storage(
                 # title_create = T("Add Cluster Subsector"),
                 # title_display = T("Cluster Subsector Details"),
-                # title_list = T("List Cluster Subsectors"),
+                # title_list = T("Cluster Subsectors"),
                 # title_update = T("Edit Cluster Subsector"),
                 # title_search = T("Search Cluster Subsectors"),
                 # subtitle_create = T("Add New Cluster Subsector"),
-                # subtitle_list = T("Cluster Subsectors"),
                 # label_list_button = T("List Cluster Subsectors"),
                 # label_create_button = T("Add Cluster Subsector"),
                 # label_delete_button = T("Delete Cluster Subsector"),
@@ -199,11 +196,10 @@ class S3OrganisationModel(S3Model):
             # crud_strings[tablename] = Storage(
                 # title_create = T("Add Subsector"),
                 # title_display = T("Subsector Details"),
-                # title_list = T("List Subsectors"),
+                # title_list = T("Subsectors"),
                 # title_update = T("Edit Subsector"),
                 # title_search = T("Search Subsectors"),
                 # subtitle_create = T("Add New Subsector"),
-                # subtitle_list = T("Subsectors"),
                 # label_list_button = T("List Subsectors"),
                 # label_create_button = T("Add Subsector"),
                 # label_delete_button = T("Delete Subsector"),
@@ -296,17 +292,15 @@ class S3OrganisationModel(S3Model):
 
         # CRUD strings
         ADD_ORGANIZATION = T("Add Organization")
-        LIST_ORGANIZATIONS = T("List Organizations")
         crud_strings[tablename] = Storage(
             title_create = ADD_ORGANIZATION,
             title_display = T("Organization Details"),
-            title_list = LIST_ORGANIZATIONS,
+            title_list = T("Organizations"),
             title_update = T("Edit Organization"),
             title_search = T("Search Organizations"),
             title_upload = T("Import Organizations"),
             subtitle_create = T("Add New Organization"),
-            subtitle_list = T("Organizations"),
-            label_list_button = LIST_ORGANIZATIONS,
+            label_list_button = T("List Organizations"),
             label_create_button = T("Add New Organization"),
             label_delete_button = T("Delete Organization"),
             msg_record_created = T("Organization added"),
@@ -433,7 +427,7 @@ class S3OrganisationModel(S3Model):
                       org_organisation="organisation_id")
 
         # Projects
-        if settings.get_project_drr():
+        if settings.get_project_mode_3w():
             add_component("project_project",
                           org_organisation=Storage(
                                     link="project_organisation",
@@ -520,17 +514,15 @@ class S3OrganisationModel(S3Model):
 
         # CRUD strings
         ADD_BRANCH = T("Add Branch Organization")
-        LIST_BRANCHES = T("List Branch Organizations")
         crud_strings[tablename] = Storage(
             title_create = ADD_BRANCH,
             title_display = T("Branch Organization Details"),
-            title_list = LIST_BRANCHES,
+            title_list = T("Branch Organizations"),
             title_update = T("Edit Branch Organization"),
             title_search = T("Search Branch Organizations"),
             title_upload = T("Import Branch Organizations"),
             subtitle_create = T("Add New Branch Organization"),
-            subtitle_list = T("Branch Organizations"),
-            label_list_button = LIST_BRANCHES,
+            label_list_button = T("List Branch Organizations"),
             label_create_button = T("Add New Branch"),
             label_delete_button = T("Delete Branch"),
             msg_record_created = T("Branch Organization added"),
@@ -566,35 +558,37 @@ class S3OrganisationModel(S3Model):
         """
             If a logo was uploaded then create the extra versions.
         """
-        current.manager.load("image_library")
+
         newfilename = form.vars.logo_newfilename
         if newfilename:
+            s3db = current.s3db
             image = form.request_vars.logo
-            current.manager.load("image_library")
-            current.response.s3.image_resize(image.file,
-                                             newfilename,
-                                             image.filename,
-                                             (None, 60),
-                                             )
-            current.response.s3.image_modify(image.file,
-                                             newfilename,
-                                             image.filename,
-                                             (None, 60),
-                                             "bmp",
-                                             )
+            s3db.pr_image_resize(image.file,
+                                 newfilename,
+                                 image.filename,
+                                 (None, 60),
+                                 )
+            s3db.pr_image_modify(image.file,
+                                 newfilename,
+                                 image.filename,
+                                 (None, 60),
+                                 "bmp",
+                                 )
 
     # -------------------------------------------------------------------------
     @staticmethod
     def org_organisation_ondelete(row):
+        """
+        """
+
         db = current.db
         s3db = current.s3db
-        current.manager.load("image_library")
 
         table = s3db.org_organisation
-        query = (table.id == row.get('id'))
+        query = (table.id == row.get("id"))
         deleted_row = db(query).select(table.logo,
                                        limitby=(0, 1)).first()
-        current.response.s3.image_delete_all(deleted_row.logo)
+        s3db.pr_image_delete_all(deleted_row.logo)
 
     # -------------------------------------------------------------------------
     @staticmethod
@@ -1053,23 +1047,21 @@ class S3FacilityModel(S3Model):
 
         # CRUD strings
         ADD_FAC = T("Add Facility Type")
-        LIST_FACS = T("List Facility types")
         s3.crud_strings[tablename] = Storage(
             title_create = ADD_FAC,
             title_display = T("Facility Type Details"),
-            title_list = LIST_FACS,
+            title_list = T("Facility Types"),
             title_update = T("Edit Facility Type"),
-            title_search = T("Search Facility types"),
-            title_upload = T("Import Facility types"),
+            title_search = T("Search Facility Types"),
+            title_upload = T("Import Facility Types"),
             subtitle_create = T("Add New Facility Type"),
-            subtitle_list = T("Facility types"),
-            label_list_button = LIST_FACS,
+            label_list_button = T("List Facility Types"),
             label_create_button = T("Add New Facility Type"),
             label_delete_button = T("Delete Facility Type"),
             msg_record_created = T("Facility Type added"),
             msg_record_modified = T("Facility Type updated"),
             msg_record_deleted = T("Facility Type deleted"),
-            msg_list_empty = T("No Facility types currently registered"))
+            msg_list_empty = T("No Facility Types currently registered"))
 
         # =============================================================================
         # Facilities (generic)
@@ -1108,17 +1100,15 @@ class S3FacilityModel(S3Model):
 
         # CRUD strings
         ADD_FAC = T("Add Facility")
-        LIST_FACS = T("List Facilities")
         s3.crud_strings[tablename] = Storage(
             title_create = ADD_FAC,
             title_display = T("Facility Details"),
-            title_list = LIST_FACS,
+            title_list = T("Facilities"),
             title_update = T("Edit Facility"),
             title_search = T("Search Facilities"),
             title_upload = T("Import Facilities"),
             subtitle_create = T("Add New Facility"),
-            subtitle_list = T("Facilities"),
-            label_list_button = LIST_FACS,
+            label_list_button = T("List Facilities"),
             label_create_button = T("Add New Facility"),
             label_delete_button = T("Delete Facility"),
             msg_record_created = T("Facility added"),
@@ -1203,16 +1193,14 @@ class S3RoomModel(S3Model):
 
         # CRUD strings
         ADD_ROOM = T("Add Room")
-        LIST_ROOMS = T("List Rooms")
         s3.crud_strings[tablename] = Storage(
             title_create = ADD_ROOM,
             title_display = T("Room Details"),
-            title_list = LIST_ROOMS,
+            title_list = T("Rooms"),
             title_update = T("Edit Room"),
             title_search = T("Search Rooms"),
             subtitle_create = T("Add New Room"),
-            subtitle_list = T("Rooms"),
-            label_list_button = LIST_ROOMS,
+            label_list_button = T("List Rooms"),
             label_create_button = ADD_ROOM,
             label_delete_button = T("Delete Room"),
             msg_record_created = T("Room added"),
@@ -1369,17 +1357,15 @@ class S3OfficeModel(S3Model):
             table.building_name.readable = False
 
         # CRUD strings
-        LIST_OFFICES = T("List Offices")
         s3.crud_strings[tablename] = Storage(
             title_create = ADD_OFFICE,
             title_display = T("Office Details"),
-            title_list = LIST_OFFICES,
+            title_list = T("Offices"),
             title_update = T("Edit Office"),
             title_search = T("Search Offices"),
             title_upload = T("Import Offices"),
             subtitle_create = T("Add New Office"),
-            subtitle_list = T("Offices"),
-            label_list_button = LIST_OFFICES,
+            label_list_button = T("List Offices"),
             label_create_button = T("Add New Office"),
             label_delete_button = T("Delete Office"),
             msg_record_created = T("Office added"),
@@ -1389,17 +1375,15 @@ class S3OfficeModel(S3Model):
 
         # CRUD strings
         ADD_WH = T("Add Warehouse")
-        LIST_WH = T("List Warehouses")
         warehouse_crud_strings = Storage(
             title_create = ADD_WH,
             title_display = T("Warehouse Details"),
-            title_list = LIST_WH,
+            title_list = T("Warehouses"),
             title_update = T("Edit Warehouse"),
             title_search = T("Search Warehouses"),
             title_upload = T("Import Warehouses"),
             subtitle_create = T("Add New Warehouse"),
-            subtitle_list = T("Warehouses"),
-            label_list_button = LIST_WH,
+            label_list_button = T("List Warehouses"),
             label_create_button = T("Add New Warehouse"),
             label_delete_button = T("Delete Warehouse"),
             msg_record_created = T("Warehouse added"),
@@ -1499,66 +1483,6 @@ class S3OfficeModel(S3Model):
                 item.method = item.METHOD.UPDATE
 
 # =============================================================================
-def org_organisation_represent(id, showlink=False, acronym=True, parent=True):
-    """
-        Represent an Organisation in option fields or list views
-
-        @param showlink: whether to make the output into a hyperlink
-        @param acronym: whether to show any acronym present
-        @param parent: whether to show the parent Org for branches
-    """
-
-    db = current.db
-    s3db = current.s3db
-
-    if not parent and isinstance(id, Row):
-        # Do not repeat the lookup if already done by IS_ONE_OF or RHeader
-        org = id
-    elif parent:
-        otable = s3db.org_organisation
-        btable = s3db.org_organisation_branch
-        query = (otable.id == id)
-        left = btable.on(btable.branch_id == otable.id)
-        org = db(query).select(otable.name,
-                               otable.acronym,
-                               btable.organisation_id,
-                               left = left,
-                               limitby = (0, 1)).first()
-    else:
-        otable = s3db.org_organisation
-        query = (otable.id == id)
-        org = db(query).select(otable.name,
-                               otable.acronym,
-                               limitby = (0, 1)).first()
-
-    if org:
-        if parent:
-            represent = org.org_organisation.name
-            if "org_organisation_branch" in org:
-                # We're a Branch
-                query = (otable.id == org.org_organisation_branch.organisation_id)
-                parent = db(query).select(otable.name,
-                                          limitby = (0, 1)).first()
-                if parent:
-                    represent = "%s > %s" % (parent.name,
-                                            represent)
-            elif acronym and org.org_organisation.acronym:
-                represent = "%s (%s)" % (represent,
-                                         org.org_organisation.acronym)
-        else:
-            represent = org.name
-            if acronym and org.acronym:
-                represent = "%s (%s)" % (represent,
-                                         org.acronym)
-        if showlink:
-            represent = A(represent,
-                          _href = URL(c="org", f="organisation", args = [id]))
-    else:
-        represent = current.messages.NONE
-
-    return represent
-
-# =============================================================================
 def org_organisation_logo(id, type="png"):
     """
         Return a logo of the organisation with the given id, if one exists
@@ -1568,20 +1492,21 @@ def org_organisation_logo(id, type="png"):
 
         The type can either be png or bmp and is the format of the saved image
     """
+
+    s3db = current.s3db
     if isinstance(id, Row):
         # Do not repeat the lookup if already done by IS_ONE_OF or RHeader
         record = id
     else:
-        table = current.s3db.org_organisation
+        table = s3db.org_organisation
         query = (table.id == id)
         record = current.db(query).select(limitby = (0, 1)).first()
 
-    current.manager.load("image_library")
     format = None
     if type == "bmp":
         format = "bmp"
     size = (None, 60)
-    image = current.response.s3.image_represent(record.logo, size=size)
+    image = s3db.pr_image_represent(record.logo, size=size)
     url_small = URL(c="default", f="download", args=image)
     if record and image:
         if record.acronym == None or record.acronym == "":
@@ -1651,6 +1576,66 @@ def org_root_organisation(organisation_id=None, pe_id=None):
             return (row.id, row.pe_id)
 
     return None, None
+
+# =============================================================================
+def org_organisation_represent(id, showlink=False, acronym=True, parent=True):
+    """
+        Represent an Organisation in option fields or list views
+
+        @param showlink: whether to make the output into a hyperlink
+        @param acronym: whether to show any acronym present
+        @param parent: whether to show the parent Org for branches
+    """
+
+    db = current.db
+    s3db = current.s3db
+
+    if not parent and isinstance(id, Row):
+        # Do not repeat the lookup if already done by IS_ONE_OF or RHeader
+        org = id
+    elif parent:
+        otable = s3db.org_organisation
+        btable = s3db.org_organisation_branch
+        query = (otable.id == id)
+        left = btable.on(btable.branch_id == otable.id)
+        org = db(query).select(otable.name,
+                               otable.acronym,
+                               btable.organisation_id,
+                               left = left,
+                               limitby = (0, 1)).first()
+    else:
+        otable = s3db.org_organisation
+        query = (otable.id == id)
+        org = db(query).select(otable.name,
+                               otable.acronym,
+                               limitby = (0, 1)).first()
+
+    if org:
+        if parent:
+            represent = org.org_organisation.name
+            if "org_organisation_branch" in org:
+                # We're a Branch
+                query = (otable.id == org.org_organisation_branch.organisation_id)
+                parent = db(query).select(otable.name,
+                                          limitby = (0, 1)).first()
+                if parent:
+                    represent = "%s > %s" % (parent.name,
+                                            represent)
+            elif acronym and org.org_organisation.acronym:
+                represent = "%s (%s)" % (represent,
+                                         org.org_organisation.acronym)
+        else:
+            represent = org.name
+            if acronym and org.acronym:
+                represent = "%s (%s)" % (represent,
+                                         org.acronym)
+        if showlink:
+            represent = A(represent,
+                          _href = URL(c="org", f="organisation", args = [id]))
+    else:
+        represent = current.messages.NONE
+
+    return represent
 
 # =============================================================================
 def org_site_represent(id, show_link=True):
@@ -1876,6 +1861,12 @@ def org_organisation_controller():
 
     # Pre-process
     def prep(r):
+        if r.representation == "json":
+            r.table.pe_id.readable = True
+            model = manager.model
+            list_fields = model.get_config(r.tablename, "list_fields") or []
+            model.configure(r.tablename, list_fields = list_fields + ["pe_id"])
+
         if r.interactive:
             r.table.country.default = gis.get_default_country("code")
 
@@ -2083,6 +2074,7 @@ def org_office_controller():
         rheader = s3db.inv_warehouse_rheader
     else:
         rheader = s3db.org_rheader
-    return s3_rest_controller("org", "office", rheader=rheader)
+    output = s3_rest_controller("org", "office", rheader=rheader)
+    return output
 
 # END =========================================================================

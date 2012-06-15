@@ -8,8 +8,7 @@ class hrm_setup_volunteer(SeleniumUnitTest):
     def test_setup_volunteer(self):
         
         browser = self.browser
-        #browser.find_element_by_link_text("Staff & Volunteers").click()
-        browser.get("%s/hrm" % self.config.url)
+        browser.get("%s/vol" % self.config.url)
         browser.find_element_by_link_text("New Volunteer").click()
         w_autocomplete("Rom",
                        "hrm_human_resource_organisation_id",
@@ -45,4 +44,3 @@ class hrm_setup_volunteer(SeleniumUnitTest):
         time.sleep(5)
         browser.find_element_by_id("ui-menu-2-0").click()
         browser.find_element_by_css_selector("input[type=\"submit\"]").click()
-        browser.find_element_by_link_text("Home").click()

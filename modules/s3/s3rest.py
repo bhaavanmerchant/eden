@@ -1976,7 +1976,7 @@ class S3Resource(object):
             table = s3db[tablename]
         except:
             manager.error = "Undefined table: %s" % tablename
-            raise KeyError(manager.error)
+            raise # KeyError(manager.error)
         self.tablename = tablename
         self.table = table
         # Table alias (needed for self-joins)
@@ -2056,6 +2056,7 @@ class S3Resource(object):
         self.job = None
         self.error = None
         self.error_tree = None
+        self.import_count = 0
 
         # Search
         self.search = model.get_config(self.tablename, "search_method", None)
@@ -2236,7 +2237,7 @@ class S3Resource(object):
                 left_joins.append(join)
         if left_joins:
             try:
-                left_joins.sort(self.__sortleft)
+                left_joins.sort(self.sortleft)
             except:
                 pass
             left = left_joins
@@ -2761,9 +2762,10 @@ class S3Resource(object):
         """ Loads the IDs/UIDs of all records matching the current filter """
 
         left_joins = self.rfilter.get_left_joins()
+        distinct = self.rfilter.distinct
         if left_joins:
             try:
-                left_joins.sort(self.__sortleft)
+                left_joins.sort(self.sortleft)
             except:
                 pass
             left = left_joins
@@ -2771,13 +2773,12 @@ class S3Resource(object):
             left = None
 
         table = self.table
-        pkey = table._id.name
         UID = current.manager.xml.UID
 
         if UID in table.fields:
-            fields = (table[pkey], table[UID])
+            fields = (table._id, table[UID])
         else:
-            fields = (table[pkey], )
+            fields = (table._id, )
 
         vfltr = self.get_filter()
         if vfltr is not None:
@@ -2785,11 +2786,13 @@ class S3Resource(object):
             rows = self.sqltable(fields=fs, as_rows=True) or []
         else:
             query = self.get_query()
-            rows = current.db(query).select(left=left, *fields)
+            rows = current.db(query).select(left=left,
+                                            distinct=distinct,
+                                            *fields)
 
         if UID in table.fields:
-            self._uids = [row[UID] for row in rows]
-        self._ids = [row[pkey] for row in rows]
+            self._uids = [row[table[UID]] for row in rows]
+        self._ids = [row[table._id] for row in rows]
         return self._ids
 
     # -------------------------------------------------------------------------
@@ -2854,7 +2857,7 @@ class S3Resource(object):
                    msince=None,
                    fields=None,
                    dereference=True,
-                   mcomponents=None,
+                   mcomponents=[],
                    rcomponents=None,
                    references=None,
                    stylesheet=None,
@@ -3012,8 +3015,13 @@ class S3Resource(object):
         if layer_id:
             # We're being called as a GIS Feature Layer, so do lookup per layer
             # and not per-record
-            # Marker, Popup & LatLon
+            # Marker, Popup & LatLon/WKT
             marker = current.gis.get_marker_and_popup(layer_id, self)
+        elif self.tablename == "gis_theme_data" and \
+             current.auth.permission.format == "geojson":
+            # Theme Layer, so do lookup per layer
+            # and not per-record
+            marker = current.gis.get_theme_geojson(self)
         else:
             # Marker provided in request
             # Q: What does this?
@@ -3107,7 +3115,6 @@ class S3Resource(object):
                                               export_map=export_map,
                                               components=rcomponents,
                                               skip=skip,
-                                              msince=msince,
                                               marker=marker)
 
                     # Mark as referenced element (for XSLT)
@@ -3297,7 +3304,7 @@ class S3Resource(object):
         default = (None, None)
 
         # Do not export the record if it already is in the export map
-        if tablename in export_map and record.id in export_map[tablename]:
+        if tablename in export_map and record[table._id] in export_map[tablename]:
             return default
 
         # Do not export the record if it hasn't been modified since msince
@@ -3678,6 +3685,7 @@ class S3Resource(object):
         # Commit the import job
         import_job.commit(ignore_errors=ignore_errors)
         self.error = import_job.error
+        self.import_count += import_job.count
         if self.error:
             if ignore_errors:
                 self.error = "%s - invalid items ignored" % self.error
@@ -4528,6 +4536,10 @@ class S3Resource(object):
             fields = [f.name for f in self.readable_fields()]
         if table._id.name not in fields and not no_ids:
             fields.insert(0, table._id.name)
+        ffields = rfilter.get_fields()
+        for f in ffields:
+            if f not in fields:
+                fields.append(f)
         lfields, joins, ljoins, d = self.resolve_selectors(fields)
 
         distinct = distinct | d
@@ -4560,7 +4572,7 @@ class S3Resource(object):
         # Sort left joins and add to attributes
         if left_joins:
             try:
-                left_joins.sort(self.__sortleft)
+                left_joins.sort(self.sortleft)
             except:
                 pass
             attributes.update(left=left_joins)
@@ -5039,6 +5051,15 @@ class S3ResourceFilter:
             return []
 
     # -------------------------------------------------------------------------
+    def get_fields(self):
+        """ Get all field selectors in this filter """
+
+        if self.vfltr:
+            return self.vfltr.fields()
+        else:
+            return []
+
+    # -------------------------------------------------------------------------
     @staticmethod
     def parse_url_query(resource, vars):
         """
@@ -5333,7 +5354,7 @@ class S3ResourceFilter:
                 left_joins.append(join)
         if left_joins:
             try:
-                left_joins.sort(self.__sortleft)
+                left_joins.sort(resource.sortleft)
             except:
                 pass
             left = left_joins
@@ -5379,7 +5400,7 @@ class S3ResourceFilter:
         left_joins = self.get_left_joins()
         if left_joins:
             try:
-                left_joins.sort(self.__sortleft)
+                left_joins.sort(resource.sortleft)
             except:
                 pass
             left = left_joins
@@ -5529,31 +5550,35 @@ class S3FieldSelector:
         """
 
         if isinstance(field, Field):
-            field = field.name
-            if "." in field:
-                tname, fname = field.split(".", 1)
-            else:
-                tname = None
-                fname = field
+            f = field
+            colname = str(field)
         elif isinstance(field, S3FieldSelector):
-            field = field.name
-            lf = resource.resolve_selector(field)
+            lf = field.resolve(resource)
+            f = lf.field
             tname = lf.tname
             fname = lf.fname
+            colname = lf.colname
         elif isinstance(field, dict):
+            f = field.field
             tname = field.get("tname", None)
             fname = field.get("fname", None)
             if not fname:
                 return None
+            colname = field.colname
         else:
             return field
-        if fname in row:
+        if f is not None:
+            try:
+                return row[f]
+            except KeyError:
+                raise KeyError("Field not found: %s" % colname)
+        elif fname in row:
             value = row[fname]
         elif tname is not None and \
              tname in row and fname in row[tname]:
             value = row[tname][fname]
         else:
-            raise KeyError("Field not found: %s" % field)
+            raise KeyError("Field not found: %s" % colname)
         if isinstance(field, S3FieldSelector):
             return field.expr(value)
         return value
@@ -5661,6 +5686,25 @@ class S3ResourceQuery:
                 else:
                     return (lfield.join, False)
         return(Storage(), False)
+
+    # -------------------------------------------------------------------------
+    def fields(self):
+        """ Get all field selectors involved with this query """
+
+        op = self.op
+        l = self.left
+        r = self.right
+
+        if op in (self.AND, self.OR):
+            lf = l.fields()
+            rf = r.fields()
+            return lf+rf
+        elif op == self.NOT:
+            return l.fields()
+        elif isinstance(l, S3FieldSelector):
+            return [l.name]
+        else:
+            return []
 
     # -------------------------------------------------------------------------
     def query(self, resource):
@@ -5796,16 +5840,16 @@ class S3ResourceQuery:
         """
 
         if self.op == self.AND:
-            l = self.left(resource, row)
-            r = self.right(resource, row)
+            l = self.left(resource, row, virtual=False)
+            r = self.right(resource, row, virtual=False)
             if l is None:
                 return r
             if r is None:
                 return l
             return l and r
         elif self.op == self.OR:
-            l = self.left(resource, row)
-            r = self.right(resource, row)
+            l = self.left(resource, row, virtual=False)
+            r = self.right(resource, row, virtual=False)
             if l is None:
                 return r
             if r is None:
@@ -5849,7 +5893,15 @@ class S3ResourceQuery:
             l = extract(lfield)
             r = extract(rfield)
         except KeyError, SyntaxError:
+            if current.session.s3.debug:
+                from s3utils import s3_debug
+                s3_debug(sys.exc_info()[1])
             return None
+
+        if isinstance(left, S3FieldSelector):
+            l = left.expr(l)
+        if isinstance(right, S3FieldSelector):
+            r = right.expr(r)
 
         op = self.op
         invert = False
@@ -6019,7 +6071,7 @@ class S3ResourceQuery:
                 if resource is not None:
                     n = "%s.%s" % (resource.alias, n)
                 else:
-                    return
+                    return url_query
             if o == self.LIKE:
                 v = v.replace("%", "*")
             if o == self.EQ:
@@ -6028,8 +6080,12 @@ class S3ResourceQuery:
                 operator = "__%s" % o
             if invert:
                 operator = "%s!" % operator
-            url_query["%s%s" % (n, operator)] = v
-            return
+            key = "%s%s" % (n, operator)
+            if key in url_query:
+                url_query[key] = "%s,%s" % (url_query[key], v)
+            else:
+                url_query[key] = v
+            return url_query
         if op == self.AND:
             lu = l.serialize_url()
             url_query.update(lu)

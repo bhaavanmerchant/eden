@@ -33,16 +33,32 @@ config.system_name = system_name
 config.timeout = 5 # seconds
 config.url = base_url
 
-browser = config.browser = webdriver.Firefox()
-browser.implicitly_wait(config.timeout)
+base_dir = os.path.join(os.getcwd(), "applications", current.request.application)
+config.base_dir = base_dir
 
+test = None
+remote = None
 # Do we have any command-line arguments?
 args = sys.argv
 if args[1:]:
     # The 1st argument is taken to be the test name:
     test = args[1]
+    if args[2:]:
+        # The 2nd argument is taken to be a remote server:
+        # @ToDo:
+        #  Need to change this so can do remote for whole suite (normal case)
+        #  - convert to proper params
+        remote = args[2]
+
+if remote:
+    # @ToDo
+    browser = config.browser = webdriver.Remote()
 else:
-    test = None
+    fp = webdriver.FirefoxProfile()
+    fp.set_preference("network.proxy.type", 0)
+    browser = config.browser = webdriver.Firefox(firefox_profile=fp)
+
+browser.implicitly_wait(config.timeout)
 
 # Shortcut
 loadTests = unittest.TestLoader().loadTestsFromTestCase
@@ -51,7 +67,7 @@ if test:
     # Run specified Test after logging in
     # @ToDo: Each test should check whether it needs to login independently as they may wish to login using different credentials
     # Maybe this could be bypassed for a test run within the suite by passing it an argument
-    
+
     #login(account="admin")
     print test
     suite = loadTests(globals()[test])
@@ -60,7 +76,7 @@ else:
     # Run all Tests
 
     # Create Organisation
-    suite = loadTests(org_create_organisation)
+    suite = loadTests(Org_Organisation)
     # Shortcut
     addTests = suite.addTests
     # Create Office
@@ -74,8 +90,10 @@ else:
     # Setup Training Event
     #addTests(loadTests(hrm_setup_trainingevent))
     # Inventory tests
-    #addTests(loadTests(Logistics))
-    #addTests(loadTests(Logistics2))
+    addTests(loadTests(Logistics))
+    
+    # Create Project
+    addTests(loadTests(project_create))
 
     # Assign Staff to Organisation
     #addTests(loadTests(hrm_assign_organisationstaff))
@@ -96,6 +114,6 @@ except:
     unittest.TextTestRunner(verbosity=2).run(suite)
 
 # Cleanup
-#browser.close()
+browser.close()
 
 # END =========================================================================

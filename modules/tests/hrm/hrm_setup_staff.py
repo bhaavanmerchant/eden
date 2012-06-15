@@ -6,7 +6,6 @@ class hrm_setup_staff(SeleniumUnitTest):
     def test_setup_staff(self):
 
         browser = self.browser
-        #browser.find_element_by_link_text("Staff & Volunteers").click()
         browser.get("%s/hrm" % self.config.url)
         browser.find_element_by_link_text("New Staff Member").click()
         w_autocomplete("Rom",
@@ -47,5 +46,3 @@ class hrm_setup_staff(SeleniumUnitTest):
                        "Bucharest RFAAT Centre (Test) (Office)",
                        False)
         browser.find_element_by_css_selector("input[type=\"submit\"]").click()
-        browser.find_element_by_link_text("Home").click()
-
