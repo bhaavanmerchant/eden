@@ -1,11 +1,15 @@
 {{extend 'layout.html'}}
 <head><script type="text/javascript">
+    var current_cell={"r":0,
+                      "c":0};
 jQuery(document).ready(function(){
     $('#newrole').hide();
     $('#r_varea').hide();
     $('#addrow').click(function(){$('#newrole').toggle(); $('#addrow').hide();});
     $('#new_job_role').change(function(){$('#new_job_role_form').submit();});
-    $('.addv').click(function(){$('#r_varea').toggle();});;
+    $('.addv').click(function(){$('#r_varea').toggle();current_cell.r=$(this).data('row');current_cell.c=$(this).data('col');});
+    
+
 });</script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
 </head>
@@ -44,8 +48,9 @@ Slot:
 </div>
 <br/>
 <table id="r_table">
+<thead>
 <tr><td>Role</td><td>Day 1</td><td>Day 2</td><td>Day 3</td><td>Day 4</td><td>Day 5</td><td>Day 6</td><td>Day 7</td>
-</tr>
+</tr></thead>
 {{for r in range(len(alloted_roles)):}}
 <tr><td>{{=alloted_roles[r]}}</td>
 {{for c in range(7):}}<td><img src='/eden/static/img/plus.png' alt='addv' class='addv' data-col={{=c}} data-row={{=r}} /></td>{{pass}}
