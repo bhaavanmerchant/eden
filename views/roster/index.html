@@ -74,7 +74,7 @@ Slot:
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
 <tr><td>{{=alloted_roles[r]}}</td>
-{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > <img src='/eden/static/img/plus.png' alt='addv' class='addv' /></div> </td>{{pass}}
+{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</div> </td>{{pass}}
 </tr>
 {{pass}}
 
