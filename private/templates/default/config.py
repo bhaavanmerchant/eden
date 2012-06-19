@@ -28,6 +28,9 @@ T = current.T
 # In Production, prepopulate = 0 (to save 1x DAL hit every page)
 #settings.base.prepopulate = 1
 
+# Theme (folder to use for views/layout.html)
+#settings.base.theme = "default"
+
 # Authentication settings
 # These settings should be changed _after_ the 1st (admin) user is
 # registered in order to secure the deployment
@@ -307,6 +310,10 @@ settings.L10n.decimal_separator = "."
 #settings.project.mode_drr = True
 # Uncomment this to use settings suitable for detailed Task management
 #settings.project.mode_task = True
+# Uncomment this to call project locations 'Communities'
+#settings.project.community = True
+# Uncomment this to use Activities for projects
+#settings.project.activities = True
 # Uncomment this to use Codes for projects
 #settings.project.codes = True
 # Uncomment this to use Milestones in project/task.
@@ -334,6 +341,10 @@ settings.L10n.decimal_separator = "."
 
 # Terms of Service to be able to Register on the system
 #settings.options.terms_of_service = T("Terms of Service\n\nYou have to be eighteen or over to register as a volunteer.")
+
+#Message Parser Settings
+#Add the enabled parsing workflows to the list below
+#settings.parser.parser_enabled = ["parser_1", "parser_2", "parser_3"]
 
 # Comment/uncomment modules here to disable/enable them
 # @ToDo: Have the system automatically enable migrate if a module is enabled
@@ -561,7 +572,7 @@ settings.modules = OrderedDict([
     #       module_type = 10,
     #   )),
     # These are specialist modules
-    # Requires RPy2
+    # Requires RPy2 & PostgreSQL
     #("climate", Storage(
     #        name_nice = T("Climate"),
     #        #description = "Climate data portal",

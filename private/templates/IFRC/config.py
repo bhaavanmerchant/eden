@@ -20,6 +20,9 @@ settings.base.prepopulate = ["IFRC_Train"]
 settings.base.system_name = T("Resource Management System")
 settings.base.system_name_short = T("Resource Management System")
 
+# Theme (folder to use for views/layout.html)
+settings.base.theme = "IFRC"
+
 # L10n settings
 settings.L10n.languages = OrderedDict([
     ("en-gb", "English"),
@@ -87,6 +90,8 @@ settings.hrm.experience = "programme"
 settings.project.mode_3w = True
 # Uncomment this to use DRR (Disaster Risk Reduction) extensions
 settings.project.mode_drr = True
+# Uncomment this to call project locations 'Communities'
+settings.project.community = True
 # Uncomment this to use multiple Budgets per project
 settings.project.multiple_budgets = True
 # Uncomment this to use multiple Organisations per project
