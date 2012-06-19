@@ -12,7 +12,7 @@ jQuery(document).ready(function(){
     $('#timeslot').change(function(){$('#roster_info_form').submit();});
     $('.addv').click(function()
         {
-        $('#r_varea').toggle();
+        $('#r_varea').show();
         var cell=$(this).parent();
         current_cell.r=cell.data('row');
         current_cell.c=cell.data('col');
@@ -25,11 +25,14 @@ jQuery(document).ready(function(){
             {
             if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
                 {
-                $(this).html(vname);
-                $(this).addClass(vid);
+                var cell_c=vname+"<img src='/eden/static/img/minus.png' class='remv' alt='remv'>";
+                $(this).html(cell_c);
+                $(this).data("vid",vid);
+                $(this).addClass('allotted');
                 }; 
             });
         });
+    $('.remv').click(function(){$(this).html("<img src='/eden/static/img/plus.png' class='addv' alt='addv'>");$(this).removeClass('allotted');})
 
 });</script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
@@ -71,11 +74,11 @@ Slot:
 <br/>
 <table id="r_table">
 <thead>
-<tr><td>Role</td><td>Day 1</td><td>Day 2</td><td>Day 3</td><td>Day 4</td><td>Day 5</td><td>Day 6</td><td>Day 7</td>
+<tr><th>Role</th>{{for d in time_dets:}}<th>{{=d}}</th>{{pass}}
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
 <tr><td>{{=alloted_roles[r]}}</td>
-{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</div> </td>{{pass}}
+{{for c in range(len(time_dets)):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</div> </td>{{pass}}
 </tr>
 {{pass}}
 
@@ -83,7 +86,7 @@ Slot:
 <select name="new_job_role" id="new_job_role">
 {{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}
 </select></form></td>
-{{for x in range(7):}}<td>{{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</td>{{pass}}
+{{for x in range(len(time_dets)):}}<td>{{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</td>{{pass}}
 </tr>
 
 </table>

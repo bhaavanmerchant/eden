@@ -1,5 +1,5 @@
 #r_tablearea{
-background:#555;
+background:#c9c9c9;
 border-radius:10px;
 width:900px;
 padding:20px;
@@ -7,6 +7,16 @@ padding:20px;
 #r_table{
 width:900px;
 padding:50px;
+}
+table, th, td{
+border:1px solid black;
+padding:5px;
+}
+tr:hover{
+background:#bfbfbf;
+}
+thead{
+background:#c3c3c3;
 }
 #selectarea{
 width:900px;
@@ -17,12 +27,31 @@ left:80px;
 }
 #r_varea{
 width:120px;
-background:#555;
+background:#999;
 border-radius:10px;
 padding: 20px;
 position: absolute;
 }
 #maincontent{
 overflow:auto;
-height:500px;
+height:580px;
+}
+.vcell{
+width:100px;
+height:35px;
+position:relative;
+}
+.addv{
+position:absolute;
+bottom:0px;
+right:0px;
+}
+.remv{
+position:absolute;
+bottom:0px;
+right:0px;
+}
+.allotted{
+background:#3C3;
+padding:3px;
 }
