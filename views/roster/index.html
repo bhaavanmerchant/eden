@@ -1,9 +1,28 @@
 {{extend 'layout.html'}}
 <head><script type="text/javascript">
+    var current_cell={"r":0,
+                      "c":0};
 jQuery(document).ready(function(){
-    $('#addrow').click(function(){$('#newrole').toggle(); $('#addrow').hide();});
     $('#newrole').hide();
-    $('#new_job_role').change(function(){$('#new_job_role_form').submit();});
+    $('#r_varea').hide();
+    $('#addrow').click(function(){$('#newrole').toggle(); $('#addrow').hide();});
+    $('#new_job_role').change(function(){$('#roster_info_form').submit();});
+    $('#project_selector').change(function(){$('#roster_info_form').submit();});
+    $('#timeframe').change(function(){$('#roster_info_form').submit();});
+    $('#timeslot').change(function(){$('#roster_info_form').submit();});
+    $('.addv').click(function(){$('#r_varea').toggle();current_cell.r=$(this).data('row');current_cell.c=$(this).data('col');});
+    $('.volunteer_names').click(function()
+        {
+        var vname=$(this).html();
+        $('.vcell').each(function()
+            {
+            if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
+                {
+                $(this).html(vname);
+                }; 
+            });
+        });
+
 });</script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
 </head>
@@ -13,19 +32,21 @@ jQuery(document).ready(function(){
 <span>
 <div id="r_varea">
 Volunteers:
-{{for vname in volunteers:}}
-<div class="volunteer_names">{{=vname}}</div>
+<br/>
+{{for v_id in volunteers:}}
+<div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
 {{pass}}
 </div>
 </span>
 <span style="position:absolute; right:50px;">
 <div id="r_tablearea">
+<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL()}}" method="post">
 <div id="selectboxes">
 <span>Project:
-<select>
+<select name='project_selector' id='project_selector'>
 {{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
 </select> </span> <span style="position:relative; left:200px;">
-<select>
+<select name='timeframe' id='timeframe'>
   <option value="1">Week 1</option>
   <option value="2">Week 2</option>
   <option value="3">Week 3</option>
@@ -35,21 +56,23 @@ Volunteers:
   <option value="7">Week 7</option>
 </select> </span> <span style="position:relative; left:500px;">
 Slot:
-<select>
+<select name='timeslot' id='timeslot'>
 {{for x in range(len(slots)):}}<option value={{=x}}>{{=slots[x]}}</option>{{pass}}
 </select> </span>
 </div>
 <br/>
 <table id="r_table">
+<thead>
 <tr><td>Role</td><td>Day 1</td><td>Day 2</td><td>Day 3</td><td>Day 4</td><td>Day 5</td><td>Day 6</td><td>Day 7</td>
-</tr>
-{{for x in alloted_roles:}}
-<tr><td>{{=x}}</td>
-{{for x in range(7):}}<td>{{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</td>{{pass}}
+</tr></thead>
+{{for r in range(len(alloted_roles)):}}
+<tr><td>{{=alloted_roles[r]}}</td>
+{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} ></div> <img src='/eden/static/img/plus.png' alt='addv' class='addv' data-col={{=c}} data-row={{=r}} /></td>{{pass}}
 </tr>
 {{pass}}
 
-<tr id='newrole'><td><form enctype="multipart/form-data" id="new_job_role_form" action="{{=URL()}}" method="post"><select name="new_job_role" id="new_job_role">
+<tr id='newrole'><td>
+<select name="new_job_role" id="new_job_role">
 {{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}
 </select></form></td>
 {{for x in range(7):}}<td>{{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</td>{{pass}}
