@@ -13,8 +13,9 @@ jQuery(document).ready(function(){
     $('.addv').click(function()
         {
         $('#r_varea').toggle();
-        current_cell.r=$(this).parent().data('row');
-        current_cell.c=$(this).parent().data('col');
+        var cell=$(this).parent();
+        current_cell.r=cell.data('row');
+        current_cell.c=cell.data('col');
         });
     $('.volunteer_names').click(function()
         {
