@@ -10,15 +10,22 @@ jQuery(document).ready(function(){
     $('#project_selector').change(function(){$('#roster_info_form').submit();});
     $('#timeframe').change(function(){$('#roster_info_form').submit();});
     $('#timeslot').change(function(){$('#roster_info_form').submit();});
-    $('.addv').click(function(){$('#r_varea').toggle();current_cell.r=$(this).data('row');current_cell.c=$(this).data('col');});
+    $('.addv').click(function()
+        {
+        $('#r_varea').toggle();
+        current_cell.r=$(this).parent().data('row');
+        current_cell.c=$(this).parent().data('col');
+        });
     $('.volunteer_names').click(function()
         {
         var vname=$(this).html();
+        var vid=$(this).attr('id');
         $('.vcell').each(function()
             {
             if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
                 {
                 $(this).html(vname);
+                $(this).addClass(vid);
                 }; 
             });
         });
@@ -67,7 +74,7 @@ Slot:
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
 <tr><td>{{=alloted_roles[r]}}</td>
-{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} ></div> <img src='/eden/static/img/plus.png' alt='addv' class='addv' data-col={{=c}} data-row={{=r}} /></td>{{pass}}
+{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > <img src='/eden/static/img/plus.png' alt='addv' class='addv' /></div> </td>{{pass}}
 </tr>
 {{pass}}
 
