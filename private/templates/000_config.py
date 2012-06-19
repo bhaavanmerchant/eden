@@ -14,7 +14,7 @@
 """
 
 # Remove this line when you have edited this file sufficiently to proceed to the web interface
-FINISHED_EDITING_CONFIG_FILE = False
+FINISHED_EDITING_CONFIG_FILE = True
 
 # Select the Template
 # - which Modules are enabled
@@ -27,19 +27,19 @@ settings.base.template = "default"
 # Database settings
 # Uncomment to use a different database, other than sqlite
 #settings.database.db_type = "postgres"
-#settings.database.db_type = "mysql"
+settings.database.db_type = "mysql"
 # Uncomment to use a different host
-#settings.database.host = "localhost"
+settings.database.host = "localhost"
 # Uncomment to use a different port
 #settings.database.port = 3306
 #settings.database.port = 5432
 # Uncomment to select a different name for your database
-#settings.database.database = "sahana"
+settings.database.database = "sahana"
 # Uncomment to select a different username for your database
-#settings.database.username = "sahana"
+settings.database.username = "sahana"
 # Uncomment to set the password
 # NB Web2Py doesn't like passwords with an @ in them
-#settings.database.password = "password"
+settings.database.password = "bha1"
 # Uncomment to use a different pool size
 #settings.database.pool_size = 30
 # Do we have a spatial DB available? (currently supports PostGIS. Spatialite to come.)
