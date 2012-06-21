@@ -2160,18 +2160,19 @@ class AuthS3(Auth):
             return True
 
         db = current.db
-        session = current.session
+        s3 = current.session.s3
 
         # Trigger HTTP basic auth
         self.s3_logged_in()
 
         # Get the realms
-        if not session.s3:
+        if not s3:
             return False
+        realms = None
         if self.user:
             realms = self.user.realms
-        else:
-            realms = Storage([(r, None) for r in session.s3.roles])
+        elif s3.roles:
+            realms = Storage([(r, None) for r in s3.roles])
         if not realms:
             return False
 
@@ -4572,7 +4573,7 @@ class S3Audit(object):
             @param representation: the representation format
         """
 
-        settings = current.session.s3
+        settings = current.deployment_settings
 
         #print >>sys.stderr, "Audit %s: %s_%s record=%s representation=%s" % \
                             #(operation, prefix, name, record, representation)
@@ -4608,7 +4609,7 @@ class S3Audit(object):
             record = None
 
         if operation in ("list", "read"):
-            if settings.audit_read:
+            if settings.get_security_audit_read():
                 table.insert(timestmp = now,
                              person = self.user,
                              operation = operation,
@@ -4617,7 +4618,7 @@ class S3Audit(object):
                              representation = representation)
 
         elif operation in ("create", "update"):
-            if settings.audit_write:
+            if settings.get_security_audit_write():
                 if form:
                     record = form.vars.id
                     new_value = ["%s:%s" % (var, str(form.vars[var]))
@@ -4634,7 +4635,7 @@ class S3Audit(object):
                 self.diff = None
 
         elif operation == "delete":
-            if settings.audit_write:
+            if settings.get_security_audit_write():
                 query = db[tablename].id == record
                 row = db(query).select(limitby=(0, 1)).first()
                 old_value = []

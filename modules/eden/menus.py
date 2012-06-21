@@ -95,14 +95,11 @@ class S3MainMenu(object):
                     if not _module.access:
                         menu_modules.append(MM(_module.name_nice, c=module, f="index"))
                     else:
-                        authorised = False
                         groups = re.split("\|", _module.access)[1:-1]
-                        for group in groups:
-                            if has_role(group):
-                                authorised = True
-                                break
-                        if authorised == True:
-                            menu_modules.append(MM(_module.name_nice, c=module, f="index"))
+                        menu_modules.append(MM(_module.name_nice,
+                                               c=module,
+                                               f="index",
+                                               restrict=groups))
 
         # Modules to display off the 'more' menu
         modules_submenu = []
@@ -114,13 +111,11 @@ class S3MainMenu(object):
                 if not _module.access:
                     modules_submenu.append(MM(_module.name_nice, c=module, f="index"))
                 else:
-                    authorised = False
                     groups = re.split("\|", _module.access)[1:-1]
-                    for group in groups:
-                        if has_role(group):
-                            authorised = True
-                    if authorised == True:
-                        modules_submenu.append(MM(_module.name_nice, c=module, f="index"))
+                    modules_submenu.append(MM(_module.name_nice,
+                                              c=module,
+                                              f="index",
+                                              restrict=groups))
 
         if modules_submenu:
             # Only show the 'more' menu if there are entries in the list
@@ -1000,8 +995,7 @@ class S3OptionsMenu(object):
     def inv(self):
         """ INV / Inventory """
 
-        session = current.session
-        ADMIN = session.s3.system_roles.ADMIN
+        ADMIN = current.session.s3.system_roles.ADMIN
 
         current.s3db.inv_recv_crud_strings()
         crud_strings = current.response.s3.crud_strings
@@ -1082,10 +1076,7 @@ class S3OptionsMenu(object):
     def irs(self):
         """ IRS / Incident Report System """
 
-        T = current.T
-
-        session = current.session
-        ADMIN = session.s3.system_roles.ADMIN
+        ADMIN = current.session.s3.system_roles.ADMIN
 
         return M(c="irs")(
                     M("Incident Reports", f="ireport")(
@@ -1106,7 +1097,7 @@ class S3OptionsMenu(object):
                         M("New", m="create"),
                         M("List All"),
                     ),
-                    M("Ushahidi " + T("Import"), f="ireport", restrict=[ADMIN],
+                    M("Ushahidi Import", f="ireport", restrict=[ADMIN],
                       args="ushahidi")
                 )
 
@@ -1114,10 +1105,7 @@ class S3OptionsMenu(object):
     def security(self):
         """ Security Management System """
 
-        T = current.T
-
-        session = current.session
-        ADMIN = session.s3.system_roles.ADMIN
+        ADMIN = current.session.s3.system_roles.ADMIN
 
         return M(c="security")(
                     M("Incident Reports", c="irs", f="ireport")(
@@ -1163,7 +1151,7 @@ class S3OptionsMenu(object):
                         M("New", m="create"),
                         M("List All"),
                     ),
-                    #M("Ushahidi " + T("Import"), c="irs", f="ireport", restrict=[ADMIN],
+                    #M("Ushahidi Import", c="irs", f="ireport", restrict=[ADMIN],
                     #  args="ushahidi")
                 )
 
@@ -1185,8 +1173,7 @@ class S3OptionsMenu(object):
     def survey(self):
         """ SURVEY / Survey """
 
-        session = current.session
-        ADMIN = session.s3.system_roles.ADMIN
+        ADMIN = current.session.s3.system_roles.ADMIN
 
         # Do we have a series_id?
         series_id = False
@@ -1256,17 +1243,15 @@ class S3OptionsMenu(object):
     def msg(self):
         """ MSG / Messaging """
 
-        session = current.session
-        ADMIN = session.s3.system_roles.ADMIN
+        ADMIN = current.session.s3.system_roles.ADMIN
 
-        request = current.request
-        if request.function in ("setting",
-                                "email_settings",
-                                "modem_settings",
-                                "smtp_to_sms_settings",
-                                "api_settings",
-                                "tropo_settings",
-                                "twitter_settings"):
+        if current.request.function in ("setting",
+                                        "email_settings",
+                                        "modem_settings",
+                                        "smtp_to_sms_settings",
+                                        "api_settings",
+                                        "tropo_settings",
+                                        "twitter_settings"):
             return self.admin()
 
         settings_messaging = self.settings_messaging()
@@ -1293,6 +1278,10 @@ class S3OptionsMenu(object):
     def org(self):
         """ ORG / Organization Registry """
 
+        ADMIN = current.session.s3.system_roles.ADMIN
+        SECTORS = lambda i: "Clusters" if current.deployment_settings.get_ui_cluster() \
+                       else "Sectors"
+
         return M(c="org")(
                     M("Organizations", f="organisation")(
                         M("New", m="create"),
@@ -1300,12 +1289,21 @@ class S3OptionsMenu(object):
                         M("Search", m="search"),
                         M("Import", m="import")
                     ),
-                    M("Offices", f="office")(
+                    M("Offices", f="office", restrict=[ADMIN])(
                         M("New", m="create"),
                         M("List All"),
                         M("Map", m="map"),
                         M("Search", m="search"),
                         M("Import", m="import")
+                    ),
+                    M("Organization Types", f="organisation_type",
+                      restrict=[ADMIN])(
+                        M("New", m="create"),
+                        M("List All"),
+                    ),
+                    M(SECTORS, f="sector", restrict=[ADMIN])(
+                        M("New", m="create"),
+                        M("List All"),
                     ),
                 )
 
