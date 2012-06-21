@@ -1,5 +1,5 @@
 #r_tablearea{
-background:#555;
+background:#c9c9c9;
 border-radius:10px;
 width:900px;
 padding:20px;
@@ -7,6 +7,16 @@ padding:20px;
 #r_table{
 width:900px;
 padding:50px;
+}
+table, th, td{
+border:1px solid black;
+padding:5px;
+}
+tr:hover{
+background:#bfbfbf;
+}
+thead{
+background:#c3c3c3;
 }
 #selectarea{
 width:900px;
@@ -16,13 +26,48 @@ position:relative;
 left:80px;
 }
 #r_varea{
-width:120px;
-background:#555;
+width:160px;
+background:#AAA;
 border-radius:10px;
-padding: 20px;
+padding: 15px;
 position: absolute;
+}
+#r_varea_head{
+position:relative;
+left:40px;
+font-size:15px;
+}
+#cross{
+position:absolute;
+right:5px;
+top:10px;
 }
 #maincontent{
 overflow:auto;
-height:500px;
+height:580px;
+}
+.vcell{
+width:100px;
+height:35px;
+position:relative;
+}
+.symbv{
+position:absolute;
+bottom:0px;
+right:0px;
+}
+.allotted{
+background:#3F6;
+padding:3px;
+}
+.volunteer_names{
+width:130px;
+background:#A0A0A0;
+height:15px;
+border:solid 1px #878787;
+padding:10px;
+margin:5px;
+}
+.volunteer_names:hover{
+background:#959595;
 }

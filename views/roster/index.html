@@ -5,24 +5,53 @@
 jQuery(document).ready(function(){
     $('#newrole').hide();
     $('#r_varea').hide();
+    $('.remv').hide();
     $('#addrow').click(function(){$('#newrole').toggle(); $('#addrow').hide();});
     $('#new_job_role').change(function(){$('#roster_info_form').submit();});
     $('#project_selector').change(function(){$('#roster_info_form').submit();});
     $('#timeframe').change(function(){$('#roster_info_form').submit();});
     $('#timeslot').change(function(){$('#roster_info_form').submit();});
-    $('.addv').click(function(){$('#r_varea').toggle();current_cell.r=$(this).data('row');current_cell.c=$(this).data('col');});
+    $('.addv').click(function()
+        {
+        $('#r_varea').show();
+        var cell=$(this).parent();
+        current_cell.r=cell.data('row');
+        current_cell.c=cell.data('col');
+        });
     $('.volunteer_names').click(function()
         {
         var vname=$(this).html();
+        var vid=$(this).attr('id');
         $('.vcell').each(function()
             {
             if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
                 {
-                $(this).html(vname);
+                var cell_c=vname;
+                $(this).children('.vcelln').html(cell_c);
+                $(this).children('.addv').hide();
+                $(this).children('.remv').show();
+                $(this).data("vid",vid);
+                $(this).addClass('allotted');
+                
                 }; 
             });
         });
-
+    $('.remv').click(function(){
+    $(this).parent().children('.vcelln').html("");
+    $(this).parent().children('.remv').hide();
+    $(this).parent().children('.addv').show();
+    //$(this).parent().removeClass('allotted');
+    });
+    $('#cross').click(function(){$('#r_varea').hide();});
+    $('#save').click(function()
+    {
+    $('.allotted').each(function()
+        {
+        var v_json='{row:';
+        v_json+=$(this).data('row')+',col:'+$(this).data('col')+',vid:'+$(this).data('vid')+'}';
+        alert(v_json);        
+        });
+    });
 });</script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
 </head>
@@ -31,7 +60,8 @@ jQuery(document).ready(function(){
 <h1>{{=message}}</h1>
 <span>
 <div id="r_varea">
-Volunteers:
+<div id="r_varea_head">Volunteers:</div>
+{{=IMG(_src='/eden/static/img/cross.png',_alt='cross',_id='cross')}}
 <br/>
 {{for v_id in volunteers:}}
 <div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
@@ -63,11 +93,11 @@ Slot:
 <br/>
 <table id="r_table">
 <thead>
-<tr><td>Role</td><td>Day 1</td><td>Day 2</td><td>Day 3</td><td>Day 4</td><td>Day 5</td><td>Day 6</td><td>Day 7</td>
+<tr><th>Role</th>{{for d in time_dets:}}<th>{{=d}}</th>{{pass}}
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
 <tr><td>{{=alloted_roles[r]}}</td>
-{{for c in range(7):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} ></div> <img src='/eden/static/img/plus.png' alt='addv' class='addv' data-col={{=c}} data-row={{=r}} /></td>{{pass}}
+{{for c in range(len(time_dets)):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > <div class='vcelln'></div> {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}{{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}}</div> </td>{{pass}}
 </tr>
 {{pass}}
 
@@ -75,13 +105,13 @@ Slot:
 <select name="new_job_role" id="new_job_role">
 {{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}
 </select></form></td>
-{{for x in range(7):}}<td>{{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv')}}</td>{{pass}}
+{{for x in range(len(time_dets)):}}<td></td>{{pass}}
 </tr>
 
 </table>
 {{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow')}}
 <br/>
-<span> <input type="submit" value="Save" /> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <span> <a>Autofill</a> </span> 
+<span> <input type="submit" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <span> <a>Autofill</a> </span> 
 </div>
 </span>
 </div>
