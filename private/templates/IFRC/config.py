@@ -8,10 +8,6 @@ T = current.T
 
 """
     Template settings for IFRC
-
-    All settings which are to configure a specific template are located here
-
-    Deployers should ideally not need to edit any other files outside of their template folder
 """
 
 # Pre-Populate
