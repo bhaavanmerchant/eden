@@ -40,17 +40,24 @@ jQuery(document).ready(function(){
     $(this).parent().children('.vcelln').html("");
     $(this).parent().children('.remv').hide();
     $(this).parent().children('.addv').show();
-    //$(this).parent().removeClass('allotted');
+    $(this).parent().removeClass('allotted');
     });
     $('#cross').click(function(){$('#r_varea').hide();});
     $('#save').click(function()
     {
+    var roster_dets={};
+    var i=0;
     $('.allotted').each(function()
         {
-        var v_json='{row:';
-        v_json+=$(this).data('row')+',col:'+$(this).data('col')+',vid:'+$(this).data('vid')+'}';
-        alert(v_json);        
+        var v_json= {
+                    "row":$(this).data('row'),
+                    "col":$(this).data('col'),
+                    "vid":$(this).data('vid')
+                    };
+        roster_dets[i]=v_json;
+        i=i+1;     
         });
+
     });
 });</script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
@@ -111,7 +118,7 @@ Slot:
 </table>
 {{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow')}}
 <br/>
-<span> <input type="submit" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <span> <a>Autofill</a> </span> 
+<span> <input type="button" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <span> <a>Autofill</a> </span> 
 </div>
 </span>
 </div>
