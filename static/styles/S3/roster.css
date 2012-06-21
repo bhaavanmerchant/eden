@@ -26,11 +26,21 @@ position:relative;
 left:80px;
 }
 #r_varea{
-width:120px;
-background:#999;
+width:160px;
+background:#AAA;
 border-radius:10px;
-padding: 20px;
+padding: 15px;
 position: absolute;
+}
+#r_varea_head{
+position:relative;
+left:40px;
+font-size:15px;
+}
+#cross{
+position:absolute;
+right:5px;
+top:10px;
 }
 #maincontent{
 overflow:auto;
@@ -41,17 +51,23 @@ width:100px;
 height:35px;
 position:relative;
 }
-.addv{
-position:absolute;
-bottom:0px;
-right:0px;
-}
-.remv{
+.symbv{
 position:absolute;
 bottom:0px;
 right:0px;
 }
 .allotted{
-background:#3C3;
+background:#3F6;
 padding:3px;
+}
+.volunteer_names{
+width:130px;
+background:#A0A0A0;
+height:15px;
+border:solid 1px #878787;
+padding:10px;
+margin:5px;
+}
+.volunteer_names:hover{
+background:#959595;
 }
