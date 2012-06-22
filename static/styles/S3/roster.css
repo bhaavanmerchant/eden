@@ -71,3 +71,7 @@ margin:5px;
 .volunteer_names:hover{
 background:#959595;
 }
+#volunteer_role{
+position:relative;
+left:35px;
+}

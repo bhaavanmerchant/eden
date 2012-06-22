@@ -17,8 +17,19 @@ jQuery(document).ready(function(){
         var cell=$(this).parent();
         current_cell.r=cell.data('row');
         current_cell.c=cell.data('col');
+        //ajax('people',['row'],'vn');
+        $.ajax(
+            {
+            type: "POST",
+            url: "people",
+            data: { row: current_cell.r }
+            }).done(function( msg ) 
+                {
+                $("#vn").html(msg);
+                });
+
         });
-    $('.volunteer_names').click(function()
+    $('#vn').on('click','.volunteer_names',function(event)
         {
         var vname=$(this).html();
         var vid=$(this).attr('id');
@@ -59,7 +70,8 @@ jQuery(document).ready(function(){
         });
 
     });
-});</script>
+});
+</script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
 </head>
 <body>
@@ -70,9 +82,11 @@ jQuery(document).ready(function(){
 <div id="r_varea_head">Volunteers:</div>
 {{=IMG(_src='/eden/static/img/cross.png',_alt='cross',_id='cross')}}
 <br/>
+<div class='vn' id='vn'>
 {{for v_id in volunteers:}}
 <div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
 {{pass}}
+</div>
 </div>
 </span>
 <span style="position:absolute; right:50px;">
@@ -82,16 +96,12 @@ jQuery(document).ready(function(){
 <span>Project:
 <select name='project_selector' id='project_selector'>
 {{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
-</select> </span> <span style="position:relative; left:200px;">
+</select> </span> <span style="position:relative; left:150px;">
 <select name='timeframe' id='timeframe'>
-  <option value="1">Week 1</option>
-  <option value="2">Week 2</option>
-  <option value="3">Week 3</option>
-  <option value="4">Week 4</option>
-  <option value="5">Week 5</option>
-  <option value="6">Week 6</option>
-  <option value="7">Week 7</option>
-</select> </span> <span style="position:relative; left:500px;">
+{{for i in range(numb):}}
+  <option value={{=i+1}}>Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}</option>
+{{pass}}
+</select> </span> <span style="position:relative; left:350px;">
 Slot:
 <select name='timeslot' id='timeslot'>
 {{for x in range(len(slots)):}}<option value={{=x}}>{{=slots[x]}}</option>{{pass}}
@@ -104,7 +114,7 @@ Slot:
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
 <tr><td>{{=alloted_roles[r]}}</td>
-{{for c in range(len(time_dets)):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > <div class='vcelln'></div> {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}{{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}}</div> </td>{{pass}}
+{{for c in range(len(time_dets)):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > <div class='vcelln'></div> {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}{{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}} </div> </td>{{pass}}
 </tr>
 {{pass}}
 
