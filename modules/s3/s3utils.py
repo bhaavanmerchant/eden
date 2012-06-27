@@ -65,12 +65,10 @@ import sys
 import os
 import csv
 import datetime
-import md5
+import hashlib
 import re
 import urllib
 import uuid
-
-from xml.sax.saxutils import unescape
 
 try:
     import json # try stdlib (Python 2.6)
@@ -503,11 +501,11 @@ def s3_comments_represent(text, showlink=True):
         represent = DIV(
                         DIV(text,
                             _id=unique,
-                            _class="hidden popup",
+                            _class="hide popup",
                             _onmouseout="$('#%s').hide();" % unique
                            ),
                         A("%s..." % text[:76],
-                          _onmouseover="$('#%s').removeClass('hidden').show();" % unique,
+                          _onmouseover="$('#%s').removeClass('hide').show();" % unique,
                          ),
                        )
         return represent
@@ -578,7 +576,7 @@ def s3_avatar_represent(id, tablename="auth_user", _class="avatar"):
                   args=image)
     elif email:
         # If no Image uploaded, try Gravatar, which also provides a nice fallback identicon
-        hash = md5.new(email).hexdigest()
+        hash = hashlib.md5(email).hexdigest()
         url = "http://www.gravatar.com/avatar/%s?s=50&d=identicon" % hash
     else:
         url = "http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm"
@@ -641,17 +639,17 @@ def s3_include_debug():
     """
 
     # Disable printing
-    class dummyStream:
-        """ dummyStream behaves like a stream but does nothing. """
-        def __init__(self): pass
-        def write(self,data): pass
-        def read(self,data): pass
-        def flush(self): pass
-        def close(self): pass
+    #class dummyStream:
+    #    """ dummyStream behaves like a stream but does nothing. """
+    #    def __init__(self): pass
+    #    def write(self,data): pass
+    #    def read(self,data): pass
+    #    def flush(self): pass
+    #    def close(self): pass
 
-    save_stdout = sys.stdout
+    #save_stdout = sys.stdout
     # Redirect all prints
-    sys.stdout = dummyStream()
+    #sys.stdout = dummyStream()
 
     request = current.request
     folder = request.folder
@@ -659,20 +657,21 @@ def s3_include_debug():
     theme = current.deployment_settings.get_theme()
 
     # JavaScript
-    scripts_dir_path = "%s/static/scripts" % folder
-    sys.path.append( "%s/tools" % scripts_dir_path)
+    scripts_dir = os.path.join(folder, "static", "scripts")
+    sys.path.append(os.path.join(scripts_dir, "tools"))
     import mergejsmf
 
     configDictCore = {
-        "web2py": scripts_dir_path,
-        "T2":     scripts_dir_path,
-        "S3":     scripts_dir_path
+        ".": scripts_dir,
+        "web2py": scripts_dir,
+        #"T2":     scripts_dir_path,
+        "S3":     scripts_dir
     }
-    configFilename = "%s/tools/sahana.js.cfg"  % scripts_dir_path
+    configFilename = "%s/tools/sahana.js.cfg"  % scripts_dir
     (fs, files) = mergejsmf.getFiles(configDictCore, configFilename)
 
     # Restore prints
-    sys.stdout = save_stdout
+    #sys.stdout = save_stdout
 
     include = ""
     for file in files:
@@ -1440,13 +1439,17 @@ class S3BulkImporter(object):
 
     def __init__(self):
         """ Constructor """
-        response = current.response
+
+        from xml.sax.saxutils import unescape
+
+        self.unescape = unescape
         self.importTasks = []
         self.specialTasks = []
         self.tasks = []
         # loaders aren't defined currently
+        #s3 = current.response.s3
         self.alternateTables = {"hrm_person": {"tablename":"hrm_human_resource",
-                                               #"loader":response.s3.hrm_person_loader,
+                                               #"loader":s3.hrm_person_loader,
                                                "prefix":"pr",
                                                "name":"person"},
                                 "inv_warehouse": {"tablename":"org_office",
@@ -1455,8 +1458,8 @@ class S3BulkImporter(object):
                                 "member_person": {"tablename":"member_membership",
                                                   "prefix":"pr",
                                                   "name":"person"},
-                                #"req_req":     {"loader":response.s3.req_loader},
-                                #"req_req_item":{"loader":response.s3.req_item_loader},
+                                #"req_req":     {"loader":s3.req_loader},
+                                #"req_req_item":{"loader":s3.req_item_loader},
                                }
         self.errorList = []
         self.resultList = []
@@ -1662,7 +1665,7 @@ class S3BulkImporter(object):
     def execute_special_task(self, task):
         """
         """
-        
+
         start = datetime.datetime.now()
         s3 = current.response.s3
         if task[0] == 2:

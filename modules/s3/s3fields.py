@@ -254,7 +254,7 @@ s3_meta_deletion_status = S3ReusableField("deleted", "boolean",
                                           writable=False,
                                           default=False)
 
-# Parked foreign keys of a deleted record
+# Parked foreign keys of a deleted record in JSON format
 # => to be restored upon "un"-delete
 s3_meta_deletion_fk = S3ReusableField("deleted_fk", #"text",
                                       readable=False,
@@ -348,7 +348,7 @@ def s3_meta_fields():
     if auth.is_logged_in():
         current_user = session.auth.user.id
     else:
-        current.user = None
+        current_user = None
 
     # Author of a record
     s3_meta_created_by = S3ReusableField("created_by", db.auth_user,

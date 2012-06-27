@@ -49,10 +49,10 @@ class AddStaffToOrganisation(SeleniumUnitTest):
         
         self.create("hrm_human_resource", 
                     [( "first_name",
-                       "Herculanofd",
+                       "Herculano",
                        "pr_person"),
                      ( "last_name",
-                       "Hughfd",
+                       "Hugh",
                        "pr_person"),
                      ( "email",
                        "herculandfo@icandodfmybest.com",

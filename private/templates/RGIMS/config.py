@@ -10,11 +10,14 @@ T = current.T
     Template settings for RGIMS
 """
 
-settings.base.system_name = T("Relief Goods Inventory & Monitoring System")
-settings.base.system_name_short = T("RGIMS")
+settings.base.system_name = "Relief Goods Inventory & Monitoring System"
+settings.base.system_name_short = "RGIMS"
 
 # Pre-Populate
 settings.base.prepopulate = ["RGIMS"]
+
+# Theme
+settings.base.theme = "RGIMS"
 
 # Uncomment to Hide the language toolbar
 settings.L10n.display_toolbar = False
@@ -153,7 +156,7 @@ settings.modules = OrderedDict([
             module_type = None, # Not displayed
         )),
     ("inv", Storage(
-            name_nice = T("Warehouse"),
+            name_nice = T("Warehouses"),
             #description = "Receiving and Sending Items",
             restricted = True,
             module_type = 1

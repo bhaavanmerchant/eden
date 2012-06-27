@@ -133,7 +133,7 @@ class S3LocationModel(S3Model):
                                                                                      UNKNOWN_OPT),
                                    label = T("Feature Type")),
                              # Points or Centroid for Polygons
-                             Field("lat", "double",               
+                             Field("lat", "double",
                                    label = T("Latitude"),
                                    requires = IS_NULL_OR(IS_LAT()),
                                    comment = DIV(_class="tooltip",
@@ -260,8 +260,12 @@ class S3LocationModel(S3Model):
                        list_fields = ["id",
                                       "name",
                                       "level",
-                                      "parent",
-                                      "gis_feature_type",
+                                      #"parent",
+                                      "L0",
+                                      "L1",
+                                      "L2",
+                                      "L3",
+                                      "L4",
                                       "lat",
                                       "lon"
                                     ]
@@ -289,10 +293,10 @@ class S3LocationModel(S3Model):
         # table = define_table(tablename,
                              # location_id(),
                              ##Circular 'Error' around Lat/Lon (in m).
-                             # Field("ce", "integer", 
+                             # Field("ce", "integer",
                                    # writable=False,
                                    # readable=False),
-                             ##Linear 'Error' for the Elevation (in m).                                   
+                             ##Linear 'Error' for the Elevation (in m).
                              # Field("le", "integer",
                                    # writable=False,
                                    # readable=False),
@@ -371,7 +375,6 @@ class S3LocationModel(S3Model):
         gis = current.gis
         request = current.request
         response = current.response
-        s3 = response.s3
 
         MAP_ADMIN = current.auth.s3_has_role(current.session.s3.system_roles.MAP_ADMIN)
 
@@ -396,6 +399,13 @@ class S3LocationModel(S3Model):
         parent = "parent" in vars and vars.parent
         lat = "lat" in vars and vars.lat
         lon = "lon" in vars and vars.lon
+        if lon:
+            if lon > 180:
+                # Map Selector wrapped
+                lon = lon - 360
+            elif lon < -180:
+                # Map Selector wrapped
+                lon = lon + 360
         id = "id" in request.vars and request.vars.id
 
         # 'MapAdmin' has permission to edit hierarchy locations, no matter what
@@ -576,21 +586,18 @@ class S3LocationModel(S3Model):
             # @ToDo: check the the lat and lon if they exist?
             #lat = "lat" in data and data.lat
             #lon = "lon" in data and data.lon
-            _duplicate = None
 
-            db = current.db
+            # Try the Name
+            # @ToDo: Hook for possible duplicates vs definite?
+            #query = (table.name.lower().like('%%%s%%' % name.lower()))
+            query = (table.name.lower() == name.lower())
+            if parent:
+                query = query & (table.parent == parent)
+            if level:
+                query = query & (table.level == level)
 
-            if not _duplicate:
-                # Try the Name
-                #query = (table.name.lower().like('%%%s%%' % name.lower()))
-                query = (table.name.lower() == name.lower())
-                if parent:
-                    query = query & (table.parent == parent)
-                if level:
-                    query = query & (table.level == level)
-
-            _duplicate = db(query).select(table.id,
-                                          limitby=(0, 1)).first()
+            _duplicate = current.db(query).select(table.id,
+                                                  limitby=(0, 1)).first()
             if _duplicate:
                 job.id = _duplicate.id
                 job.method = job.METHOD.UPDATE
@@ -683,7 +690,7 @@ class S3LocationTagModel(S3Model):
         #   * UN P-Codes
         #   * GeoNames
         #   * Wikipedia URL
-        #   * Christchurch 'prupi'(Property reference in the council system) & 
+        #   * Christchurch 'prupi'(Property reference in the council system) &
         #                  'gisratingid' (Polygon reference of the rating unit)
         # - can be a Triple Store for Semantic Web support
         #
@@ -696,11 +703,39 @@ class S3LocationTagModel(S3Model):
                                   s3_comments(),
                                   *s3_meta_fields())
 
+        self.configure(tablename,
+                       deduplicate=self.gis_location_tag_deduplicate)
+
         # ---------------------------------------------------------------------
         # Pass variables back to global scope (response.s3.*)
         #
         return Storage(
                 )
+
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def gis_location_tag_deduplicate(job):
+        """
+           If the record is a duplicate then it will set the job method to update
+        """
+
+        if job.tablename == "gis_location_tag":
+            table = job.table
+            data = job.data
+            tag = "tag" in data and data.tag or None
+            location = "location_id" in data and data.location_id or None
+
+            if not tag or not location:
+                return
+
+            query = (table.tag.lower() == tag.lower()) & \
+                    (table.location_id == location)
+
+            _duplicate = current.db(query).select(table.id,
+                                                  limitby=(0, 1)).first()
+            if _duplicate:
+                job.id = _duplicate.id
+                job.method = job.METHOD.UPDATE
 
 # =============================================================================
 class S3LocationGroupModel(S3Model):
@@ -1211,7 +1246,7 @@ class S3GISConfigModel(S3Model):
                              # Region field
                              location_id("region_location_id",
                                          widget = S3LocationAutocompleteWidget(),
-                                         requires = IS_NULL_OR(IS_LOCATION(level=gis.region_level_keys))),
+                                         requires = IS_NULL_OR(IS_LOCATION(level=gis.hierarchy_level_keys))),
 
                              # CRUD Settings
                              # Default Location
@@ -3754,7 +3789,7 @@ def gis_rheader(r, tabs=[]):
                                 record.level,
                                 ),
                         ), rheader_tabs)
-        
+
     elif resourcename == "config":
         # Tabs
         if not tabs:

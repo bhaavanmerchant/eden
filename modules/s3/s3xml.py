@@ -637,8 +637,12 @@ class S3XML(S3Codec):
             @param locations: locations dict
         """
 
-        gis = current.gis
+        if id not in record:
+            # e.g. Super-Entity
+            # - we only map entity instances
+            return
 
+        gis = current.gis
         if not gis:
             return
 
@@ -1006,6 +1010,20 @@ class S3XML(S3Codec):
                (cls.TAG.resource, cls.ATTRIBUTE.name, tablename)
         resources = root.xpath(expr)
         return resources
+
+    # -------------------------------------------------------------------------
+    @classmethod
+    def components(cls, element, names=None):
+        """ Selects component elements in a resource element """
+
+        RESOURCE = cls.TAG.resource
+        NAME = cls.ATTRIBUTE.name
+
+        for child in element.iterchildren():
+            if child.tag == RESOURCE:
+                if names is None or child.get(NAME, None) in names:
+                    yield child
+        return
 
     # -------------------------------------------------------------------------
     @staticmethod

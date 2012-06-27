@@ -73,15 +73,6 @@ __all__ = ["S3SearchWidget",
 MAX_RESULTS = 1000
 MAX_SEARCH_RESULTS = 200
 
-#SHAPELY = False
-#try:
-    #import shapely
-    #import shapely.geometry
-    #from shapely.wkt import loads as wkt_loads
-    #SHAPELY = True
-#except ImportError:
-    #s3_debug("WARNING: %s: Shapely GIS library not installed" % __name__)
-
 # =============================================================================
 class S3SearchWidget(object):
     """
@@ -413,6 +404,7 @@ class S3SearchMinMaxWidget(S3SearchWidget):
 
         return w
 
+    # -------------------------------------------------------------------------
     @staticmethod
     def widget_label(widget):
         """
@@ -422,6 +414,7 @@ class S3SearchMinMaxWidget(S3SearchWidget):
         """
         return LABEL(widget["label"], _for="id-%s" % widget["name"])
 
+    # -------------------------------------------------------------------------
     @staticmethod
     def widget_input(widget):
         """
@@ -505,6 +498,7 @@ class S3SearchOptionsWidget(S3SearchWidget):
         @param cols: The number of columns which the options will be
                      displayed in
     """
+
     def __init__(self, field=None, name=None, options=None, **attr):
         """
             Configures the search option
@@ -520,6 +514,7 @@ class S3SearchOptionsWidget(S3SearchWidget):
         super(S3SearchOptionsWidget, self).__init__(field, name, **attr)
         self.options = options
 
+    # -------------------------------------------------------------------------
     def _get_reference_resource(self, resource):
         """
             If the field is entered as kfield$field, will search field in the
@@ -537,6 +532,7 @@ class S3SearchOptionsWidget(S3SearchWidget):
                                                        resource_name)
         return resource, field, kfield
 
+    # -------------------------------------------------------------------------
     def widget(self, resource, vars):
         """
             Returns the widget
@@ -868,12 +864,13 @@ class S3SearchLocationWidget(S3SearchWidget):
         """
 
         format = current.auth.permission.format
+        if format == "plain":
+            return None
+
         try:
-            import shapely
+            from shapely.wkt import loads as wkt_loads
         except ImportError:
             s3_debug("WARNING: %s: Shapely GIS library not installed" % __name__)
-            return None
-        if format == "plain":
             return None
 
         T = current.T
@@ -890,16 +887,16 @@ class S3SearchLocationWidget(S3SearchWidget):
         # Hidden Field to store the Polygon value in
         polygon_input = INPUT(_id="gis_search_polygon_input",
                               _name=self.attr._name,
-                              _class="hidden")
+                              _class="hide")
+
+        # Map Popup
+        # - not added as we reuse the one that comes with dataTables
 
         # Button to open the Map
         OPEN_MAP = T("Open Map")
         map_button = A(OPEN_MAP,
                        _style="cursor:pointer; cursor:hand",
                        _id="gis_search_map-btn")
-
-        # Map Popup
-        # - reuse the one that comes with dataTables
 
         # Settings to be read by static/scripts/S3/s3.gis.js
         js_location_search = """S3.gis.draw_polygon = true;"""
@@ -913,22 +910,14 @@ class S3SearchLocationWidget(S3SearchWidget):
                       )
 
     # -------------------------------------------------------------------------
-    def query(self, resource, value):
+    @staticmethod
+    def query(resource, value):
         """
             Returns a sub-query for this search option
 
             @param resource: the resource to search in
             @param value: the value returned from the widget: WKT format
         """
-
-        #gis = current.gis
-        # table = resource.table
-        # s3db = current.s3db
-        # locations = s3db.gis_location
-
-        # Get master query and search fields
-        #self.build_master_query(resource)
-        #master_query = self.master_query
 
         if value:
             # @ToDo: Turn this into a Resource filter
@@ -937,15 +926,11 @@ class S3SearchLocationWidget(S3SearchWidget):
 
             # @ToDo: A PostGIS routine, where-available
             #        - requires a Spatial DAL?
-            try:
-                from shapely.wkt import loads as wkt_loads
-            except ImportError:
-                s3_debug("WARNING: %s: Shapely GIS library not installed" % __name__)
-                return None
+            from shapely.wkt import loads as wkt_loads
             try:
                 shape = wkt_loads(value)
             except:
-                s3_debug("WARNING: s3search: Invalid WKT")
+                s3_debug("WARNING: S3Search: Invalid WKT")
                 return None
 
             bounds = shape.bounds
@@ -1006,6 +991,7 @@ class S3SearchSkillsWidget(S3SearchOptionsWidget):
                - meanwhile at least sort by level of competency
     """
 
+    # -------------------------------------------------------------------------
     def widget(self, resource, vars):
         manager = current.manager
         c = manager.define_resource("hrm", "competency")
@@ -1192,11 +1178,9 @@ class S3Search(S3CRUD):
             user's profile, to which they can subscribe
         """
 
-        request = self.request
-
         T = current.T
         db = current.db
-        s3db = current.s3db
+        request = self.request
 
         user_id = current.session.auth.user.id
         now = request.utcnow.microsecond
@@ -1217,7 +1201,7 @@ class S3Search(S3CRUD):
         search_vars["prefix"] = r.controller
         search_vars["function"] = r.function
 
-        table = s3db.pr_save_search
+        table = current.s3db.pr_save_search
         if len(db(table.user_id == user_id).select(table.id,
                                                    limitby=(0, 1))):
             rows = db(table.user_id == user_id).select(table.ALL)
@@ -1260,33 +1244,34 @@ class S3Search(S3CRUD):
         s_var["save"] = True
         jurl = URL(r=request, c=r.controller, f=r.function,
                    args=["search"], vars=s_var)
-        save_search_script = SCRIPT("""
-$('#%s').live('click', function() {
-    $('#%s').show();
-    $('#%s').hide();
-    $.ajax({
-        url: '%s',
-        data: '%s',
-        success: function(data) {
-            $('#%s').show();
-            $('#%s').hide();
-        },
-        type: 'POST'
-        });
-    return false;
-    });
-""" % (save_search_btn_id,
+        save_search_script = '''
+$('#%s').live('click',function(){
+ $('#%s').show();
+ $('#%s').hide();
+ $.ajax({
+  url: '%s',
+  data: '%s',
+  success: function(data) {
+   $('#%s').show();
+   $('#%s').hide();
+  },
+  type: 'POST'
+ });
+ return false;
+});
+''' % (save_search_btn_id,
        save_search_processing_id,
        save_search_btn_id,
        jurl,
        json.dumps(search_vars),
        save_search_a_id,
-       save_search_processing_id))
+       save_search_processing_id)
+
+        current.response.s3.jquery_ready.append(save_search_script)
 
         widget = DIV(save_search_processing,
                     save_search_a,
                     save_search_btn,
-                    save_search_script,
                     _style="font-size:12px; padding:5px 0px 5px 90px;",
                     _id="save_search"
                     )
