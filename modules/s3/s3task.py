@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-    Asynchronous Task Execution
+""" Asynchronous Task Execution
     - falls back to Synchronous if no workers are alive
 
     Worker nodes won't run on Win32 yet.
@@ -54,7 +53,7 @@ except ImportError:
     except:
         import gluon.contrib.simplejson as json # fallback to pure-Python module
 
-from gluon import HTTP, current
+from gluon import current, HTTP
 from gluon.storage import Storage
 
 from s3widgets import S3TimeIntervalWidget
@@ -162,8 +161,7 @@ class S3Task(object):
         table.assigned_worker_name.readable = False
         table.assigned_worker_name.writable = False
 
-        manager = current.manager
-        manager.configure(tablename,
+        current.s3db.configure(tablename,
                           list_fields=["id",
                                        "enabled",
                                        "start_time",

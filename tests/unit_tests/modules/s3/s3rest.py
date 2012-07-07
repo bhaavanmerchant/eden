@@ -13,7 +13,7 @@ class Test_s3mgr_raises_on_nonexistent_modules(unittest.TestCase):
     """ Legacy Test Case """
 
     def test(test):
-        test.assertRaises(Exception, s3mgr.load, "something that doesn't exist")
+        test.assertRaises(Exception, s3db.table, "something that doesn't exist")
 
 # =============================================================================
 class S3ResourceTests(unittest.TestCase):
@@ -711,6 +711,19 @@ class S3ResourceFilterTests(unittest.TestCase):
         self.assertEqual(parse_value('"NONE",1'), ["NONE", "1"])
         self.assertEqual(parse_value('"NONE,1"'), "NONE,1")
 
+    def testAnyOf(self):
+
+        resource = s3mgr.define_resource("org", "organisation")
+        FS = s3base.S3FieldSelector
+        q = FS("sector_id").contains([1, 2])
+        query = q.query(resource)
+        self.assertEqual(str(query), "((org_organisation.sector_id LIKE '%|1|%') AND "
+                                     "(org_organisation.sector_id LIKE '%|2|%'))")
+        q = FS("sector_id").anyof([1, 2])
+        query = q.query(resource)
+        self.assertEqual(str(query), "((org_organisation.sector_id LIKE '%|1|%') OR "
+                                     "(org_organisation.sector_id LIKE '%|2|%'))")
+
     def tearDown(self):
         auth.s3_impersonate(None)
 
@@ -730,7 +743,7 @@ class S3MergeOrganisationsTests(unittest.TestCase):
                        website="http://www.example.org")
         org1_id = otable.insert(**org1)
         org1.update(id=org1_id)
-        s3mgr.model.update_super(otable, org1)
+        s3db.update_super(otable, org1)
 
         org2 = Storage(name="Merger Test Organisation",
                        acronym="MTOrg",
@@ -738,7 +751,7 @@ class S3MergeOrganisationsTests(unittest.TestCase):
                        website="http://www.example.com")
         org2_id = otable.insert(**org2)
         org2.update(id=org2_id)
-        s3mgr.model.update_super(otable, org2)
+        s3db.update_super(otable, org2)
 
         self.id1 = org1_id
         self.id2 = org2_id
@@ -835,7 +848,7 @@ class S3MergeOrganisationsTests(unittest.TestCase):
         branch1_id = otable.insert(**branch1)
         self.assertNotEqual(branch1_id, None)
         branch1.update(id=branch1_id)
-        s3mgr.model.update_super(otable, branch1)
+        s3db.update_super(otable, branch1)
         branch1_pe_id = s3db.pr_get_pe_id(otable, branch1_id)
         self.assertNotEqual(branch1_pe_id, None)
         link1 = Storage(organisation_id=self.id1, branch_id=branch1_id)
@@ -848,7 +861,7 @@ class S3MergeOrganisationsTests(unittest.TestCase):
         branch2_id = otable.insert(**branch2)
         self.assertNotEqual(branch2_id, None)
         branch2.update(id=branch2_id)
-        s3mgr.model.update_super(otable, branch2)
+        s3db.update_super(otable, branch2)
         branch2_pe_id = s3db.pr_get_pe_id("org_organisation", branch2_id)
         self.assertNotEqual(branch2_pe_id, None)
         link2 = Storage(organisation_id=self.id2, branch_id=branch2_id)
@@ -924,32 +937,52 @@ class S3MergePersonsTests(unittest.TestCase):
                           last_name="Person")
         person1_id = ptable.insert(**person1)
         person1.update(id=person1_id)
-        s3mgr.model.update_super(ptable, person1)
+        s3db.update_super(ptable, person1)
 
         person2 = Storage(first_name="Test",
                           last_name="Person")
         person2_id = ptable.insert(**person2)
         person2.update(id=person2_id)
-        s3mgr.model.update_super(ptable, person2)
+        s3db.update_super(ptable, person2)
 
         self.id1 = person1_id
         self.id2 = person2_id
 
         self.resource = s3mgr.define_resource("pr", "person")
 
-    def testMerge(self):
-        """ Test merge """
-
-        # Must raise exception if not authorized
+    def testPermissionError(self):
+        """ Check for exception if not authorized """
         auth.override = False
         auth.s3_impersonate(None)
         self.assertRaises(auth.permission.error,
                           self.resource.merge, self.id1, self.id2)
-
-        # Must raise exception for non-existent records
+        # Check for proper rollback
+        ptable = s3db.pr_person
+        query = ptable._id.belongs((self.id1, self.id2))
+        rows = db(query).select(ptable._id, limitby=(0, 2))
+        self.assertEqual(len(rows), 0)
         auth.override = True
+
+    def testOriginalNotFoundError(self):
+        """ Check for exception if record not found """
         self.assertRaises(KeyError, self.resource.merge, 0, self.id2)
+        # Check for proper rollback
+        ptable = s3db.pr_person
+        query = ptable._id.belongs((self.id1, self.id2))
+        rows = db(query).select(ptable._id, limitby=(0, 2))
+        self.assertEqual(len(rows), 0)
+
+    def testNotDuplicateFoundError(self):
+        """ Check for exception if record not found """
         self.assertRaises(KeyError, self.resource.merge, self.id1, 0)
+        # Check for proper rollback
+        ptable = s3db.pr_person
+        query = ptable._id.belongs((self.id1, self.id2))
+        rows = db(query).select(ptable._id, limitby=(0, 2))
+        self.assertEqual(len(rows), 0)
+
+    def testMerge(self):
+        """ Test merge """
 
         # Merge records
         success = self.resource.merge(self.id1, self.id2)
@@ -1004,13 +1037,13 @@ class S3MergePersonsTests(unittest.TestCase):
                       blood_type="B+")
         pd1_id = dtable.insert(**pd1)
         pd1.update(id=pd1_id)
-        s3mgr.model.update_super(dtable, pd1)
+        s3db.update_super(dtable, pd1)
 
         pd2 = Storage(pe_id=person2.pe_id,
                       blood_type="B-")
         pd2_id = dtable.insert(**pd2)
         pd2.update(id=pd2_id)
-        s3mgr.model.update_super(dtable, pd2)
+        s3db.update_super(dtable, pd2)
 
         success = self.resource.merge(self.id1, self.id2,
                                       replace = ["physical_description.blood_type"])
@@ -1040,14 +1073,14 @@ class S3MergePersonsTests(unittest.TestCase):
                       value="TEST1")
         id1_id = itable.insert(**id1)
         id1.update(id=id1_id)
-        s3mgr.model.update_super(itable, id1)
+        s3db.update_super(itable, id1)
 
         id2 = Storage(person_id=person2.id,
                       type=1,
                       value="TEST2")
         id2_id = itable.insert(**id2)
         id2.update(id=id2_id)
-        s3mgr.model.update_super(itable, id2)
+        s3db.update_super(itable, id2)
 
         success = self.resource.merge(self.id1, self.id2)
         self.assertTrue(success)
@@ -1094,12 +1127,12 @@ class S3MergeLocationsTests(unittest.TestCase):
         location1 = Storage(name="TestLocation")
         location1_id = ltable.insert(**location1)
         location1.update(id=location1_id)
-        s3mgr.model.update_super(ltable, location1)
+        s3db.update_super(ltable, location1)
 
         location2 = Storage(name="TestLocation")
         location2_id = ltable.insert(**location2)
         location2.update(id=location2_id)
-        s3mgr.model.update_super(ltable, location2)
+        s3db.update_super(ltable, location2)
 
         self.id1 = location1_id
         self.id2 = location2_id
@@ -1132,7 +1165,7 @@ class S3MergeLocationsTests(unittest.TestCase):
                          location_id = self.id2)
         office_id = otable.insert(**office)
         office.update(id=office_id)
-        s3mgr.model.update_super(otable, office)
+        s3db.update_super(otable, office)
 
         # Merge location 2 into 1
         success = self.resource.merge(self.id1, self.id2)
@@ -1156,7 +1189,7 @@ class S3MergeLocationsTests(unittest.TestCase):
                           countries_id=[self.id1, self.id2])
         project_id = ptable.insert(**project)
         project.update(id=project_id)
-        s3mgr.model.update_super(ptable, project)
+        s3db.update_super(ptable, project)
 
         # Merge location 2 into 1
         success = self.resource.merge(self.id1, self.id2)
@@ -1196,6 +1229,142 @@ class S3MergeLocationsTests(unittest.TestCase):
         auth.override = False
 
 # =============================================================================
+class S3JSONTests(unittest.TestCase):
+
+    def setUp(self):
+
+        ptable = s3db.pr_person
+        otable = s3db.org_organisation
+        htable = s3db.hrm_human_resource
+        jtable = s3db.hrm_job_role
+
+        job_role = Storage(name="TestJSONJobRole")
+        job_role_id = jtable.insert(**job_role)
+        job_role.update(id=job_role_id)
+        s3mgr.onaccept(jtable, Storage(vars=job_role))
+
+        organisation = Storage(name="TestJSONOrganisation")
+        organisation_id = otable.insert(**organisation)
+        organisation.update(id=organisation_id)
+        s3db.update_super(otable, organisation)
+        s3mgr.onaccept(otable, Storage(vars=organisation))
+
+        person = Storage(first_name="TestJSON1",
+                         last_name="Person")
+        person_id = ptable.insert(**person)
+        person.update(id=person_id)
+        s3db.update_super(ptable, person)
+        s3mgr.onaccept(ptable, Storage(vars=person))
+
+        hr_record = Storage(person_id=person_id,
+                            organisation_id=organisation_id,
+                            job_role_id=job_role_id)
+        hr_record_id = htable.insert(**hr_record)
+        hr_record.update(id=hr_record_id)
+        s3mgr.onaccept(htable, Storage(vars=hr_record))
+
+        person = Storage(first_name="TestJSON2",
+                         last_name="Person")
+        person_id = ptable.insert(**person)
+        person.update(id=person_id)
+        s3db.update_super(ptable, person)
+        s3mgr.onaccept(ptable, Storage(vars=person))
+
+        hr_record = Storage(person_id=person_id,
+                            organisation_id=organisation_id)
+        hr_record_id = htable.insert(**hr_record)
+        hr_record.update(id=hr_record_id)
+        s3mgr.onaccept(htable, Storage(vars=hr_record))
+
+    def testJSONExport(self):
+
+        auth.override = True
+        resource = s3mgr.define_resource("hrm", "human_resource")
+        fields = ["id",
+                  "person_id$first_name",
+                  "person_id$middle_name",
+                  "person_id$last_name",
+                  "organisation_id$name",
+                  "job_role_id$name"]
+
+        FS = s3base.S3FieldSelector
+        query = FS("person_id$first_name").like("TestJSON%")
+
+        resource.add_filter(query)
+
+        result = resource.sqltable(fields=fields,
+                                   start=0,
+                                   limit=None,
+                                   as_json=True)
+
+        self.assertNotEqual(result, "[]")
+        from gluon.contrib import simplejson as json
+        data = json.loads(result)
+        self.assertEqual(len(data), 2)
+        for record in data:
+            self.assertTrue("hrm_job_role.name" in record)
+            if record["pr_person.first_name"] == "TestJSON1":
+                self.assertEqual(record["hrm_job_role.name"], "TestJSONJobRole")
+            else:
+                self.assertEqual(record["hrm_job_role.name"], None)
+
+        auth.override = True
+
+    def tearDown(self):
+
+        db.rollback()
+
+# =============================================================================
+class S3ImportXMLTests(unittest.TestCase):
+
+    def setUp(self):
+
+        xmlstr = """
+<s3xml>
+
+    <resource name="pr_person">
+
+        <data field="first_name">Jason</data>
+        <data field="last_name">Test</data>
+        <data field="initials">JT</data>
+        <data field="date_of_birth" value="1922-03-15"/>
+
+        <resource name="pr_contact">
+            <data field="contact_method">EMAIL</data>
+            <data field="value">json@example.com</data>
+        </resource>
+
+        <resource name="pr_contact">
+            <data field="contact_method">SMS</data>
+            <data field="value">123456789</data>
+        </resource>
+
+    </resource>
+
+</s3xml>"""
+
+        from lxml import etree
+        self.tree = etree.ElementTree(etree.fromstring(xmlstr))
+
+    def testImportXML(self):
+        """ Test JSON message after XML import """
+
+        auth.override = True
+        resource = s3mgr.define_resource("pr", "person")
+        msg = resource.import_xml(self.tree)
+        from gluon.contrib import simplejson as json
+        msg = json.loads(msg)
+        self.assertEqual(msg["status"], "success")
+        self.assertEqual(msg["statuscode"], "200")
+        self.assertEqual(msg["records"], 1)
+        self.assertTrue("created" in msg)
+        self.assertTrue(isinstance(msg["created"], list))
+        self.assertTrue(len(msg["created"]) == 1)
+
+    def tearDown(self):
+        db.rollback()
+
+# =============================================================================
 def run_suite(*test_classes):
     """ Run the test suite """
 
@@ -1216,6 +1385,8 @@ if __name__ == "__main__":
         S3MergeOrganisationsTests,
         S3MergePersonsTests,
         S3MergeLocationsTests,
+        S3JSONTests,
+        S3ImportXMLTests,
     )
 
 # END ========================================================================

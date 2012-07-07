@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""
-    S3 Navigation Module
+""" S3 Navigation Module
 
     @copyright: 2011-12 (c) Sahana Software Foundation
     @license: MIT
@@ -1217,7 +1216,7 @@ class S3ComponentTabs:
 
     def __init__(self, tabs=[]):
 
-        self.tabs = [S3ComponentTab(t) for t in tabs]
+        self.tabs = [S3ComponentTab(t) for t in tabs if t]
 
     # -------------------------------------------------------------------------
     def render(self, r):
@@ -1339,11 +1338,11 @@ class S3ComponentTab:
     # -------------------------------------------------------------------------
     def active(self, r):
 
+        s3db = current.s3db
         manager = current.manager
-        model = manager.model
 
-        get_components = model.get_components
-        get_method = model.get_method
+        get_components = s3db.get_components
+        get_method = s3db.get_method
         get_vars = r.get_vars
         tablename = None
         if "viewing" in get_vars:

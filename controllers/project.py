@@ -7,24 +7,26 @@
 module = request.controller
 resourcename = request.function
 
-if not deployment_settings.has_module(module):
+if not settings.has_module(module):
     raise HTTP(404, body="Module disabled: %s" % module)
 
-mode_task = deployment_settings.get_project_mode_task()
+mode_task = settings.get_project_mode_task()
 
 # =============================================================================
 def index():
     """ Module's Home Page """
 
-    # Bypass home page & go direct to searching for Projects
-    if deployment_settings.get_project_mode_drr():
-        redirect(URL(f="project", args="search"))
-    elif mode_task:
+    if mode_task:
         redirect(URL(f="project", vars={"tasks":1}))
+    elif settings.get_project_mode_drr():
+        # Bypass home page & go direct to searching for Projects
+        redirect(URL(f="project", args="search"))
     else:
+        # Bypass home page & go direct to list of Projects
+        # - no good search options available
         redirect(URL(f="project"))
 
-    #module_name = deployment_settings.modules[module].name_nice
+    #module_name = settings.modules[module].name_nice
     #response.title = module_name
     #return dict(module_name=module_name)
 
@@ -44,9 +46,9 @@ def project():
         #s3.crud_strings["project_project"].sub_title_list = T("Select Project")
         s3mgr.LABEL.READ = "Select"
         s3mgr.LABEL.UPDATE = "Select"
-        s3mgr.configure("project_project",
-                        deletable=False,
-                        listadd=False)
+        s3db.configure("project_project",
+                       deletable=False,
+                       listadd=False)
         # Post-process
         def postp(r, output):
             if r.interactive:
@@ -76,7 +78,12 @@ def project():
     # Pre-process
     def prep(r):
         if r.interactive:
-            if r.component is not None:
+            if not r.component:
+                if not r.id and r.function == "index":
+                    r.method = "search"
+                    # If just a few Projects, then a List is sufficient
+                    #r.method = "list"
+            else:
                 if r.component_name == "organisation":
                     if r.method != "update":
                         host_role = 1
@@ -125,22 +132,23 @@ def project():
                     from eden.hrm import hrm_human_resource_represent
 
                     # We can pass the human resource type filter in the URL
-                    group = r.vars.get('group', None)
+                    group = r.vars.get("group", None)
 
                     # These values are defined in hrm_type_opts
                     if group:
+                        crud_strings = s3.crud_strings
                         if group == "staff":
                             group = 1
                             db.project_human_resource.human_resource_id.label = T("Staff")
-                            s3.crud_strings["project_human_resource"] = s3.crud_strings["hrm_staff"]
-                            s3.crud_strings["project_human_resource"].update(
+                            crud_strings["project_human_resource"] = crud_strings["hrm_staff"]
+                            crud_strings["project_human_resource"].update(
                                 subtitle_create = T("Add Staff Member to Project")
                                 )
                         elif group == "volunteer":
                             group = 2
                             db.project_human_resource.human_resource_id.label = T("Volunteer")
-                            s3.crud_strings["project_human_resource"] = s3.crud_strings["hrm_volunteer"]
-                            s3.crud_strings["project_human_resource"].update(
+                            crud_strings["project_human_resource"] = crud_strings["hrm_volunteer"]
+                            crud_strings["project_human_resource"].update(
                                 subtitle_create = T("Add Volunteer to Project")
                                 )
 
@@ -159,11 +167,6 @@ def project():
                             sort=True
                         )
 
-            elif not r.id and r.function == "index":
-                r.method = "search"
-                # If just a few Projects, then a List is sufficient
-                #r.method = "list"
-
         return True
     s3.prep = prep
 
@@ -171,60 +174,19 @@ def project():
     def postp(r, output):
         if r.interactive:
             if not r.component:
-                # Do extra client-side validation
-                # This part needs to be able to support multiple L10n_date_format
-                #var datePattern = /^(19|20)\d\d([-\/.])(0[1-9]|1[012])\2(0[1-9]|[12][0-9]|3[01])$/;
-                #if ( (start_date && !(datePattern.test(start_date))) | (end_date && !(datePattern.test(end_date))) ) {
-                #    error_msg = '%s';
-                #    jQuery('#project_project_start_date__row > td').last().text(error_msg);
-                #    jQuery('#project_project_start_date__row > td').last().addClass('red');
-                #    return false;
-                #}
-                validate = True
-                date_format = deployment_settings.get_L10n_date_format()
-                if date_format == T("%Y-%m-%d"):
-                    # Default
-                    start_date_string = "start_date[0], start_date[1], start_date[2]"
-                    end_date_string = "end_date[0], end_date[1], end_date[2]"
-                elif date_format == T("%m-%d-%Y"):
-                    # US Style
-                    start_date_string = "start_date[2], start_date[0], start_date[1]"
-                    end_date_string = "end_date[2], end_date[0], end_date[1]"
-                elif date_format == T("%d-%b-%Y"):
-                    # Unsortable 'Pretty' style
-                    start_date_string = "start_date[0] + ' ' + start_date[1] + ' ' + start_date[2]"
-                    end_date_string = "end_date[0] + ' ' + end_date[1] + ' ' + end_date[2]"
-                else:
-                    # Unknown format - don't add extra validation
-                    validate = False
-                if validate:
-                    script = """$('.form-container > form').submit(function () {
-    var start_date = this.start_date.value;
-    var end_date = this.end_date.value;
-    start_date = start_date.split('-');
-    start_date = new Date(%s);
-    end_date = end_date.split('-');
-    end_date = new Date(%s);
-    if (start_date > end_date) {
-        var error_msg = '%s';
-        jQuery('#project_project_end_date__row > td').last().text(error_msg);
-        jQuery('#project_project_end_date__row > td').last().addClass('red');
-        return false;
-    } else {
-        return true;
-    }
-});""" % (start_date_string,
-          end_date_string,
-          T("End date should be after start date"))
-                if validate:
-                    s3.jquery_ready.append(script)
-
+                # Set the minimum end_date to the same as the start_date
+                s3.jquery_ready.append(
+'''S3.start_end_date('project_project_start_date','project_project_end_date')''')
                 if mode_task:
                     read_url = URL(args=["[id]", "task"])
                     update_url = URL(args=["[id]", "task"])
                     s3mgr.crud.action_buttons(r,
                                               read_url=read_url,
                                               update_url=update_url)
+            elif r.component_name == "beneficiary":
+                    # Set the minimum end_date to the same as the start_date
+                    s3.jquery_ready.append(
+'''S3.start_end_date('project_beneficiary_start_date','project_beneficiary_end_date')''')
         return output
     s3.postp = postp
 
@@ -256,11 +218,11 @@ def framework():
 def organisation():
     """ RESTful CRUD controller """
 
-    if deployment_settings.get_project_multiple_organsiations():
-        s3mgr.configure("project_organisation",
-                        insertable=False,
-                        editable=False,
-                        deletable=False)
+    if settings.get_project_multiple_organisations():
+        s3db.configure("project_organisation",
+                       insertable=False,
+                       editable=False,
+                       deletable=False)
 
         list_btn = A(T("Funding Report"),
                      _href=URL(c="project", f="organisation",
@@ -291,10 +253,10 @@ def beneficiary():
 
     tablename = "project_beneficiary"
 
-    s3mgr.configure("project_beneficiary",
-                    insertable=False,
-                    editable=False,
-                    deletable=False)
+    s3db.configure("project_beneficiary",
+                   insertable=False,
+                   editable=False,
+                   deletable=False)
 
     list_btn = A(T("Beneficiary Report"),
                  _href=URL(c="project", f="beneficiary",
@@ -444,7 +406,7 @@ def location():
                         title = title,
                         details_btn = details_btn,
                     )
-            
+
         return output
     s3.postp = postp
 
@@ -520,19 +482,18 @@ def time():
     table = s3db[tablename]
     if "mine" in request.get_vars:
         # Show the Logged Time for this User
-        s3mgr.load("project_time")
         s3.crud_strings["project_time"].title_list = T("My Logged Hours")
-        s3mgr.configure("project_time",
-                        listadd=False)
+        s3db.configure("project_time",
+                       listadd=False)
         person_id = auth.s3_logged_in_person()
         if person_id:
             s3.filter = (table.person_id == person_id)
         try:
-            list_fields = s3mgr.model.get_config(tablename,
-                                                 "list_fields")
+            list_fields = s3db.get_config(tablename,
+                                          "list_fields")
             list_fields.remove("person_id")
-            s3mgr.configure(tablename,
-                            list_fields=list_fields)
+            s3db.configure(tablename,
+                           list_fields=list_fields)
         except:
             pass
 
@@ -578,8 +539,8 @@ def comment_parse(comment, comments, task_id=None):
             url = "http://www.gravatar.com/%s" % hash
             author = B(A(username, _href=url, _target="top"))
     if not task_id and comment.task_id:
-        s3mgr.load("project_task")
-        task = "re: %s" % db.project_task[comment.task_id].name
+        table = s3db.project_task
+        task = "re: %s" % table[comment.task_id].name
         header = DIV(author, " ", task)
         task_id = comment.task_id
     else:
@@ -616,45 +577,27 @@ def comment_parse(comment, comments, task_id=None):
 
 # -----------------------------------------------------------------------------
 def comments():
-    """ Function accessed by AJAX from discuss() to handle Comments """
-
-    resourcename = request.args(0)
-    if not resourcename:
-        raise HTTP(400)
+    """ Function accessed by AJAX from rfooter to handle Comments """
 
     try:
-        id = request.args[1]
+        task_id = request.args[0]
     except:
         raise HTTP(400)
 
-    if resourcename == "task":
-        task_id = id
-    else:
-        raise HTTP(400)
-
     table = s3db.project_comment
-    if task_id:
-        table.task_id.default = task_id
-        table.task_id.writable = table.task_id.readable = False
-    else:
-        table.task_id.label = T("Related to Task (optional)")
-        table.task_id.requires = IS_EMPTY_OR(IS_ONE_OF(db,
-                                                       "project_task.id",
-                                                       "%(name)s"
-                                                      ))
+    field = table.task_id
+    field.default = task_id
+    field.writable = field.readable = False
 
     # Form to add a new Comment
-    form = crud.create(table)
+    form = crud.create(table, formname="project_comment/%s" % task_id)
 
     # List of existing Comments
-    if task_id:
-        comments = db(table.task_id == task_id).select(table.id,
-                                                       table.parent,
-                                                       table.body,
-                                                       table.created_by,
-                                                       table.created_on)
-    else:
-        comments = ""
+    comments = db(field == task_id).select(table.id,
+                                           table.parent,
+                                           table.body,
+                                           table.created_by,
+                                           table.created_on)
 
     output = UL(_id="comments")
     for comment in comments:
@@ -663,14 +606,16 @@ def comments():
             thread = comment_parse(comment, comments, task_id=task_id)
             output.append(thread)
 
-    # Also see the outer discuss()
-    script = "".join(("""
-$('#comments').collapsible({xoffset:'-5',yoffset:'50',imagehide:img_path+'arrow-down.png',imageshow:img_path+'arrow-right.png',defaulthide:false});
-$('#project_comment_parent__row1').hide();
-$('#project_comment_parent__row').hide();
-$('#project_comment_body').ckeditor(ck_config);
-$('#submit_record__row input').click(function(){$('#comment-form').hide();$('#project_comment_body').ckeditorGet().destroy();return true;});
-"""))
+    script = "".join((
+'''$('#comments').collapsible({xoffset:'-5',yoffset:'50',imagehide:img_path+'arrow-down.png',imageshow:img_path+'arrow-right.png',defaulthide:false})
+$('#project_comment_parent__row1').hide()
+$('#project_comment_parent__row').hide()
+$('#project_comment_body').ckeditor(ck_config)
+$('#submit_record__row input').click(function(){
+ $('#comment-form').hide()
+ $('#project_comment_body').ckeditorGet().destroy()
+ return true
+})'''))
 
     # No layout in this output!
     #s3.jquery_ready.append(script)

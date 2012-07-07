@@ -46,7 +46,7 @@ class CreateVolunteerTraining(SeleniumUnitTest):
             @Test Wiki: http://eden.sahanafoundation.org/wiki/DeveloperGuidelines/Testing
             
             @ToDo: 
-            * Add Staff Participants
+            * Add Volunteer Participants
         """
         
         browser = self.browser
@@ -65,7 +65,7 @@ class CreateVolunteerTraining(SeleniumUnitTest):
                        "Emergency First Aid",
                        "option"),
                      ( "site_id",
-                       "Bucharest RFAAT Centre",
+                       "AP Zone",
                        "autocomplete"),
                      ( "start_date",
                        "2012-04-11"),

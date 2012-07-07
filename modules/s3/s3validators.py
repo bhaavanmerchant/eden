@@ -52,16 +52,19 @@ __all__ = ["single_phone_number_pattern",
            "IS_ADD_PERSON_WIDGET",
            "IS_ACL",
            "QUANTITY_INV_ITEM",
-           "IS_IN_SET_LAZY"]
+           "IS_IN_SET_LAZY"
+           ]
 
 import re
 import time
 from datetime import datetime, timedelta
 
-from gluon import current
-from gluon.dal import Field
+from gluon import *
+#from gluon import current
+#from gluon.dal import Field
+#from gluon.validators import IS_DATE_IN_RANGE, IS_MATCH, IS_NOT_IN_DB, IS_IN_SET, IS_INT_IN_RANGE, IS_FLOAT_IN_RANGE, IS_EMAIL
 from gluon.languages import lazyT
-from gluon.validators import Validator, IS_DATE_IN_RANGE, IS_MATCH, IS_NOT_IN_DB, IS_IN_SET, IS_INT_IN_RANGE, IS_FLOAT_IN_RANGE, IS_EMAIL
+from gluon.validators import Validator
 from gluon.storage import Storage
 
 def translate(text):
@@ -451,15 +454,25 @@ class IS_ONE_OF_EMPTY(Validator):
                 query = current.auth.s3_accessible_query("read", table)
                 if "deleted" in table:
                     query = ((table["deleted"] == False) & query)
-                if self.filterby and self.filterby in table:
-                    if self.filter_opts:
-                        query = query & (table[self.filterby].belongs(self.filter_opts))
+                filterby = self.filterby
+                if filterby and filterby in table:
+                    filter_opts = self.filter_opts
+                    if filter_opts:
+                        if None in filter_opts:
+                            # Needs special handling (doesn't show up in 'belongs')
+                            _query = (table[filterby]== None)
+                            filter_opts = [f for f in filter_opts if f is not None]
+                            if filter_opts:
+                                _query = _query | (table[filterby].belongs(filter_opts))
+                            query = query & _query
+                        else:
+                            query = query & (table[filterby].belongs(filter_opts))
                     if not self.orderby:
-                        dd.update(orderby=table[self.filterby])
+                        dd.update(orderby=table[filterby])
                 if self.not_filterby and self.not_filterby in table and self.not_filter_opts:
                     query = query & (~(table[self.not_filterby].belongs(self.not_filter_opts)))
                     if not self.orderby:
-                        dd.update(orderby=table[self.filterby])
+                        dd.update(orderby=table[filterby])
                 if self.left is not None:
                     dd.update(left=self.left)
                 records = dbset(query).select(*fields, **dd)
@@ -685,11 +698,7 @@ class IS_LOCATION_SELECTOR(Validator):
                  error_message = None,
                 ):
         T = current.T
-        self.error_message = error_message or T("Invalid Location!")
-        self.no_parent = T("Need to have all levels filled out in mode strict!")
-        self.invalid_lat = T("Latitude is Invalid!")
-        self.invalid_lon = T("Longitude is Invalid!")
-        self.no_permission = current.auth.messages.access_denied
+        self.error_message = error_message or current.T("Invalid Location!")
         self.errors = Storage()
 
     def __call__(self, value):
@@ -703,7 +712,7 @@ class IS_LOCATION_SELECTOR(Validator):
             value = int(value)
             # Yes: This must be an Update form
             if not auth.s3_has_permission("update", table, record_id=value):
-                return (value, self.no_permission)
+                return (value, auth.messages.access_denied)
             # Check that this is a valid location_id
             query = (table.id == value) & \
                     (table.deleted == False) & \
@@ -743,7 +752,7 @@ class IS_LOCATION_SELECTOR(Validator):
         except:
             # Create form
             if not auth.s3_has_permission("create", table):
-                return (None, self.no_permission)
+                return (None, auth.messages.access_denied)
             location = self._process_values()
             if self.errors:
                 errors = self.errors
@@ -786,12 +795,9 @@ class IS_LOCATION_SELECTOR(Validator):
             Note: This is also used by IS_SITE_SELECTOR()
         """
 
+        T = current.T
         db = current.db
         s3db = current.s3db
-        auth = current.auth
-        response = current.response
-        session = current.session
-
         table = s3db.gis_location
 
         vars = current.request.vars
@@ -804,21 +810,22 @@ class IS_LOCATION_SELECTOR(Validator):
             try:
                 lat = float(lat)
             except ValueError:
-                self.errors["lat"] = self.invalid_lat
+                self.errors["lat"] = T("Latitude is Invalid!")
         if lon:
             try:
                 lon = float(lon)
             except ValueError:
-                self.errors["lon"] = self.invalid_lon
+                self.errors["lon"] = T("Longitude is Invalid!")
         if self.errors:
             return None
 
         # Are we allowed to create Locations?
+        auth = current.auth
         if not auth.s3_has_permission("create", table):
-            self.errors["location_id"] = self.no_permission
+            self.errors["location_id"] = auth.messages.access_denied
             return None
         # What level of hierarchy are we allowed to edit?
-        if auth.s3_has_role(session.s3.system_roles.MAP_ADMIN):
+        if auth.s3_has_role(current.session.s3.system_roles.MAP_ADMIN):
             # 'MapAdmin' always has permission to edit hierarchy locations
             L1_allowed = True
             L2_allowed = True
@@ -1132,11 +1139,7 @@ class IS_SITE_SELECTOR(IS_LOCATION_SELECTOR):
                  site_type = "project_site",
                  error_message = None,
                 ):
-        T = current.T
-        self.error_message = error_message or T("Invalid Site!")
-        self.no_parent = T("Need to have all levels filled out in mode strict!")
-        auth = current.auth
-        self.no_permission = auth.messages.access_denied
+        self.error_message = error_message or current.T("Invalid Site!")
         self.errors = Storage()
         self.site_type = site_type
 
@@ -1152,7 +1155,7 @@ class IS_SITE_SELECTOR(IS_LOCATION_SELECTOR):
             value = int(value)
             # Yes: This must be an Update form
             if not auth.s3_has_permission("update", stable, record_id=value):
-                return (value, self.no_permission)
+                return (value, auth.messages.access_denied)
             # Check that this is a valid site_id
             query = (stable.id == value) & \
                     (stable.deleted == False)
@@ -1187,7 +1190,7 @@ class IS_SITE_SELECTOR(IS_LOCATION_SELECTOR):
         except:
             # Create form
             if not auth.s3_has_permission("create", stable):
-                return (None, self.no_permission)
+                return (None, auth.messages.access_denied)
             location = self._process_values()
             if self.errors:
                 errors = self.errors
@@ -1235,8 +1238,6 @@ class IS_ADD_PERSON_WIDGET(Validator):
 
         T = current.T
         db = current.db
-        manager = current.manager
-        validate = manager.validate
         request = current.request
         settings = current.deployment_settings
 
@@ -1295,6 +1296,7 @@ class IS_ADD_PERSON_WIDGET(Validator):
                     error = T("Invalid phone number")
                     return (person_id, error)
 
+            validate = current.manager.validate
             if person_id:
                 # Update the person record
                 query = (ptable.id == person_id)
@@ -1365,7 +1367,7 @@ class IS_ADD_PERSON_WIDGET(Validator):
 
                 if person_id:
                     # Update the super-entities
-                    manager.model.update_super(ptable, dict(id=person_id))
+                    current.s3db.update_super(ptable, dict(id=person_id))
                     # Read the created pe_id
                     query = (ptable.id == person_id)
                     person = db(query).select(ptable.pe_id,
@@ -1834,6 +1836,8 @@ class IS_IN_SET_LAZY(Validator):
                         self.labels = [represent(item) for item in theset]
             else:
                 self.theset = theset
+        else:
+            self.theset = []
 
     def options(self):
         if not self.theset:
