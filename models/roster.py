@@ -2,15 +2,15 @@
 tablename = "hrm_roster"
 table = db.define_table(tablename, *s3_meta_fields())
 tablename = "hrm_roster_organisation"
-table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.org_organisation_id())
+table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.super_link("id", "org_organisation"))
 tablename = "hrm_roster_project"
-table = db.define_table(tablename, Field('roster',db.hrm_roster),  s3db.project_project_id())
+table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.super_link("id", "project_project"))
 tablename = "hrm_roster_site"
-table = db.define_table(tablename, Field('roster',db.hrm_roster),  s3db.super_link("site_id", "org_site"),)
+table = db.define_table(tablename, Field('roster',db.hrm_roster),  s3db.super_link("site_id", "org_site"))
 tablename = "hrm_roster_incident" 
-table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.event_incident_id())
+table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.super_link("id", "event_incident"))
 tablename = "hrm_roster_scenario"
-table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.scenario_scenario_id())
+table = db.define_table(tablename, Field('roster',db.hrm_roster), s3db.super_link("id", "scenario_scenario"))
 tablename = "hrm_shift"
 table = db.define_table(tablename, 
                             Field('roster',db.hrm_roster),
