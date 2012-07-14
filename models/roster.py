@@ -46,7 +46,6 @@ table = db.define_table(tablename,
                             Field("table_id",db.hrm_roster_table),
                             Field("date"),
                             Field("role")
-                            
                         )
 
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
