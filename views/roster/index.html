@@ -68,8 +68,9 @@ jQuery(document).ready(function(){
         roster_dets[i]=v_json;
         i=i+1;     
         });
-
+    //alert(roster_dets);
     });
+    
 });
 </script>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
@@ -113,7 +114,7 @@ Slot:
 <tr><th>Role</th>{{for d in time_dets:}}<th>{{=d}}</th>{{pass}}
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
-<tr><td>{{=alloted_roles[r]}}</td>
+<tr><td><div class='vcell'>{{=alloted_roles[r]}}{{=IMG(_src='/eden/static/img/minus.png', _class='symbv')}}</div> </td>
 {{for c in range(len(time_dets)):}}<td><div class='vcell' data-col={{=c}} data-row={{=r}} > <div class='vcelln'></div> {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}{{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}} </div> </td>{{pass}}
 </tr>
 {{pass}}
