@@ -24,15 +24,15 @@ tablename = "hrm_roster_shift"
 #                            Field("endtime", "datetime", label=T("end"))
 #                        )
 table = db.define_table(tablename,
-                            s3db.super_link("roster_id","hrm_roster"),
-                            s3db.super_link("table_id","hrm_roster_table"),
+                            Field("roster_id",db.hrm_roster),
+                            Field("table_id",db.hrm_roster_table),
                             Field("date"),
                             Field("role")
                             
                         )
 
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
-table = db.define_table(tablename, s3db.superlink("table_id", "hrm_roster_table"), Field('roles'))
+table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'))
 tablename = "hrm_roster_type" #type: event, scenario, project etc.
-table = db.define_table(tablename, s3db.superlink("table_id", "hrm_roster_table"), Field('type'))
+table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('type'))
 
