@@ -33,4 +33,8 @@ def people():
     alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ];
     r=int(request.vars.row);
     return DIV(DIV(alloted_roles[r], _id='volunteer_role'), *[DIV(volunteers[v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers]);
-    
+
+
+def roster_submit():
+    import json
+    return DIV("Successfully saved!" + json.dumps(request.vars))

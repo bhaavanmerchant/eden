@@ -68,6 +68,17 @@ jQuery(document).ready(function(){
         roster_dets[i]=v_json;
         i=i+1;     
         });
+    $.ajax(
+            {
+            type: "POST",
+            url: "roster_submit",
+            data: roster_dets
+            }).done(function( msg ) 
+                {
+                $("#vn").html(msg);
+                });
+
+        
     //alert(roster_dets);
     });
     
