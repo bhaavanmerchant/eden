@@ -72,14 +72,14 @@ jQuery(document).ready(function(){
             {
             type: "POST",
             url: "roster_submit",
-            data: roster_dets
+            data: roster_dets 
             }).done(function( msg ) 
                 {
                 $("#vn").html(msg);
                 });
 
         
-    //alert(roster_dets);
+    //alert(roster_dets[0].row);
     });
     
 });

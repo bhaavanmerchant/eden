@@ -6,11 +6,12 @@ table = db.define_table(tablename,
                                 Field('week'), 
                                 Field('slot')
                         )
+#db.hrm_roster_table.insert(week='21', slot='1')
 tablename = "hrm_roster"
 table = db.define_table(tablename, 
-                                Field('roster_table',
-                                    db.hrm_roster_table
-                        ), *s3_meta_fields())
+#                                Field('roster_table',
+#                                    db.hrm_roster_table),
+                                 *s3_meta_fields())
 tablename = "hrm_roster_organisation"
 table = db.define_table(tablename, 
                                 Field('roster',db.hrm_roster), 
