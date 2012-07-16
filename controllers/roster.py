@@ -26,8 +26,9 @@ def index():
     slots=['8:00 - 12:00','12:00 - 4:00','4:00 - 8:00']
     job_roles=['-- Select --']
     job_roles+=['Team Leader', 'Team Member', 'Trainee']
+    filled_slots=[{'row':3, 'col':2, 'vid':'a5'}]
     projects=['Project Alpha', 'Project Beta', 'Peoject Gamma', 'Project Delta', 'Project Epsilon', 'Project Zeta', 'Project Eta']
-    return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date)
+    return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date,filled_slots=filled_slots)
 
 def people():
     """
