@@ -127,8 +127,29 @@ Slot:
 <tr><th>Role</th>{{for d in time_dets:}}<th>{{=d}}</th>{{pass}}
 </tr></thead>
 {{for r in range(len(alloted_roles)):}}
-<tr><td><div class='vcell'>{{=alloted_roles[r]}}{{=IMG(_src='/eden/static/img/minus.png', _class='symbv')}}</div> </td>
-{{for c in range(len(time_dets)):}}<td>{{ for filled_slot in filled_slots: }} {{if r==filled_slot['row'] and c==filled_slot['col']:}}<div class='vcell allotted' data-col={{=c}} data-row={{=r}} > <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div> {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv addpf')}}{{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv rempf')}} </div>{{else:}}<div class='vcell' data-col={{=c}} data-row={{=r}} > <div class='vcelln'></div> {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}{{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}} </div> {{pass}} {{pass}} </td>{{pass}}
+<tr>
+    <td>
+        <div class='vcell'>{{=alloted_roles[r]}}{{=IMG(_src='/eden/static/img/minus.png', _class='symbv')}}</div>
+    </td>
+    {{for c in range(len(time_dets)):}}
+    <td>
+        {{ for filled_slot in filled_slots: }}
+            {{if r==filled_slot['row'] and c==filled_slot['col']:}}
+                <div class='vcell allotted' data-col={{=c}} data-row={{=r}} > 
+                    <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div> 
+                    {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv addpf')}}
+                    {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv rempf')}}
+                </div>
+            {{else:}}
+                <div class='vcell' data-col={{=c}} data-row={{=r}} >
+                    <div class='vcelln'></div>
+                    {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}
+                    {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}}
+                </div> 
+            {{pass}}
+        {{pass}} 
+    </td>
+    {{pass}}
 </tr>
 {{pass}}
 
