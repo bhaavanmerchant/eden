@@ -1168,6 +1168,14 @@ class S3OptionsMenu(object):
         return self.inv()
 
     # -------------------------------------------------------------------------
+    def roster(self):
+        """ Roster """
+
+        M(c="roster")(
+                    M("Create a roster", f="index")
+                )
+
+    # -------------------------------------------------------------------------
     def survey(self):
         """ SURVEY / Survey """
 

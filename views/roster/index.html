@@ -10,6 +10,7 @@ jQuery(document).ready(function(){
     $('.rempf').show();
     $('#addrow').click(function(){$('#newrole').toggle(); $('#addrow').hide();});
     $('#new_job_role').change(function(){$('#roster_info_form').submit();});
+    $('#occasion').change(function(){$('#roster_info_form').submit();});
     $('#project_selector').change(function(){$('#roster_info_form').submit();});
     $('#timeframe').change(function(){$('#roster_info_form').submit();});
     $('#timeslot').change(function(){$('#roster_info_form').submit();});
@@ -97,6 +98,9 @@ jQuery(document).ready(function(){
 {{=IMG(_src='/eden/static/img/cross.png',_alt='cross',_id='cross')}}
 <br/>
 <div class='vn' id='vn'>
+<form>
+<input type='text' id='volunteer_quick_search'>
+</form>
 {{for v_id in volunteers:}}
 <div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
 {{pass}}
@@ -107,19 +111,33 @@ jQuery(document).ready(function(){
 <div id="r_tablearea">
 <form enctype="multipart/form-data" id="roster_info_form" action="{{=URL()}}" method="post">
 <div id="selectboxes">
-<span>Project:
-<select name='project_selector' id='project_selector'>
-{{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
-</select> </span> <span style="position:relative; left:150px;">
-<select name='timeframe' id='timeframe'>
-{{for i in range(numb):}}
-  <option value={{=i+1}}>Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}</option>
-{{pass}}
-</select> </span> <span style="position:relative; left:350px;">
-Slot:
-<select name='timeslot' id='timeslot'>
-{{for x in range(len(slots)):}}<option value={{=x}}>{{=slots[x]}}</option>{{pass}}
-</select> </span>
+    <span>Event:
+        <select name='occasion' id='occasion'>
+        {{for x in range(len(occasion)):}}<option value={{=x}}>{{=occasion[x]}}</option>{{pass}}
+        </select>
+    </span>
+
+    <span style="position:relative; left:60px;">
+        <select name='project_selector' id='project_selector'>
+        {{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
+        </select>
+    </span>
+
+    <span style="position:relative; left:180px;">
+        <select name='timeframe' id='timeframe'>
+        {{for i in range(numb):}}
+            <option value={{=i+1}}>Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}
+            </option>
+        {{pass}}
+        </select>
+    </span>
+
+    <span style="position:relative; left:240px;">
+    Slot:
+        <select name='timeslot' id='timeslot'>
+        {{for x in range(len(slots)):}}<option value={{=x}}>{{=slots[x]}}</option>{{pass}}
+        </select>
+    </span>
 </div>
 <br/>
 <table id="r_table">
@@ -163,7 +181,7 @@ Slot:
 </table>
 {{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow')}}
 <br/>
-<span> <input type="button" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <span> <a>Autofill</a> </span> 
+<span> <input type="button" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> 
 </div>
 </span>
 </div>
