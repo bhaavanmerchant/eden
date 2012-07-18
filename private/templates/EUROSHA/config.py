@@ -7,53 +7,42 @@ settings = current.deployment_settings
 T = current.T
 
 """
-    Template settings for DRRPP
+    Template settings for EUROSHA: European Open Source Humanitarian Aid
 """
 
 # Pre-Populate
-settings.base.prepopulate = ["DRRPP"]
+settings.base.prepopulate = ["EUROSHA"]
 
-settings.base.system_name = T("DRR Project Portal")
-settings.base.system_name_short = T("DRRPP")
+settings.base.system_name = T("European Open Source Humanitarian Aid")
+settings.base.system_name_short = T("EUROSHA")
 
 # Theme (folder to use for views/layout.html)
-settings.base.theme = "DRRPP"
+#settings.base.theme = "EUROSHA"
 
 # Auth settings
 # Do new users need to verify their email address?
 settings.auth.registration_requires_verification = True
 # Do new users need to be approved by an administrator prior to being able to login?
 settings.auth.registration_requires_approval = True
-# Uncomment this to request the Organisation when a user registers
-settings.auth.registration_requests_organisation = True
-settings.auth.registration_pending = \
-"""Registration awaiting approval from Administrator or Organisation Contact.
-A confirmation email will be sent to you once approved.
-For enquiries contact %s""" % settings.get_mail_approver()
 
 # L10n settings
 settings.L10n.languages = OrderedDict([
     ("en", "English"),
+    ("fr", "French"),
 ])
 # Default timezone for users
-settings.L10n.utc_offset = "UTC +0700"
+settings.L10n.utc_offset = "UTC +0100"
 # Number formats (defaults to ISO 31-0)
 # Decimal separator for numbers (defaults to ,)
 settings.L10n.decimal_separator = "."
 # Thousands separator for numbers (defaults to space)
 settings.L10n.thousands_separator = ","
-# Unsortable 'pretty' date format
-#settings.L10n.date_format = T("%d-%b-%Y")
-#settings.L10n.datetime_format = T("%d-%b-%Y %H:%M:%S")
 
 # Finance settings
 settings.fin.currencies = {
-    "AUD" : T("Australian Dollars"),
-    "CAD" : T("Canadian Dollars"),
     "EUR" : T("Euros"),
     "GBP" : T("Great British Pounds"),
-    "PHP" : T("Philippine Pesos"),
-    "CHF" : T("Swiss Francs"),
+    #"CHF" : T("Swiss Francs"),
     "USD" : T("United States Dollars"),
 }
 
@@ -61,22 +50,12 @@ settings.fin.currencies = {
 settings.security.policy = 6 # Realm
 settings.security.map = True
 
-# Theme
-settings.gis.map_height = 600
-settings.gis.map_width = 854
-
-# Display Resources recorded to Admin-Level Locations on the map
-# @ToDo: Move into gis_config?
-settings.gis.display_L0 = True
-
 # Enable this for a UN-style deployment
 settings.ui.cluster = True
 
 # Projects
 # Uncomment this to use settings suitable for a global/regional organisation (e.g. DRR)
 settings.project.mode_3w = True
-# Uncomment this to use DRR (Disaster Risk Reduction) extensions
-settings.project.mode_drr = True
 # Uncomment this to call project locations 'Communities'
 #settings.project.community = True
 # Uncomment this to use multiple Budgets per project
@@ -131,7 +110,7 @@ settings.modules = OrderedDict([
             name_nice = T("Map"),
             #description = "Situation Awareness & Geospatial Analysis",
             restricted = True,
-            module_type = 3,     # 6th item in the menu
+            module_type = 4,     # 4th item in the menu
         )),
     ("pr", Storage(
             name_nice = T("Person Registry"),
@@ -151,13 +130,25 @@ settings.modules = OrderedDict([
             name_nice = T("Staff"),
             #description = "Human Resources Management",
             restricted = True,
-            module_type = None,
+            module_type = 10,
         )),
+    ("vol", Storage(
+            name_nice = T("Volunteers"),
+            #description = "Human Resources Management",
+            restricted = True,
+            module_type = 10,
+        )),
+    ("cms", Storage(
+          name_nice = T("Content Management"),
+          #description = "Content Management System",
+          restricted = True,
+          module_type = 10,
+      )),
     ("doc", Storage(
             name_nice = T("Documents"),
             #description = "A library of digital resources, such as photos, documents and reports",
             restricted = True,
-            module_type = None,
+            module_type = 10,
         )),
     ("msg", Storage(
             name_nice = T("Messaging"),
@@ -166,10 +157,41 @@ settings.modules = OrderedDict([
             # The user-visible functionality of this module isn't normally required. Rather it's main purpose is to be accessed from other modules.
             module_type = None,
         )),
+    ("supply", Storage(
+            name_nice = T("Supply Chain Management"),
+            #description = "Used within Inventory Management, Request Management and Asset Management",
+            restricted = True,
+            module_type = None, # Not displayed
+        )),
+    ("inv", Storage(
+            name_nice = T("Warehouses"),
+            #description = "Receiving and Sending Items",
+            restricted = True,
+            module_type = 10
+        )),
+    ("asset", Storage(
+            name_nice = T("Assets"),
+            #description = "Recording and Assigning Assets",
+            restricted = True,
+            module_type = 4,
+        )),
+    # Vehicle depends on Assets
+    ("vehicle", Storage(
+            name_nice = T("Vehicles"),
+            #description = "Manage Vehicles",
+            restricted = True,
+            module_type = 10,
+        )),
     ("project", Storage(
             name_nice = T("Projects"),
             #description = "Tracking of Projects, Activities and Tasks",
             restricted = True,
-            module_type = 1
+            module_type = 2
+        )),
+    ("hms", Storage(
+            name_nice = T("Hospitals"),
+            #description = "Helps to monitor status of hospitals",
+            restricted = True,
+            module_type = 10
         )),
 ])

@@ -165,11 +165,12 @@ class S3ProjectModel(S3Model):
                                                                   sort=True,
                                                                   multiple=True)),
                                          represent = lambda opt, row=None: \
-                                            multiref_represent(opt, "project_theme"),
+                                             multiref_represent(opt, "project_theme"),
                                          ondelete = "RESTRICT",
                                          widget = lambda f, v: \
-                                            CheckboxesWidgetS3.widget(f, v,
-                                                                      cols=3)
+                                             s3_grouped_checkboxes_widget(f, v,
+                                                                          cols=3,
+                                                                          help_field="comments")
                                         )
 
         # Projects
@@ -205,11 +206,12 @@ class S3ProjectModel(S3Model):
                                                                   sort=True,
                                                                   multiple=True)),
                                           represent = lambda opt, row=None: \
-                                            multiref_represent(opt, "project_hazard"),
+                                              multiref_represent(opt, "project_hazard"),
                                           ondelete = "RESTRICT",
-                                          widget = lambda f, v: \
-                                            CheckboxesWidgetS3.widget(f, v,
-                                                                      cols=3)
+                                          widget=lambda f, v: \
+                                              s3_grouped_checkboxes_widget(f, v,
+                                                                           cols=3,
+                                                                           help_field="comments")
                                           )
 
         # ---------------------------------------------------------------------
@@ -368,6 +370,7 @@ class S3ProjectModel(S3Model):
                         name = "project_search_hazard",
                         label = T("Hazard"),
                         field = "multi_hazard_id",
+                        help_field="comments",
                         cols = 4
                     ))
         if not theme_percentages:
@@ -375,6 +378,7 @@ class S3ProjectModel(S3Model):
                         name = "project_search_theme",
                         label = T("Theme"),
                         field = "multi_theme_id",
+                        help_field="comments",
                         cols = 4
                     ))
         if mode_drr:
@@ -457,7 +461,7 @@ class S3ProjectModel(S3Model):
                                      sortby="name",
                                      requires = IS_NULL_OR(
                                                     IS_ONE_OF(db, "project_project.id",
-                                                              project_project_represent
+                                                              project_project_represent_no_link
                                                               )),
                                      represent = project_project_represent,
                                      comment = S3AddResourceLink(c="project", f="project",
@@ -3484,6 +3488,9 @@ class S3ProjectTaskIReportModel(S3Model):
         return
 
 # =============================================================================
+def project_project_represent_no_link(id, row=None):
+    return project_project_represent(id, row, False)
+
 def project_project_represent(id, row=None, show_link=True):
     """ FK representation """
 
