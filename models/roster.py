@@ -51,6 +51,7 @@ table = db.define_table(tablename,
 
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'))
+#db.hrm_roster_roles.insert(table_id="1", roles="Volunteer")
 tablename = "hrm_roster_type" #type: event, scenario, project etc.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('type'))
 

@@ -19,7 +19,11 @@ def index():
     """
     import datetime;
     import dateutil;
-    alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ] #db().select(db.hrm_roster_roles)
+    #alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ] #db().select(db.hrm_roster_roles)
+    alloted_roles=[]
+    rows=db().select(db.hrm_roster_roles.roles)
+    for row in rows:
+        alloted_roles.append(row['roles'])
     volunteers={'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble','a9':'Vinnie Launius','a10':'Roxane Cremin'}; # {volunteer_id:volunteer_name}
     time_dets=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     project_date=datetime.date(2012,4,4);
@@ -38,7 +42,7 @@ def people():
     volunteers={'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms'}; # {volunteer_id:volunteer_name}
     alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ]; #db().select(db.hrm_roster_roles)
     r=int(request.vars.row);
-    return DIV(DIV(alloted_roles[r], _id='volunteer_role'), *[DIV(volunteers[v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers]);
+    return DIV(DIV(alloted_roles[r], _id='volunteer_role'), FORM(INPUT(_name='volunteer_quick_search', _id='volunteer_quick_search')), *[DIV(volunteers[v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers]);
 
 
 def roster_submit():
