@@ -19,7 +19,6 @@ def index():
     """
     import datetime;
     import dateutil;
-    #alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ] #db().select(db.hrm_roster_roles)
     alloted_roles=[]
     rows=db().select(db.hrm_roster_roles.roles)
     for row in rows:
@@ -40,7 +39,10 @@ def people():
         List of people specific to a job role
     """
     volunteers={'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms'}; # {volunteer_id:volunteer_name}
-    alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ]; #db().select(db.hrm_roster_roles)
+    alloted_roles=[]
+    rows=db().select(db.hrm_roster_roles.roles)
+    for row in rows:
+        alloted_roles.append(row['roles'])
     r=int(request.vars.row);
     return DIV(DIV(alloted_roles[r], _id='volunteer_role'), FORM(INPUT(_name='volunteer_quick_search', _id='volunteer_quick_search')), *[DIV(volunteers[v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers]);
 
@@ -53,7 +55,10 @@ def roster_submit():
     #roster_info = json.JSONDecoder().decode(request.vars)
     roster_info = str(request.vars)
     roster_info = roster_info[9:-1]
-    alloted_roles=['Team Leader', 'Team Member', 'Team Member', 'Team Member', 'Trainee', 'Trainee', 'Trainee' ]; #db().select(db.hrm_roster_roles)
+    alloted_roles=[]
+    rows=db().select(db.hrm_roster_roles.roles)
+    for row in rows:
+        alloted_roles.append(row['roles'])
     table_id=1;
     a=db.hrm_roster.insert()
     roster_col=2
@@ -61,3 +66,23 @@ def roster_submit():
     date_from_week=datetime.date(2012,4,4)+dateutil.relativedelta.relativedelta( days = roster_col);
     db.hrm_roster_shift.insert(roster_id=a, table_id=table_id, date=date_from_week, role=alloted_roles[roster_row])
     return DIV("Successfully saved!" + roster_info + str(a))
+
+def add_role():
+    table_id=1
+    job_roles=['Team Leader', 'Team Member', 'Trainee']
+    pt=db(db.hrm_roster_roles.table_id==table_id).count()
+    db.hrm_roster_roles.insert(table_id=table_id, roles=job_roles[int(request.vars.new_job_role)-1],position_in_table=pt)
+    redirect(URL('index'))
+    return job_roles[request.vars.new_job_role]
+
+def del_role():
+    table_id=1
+    result = db(db.hrm_roster_roles.table_id==table_id and db.hrm_roster_roles.position_in_table==request.args[0]).delete()
+    def remap_table(table_id):
+        #pt=db(db.hrm_roster_roles.table_id==table_id).count()
+        rows=db(db.hrm_roster_roles.table_id==table_id).select()
+        for i in range(len(rows)):
+            db(db.hrm_roster_roles.table_id==table_id and db.hrm_roster_roles.position_in_table==rows[i].position_in_table).update(position_in_table=i)
+    remap_table(table_id)
+    redirect(URL('index'))
+    return result

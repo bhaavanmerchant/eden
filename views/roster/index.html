@@ -32,6 +32,12 @@ jQuery(document).ready(function(){
                 });
 
         });
+    $('.remrole').click(function()
+        {
+        var cell=$(this).parent();
+        var url="{{=URL('del_role')}}"+"/"+cell.data('pos');
+        $(location).attr('href',url);
+        });
     $('#vn').on('click','.volunteer_names',function(event)
         {
         var vname=$(this).html();
@@ -109,7 +115,7 @@ jQuery(document).ready(function(){
 </span>
 <span style="position:absolute; right:50px;">
 <div id="r_tablearea">
-<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL()}}" method="post">
+<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL('add_role')}}" method="post">
 <div id="selectboxes">
     <span>Event:
         <select name='occasion' id='occasion'>
@@ -147,7 +153,10 @@ jQuery(document).ready(function(){
 {{for r in range(len(alloted_roles)):}}
 <tr>
     <td>
-        <div class='vcell'>{{=alloted_roles[r]}}{{=IMG(_src='/eden/static/img/minus.png', _class='symbv')}}</div>
+        <div class='vcell' data-pos={{=r}}>
+        {{=alloted_roles[r]}}
+            {{=IMG(_src='/eden/static/img/minus.png', _class='symbv remrole')}}
+        </div>
     </td>
     {{for c in range(len(time_dets)):}}
     <td>
