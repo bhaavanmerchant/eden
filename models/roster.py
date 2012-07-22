@@ -52,7 +52,7 @@ table = db.define_table(tablename,
 
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'), Field('position_in_table','integer'))
-#db.hrm_roster_roles.insert(table_id="1", roles="Volunteer")
+db.hrm_roster_table.update_or_insert(week="1", slot="1")
 db.pr_person.update_or_insert(first_name='Mari', last_name='Hargis', gender=1, age_group=1)
 db.pr_person.update_or_insert(first_name='Ismael', last_name='Nolin', gender=1, age_group=1)
 db.pr_person.update_or_insert(first_name='Sherry', last_name='Febres', gender=1, age_group=1)
