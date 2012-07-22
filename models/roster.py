@@ -46,12 +46,25 @@ table = db.define_table(tablename,
                             Field("roster_id",db.hrm_roster),
                             Field("table_id",db.hrm_roster_table),
                             Field("date"),
-                            Field("role")
+                            Field("role"),
+                            s3db.pr_person_id()
                         )
 
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'), Field('position_in_table','integer'))
 #db.hrm_roster_roles.insert(table_id="1", roles="Volunteer")
+db.pr_person.update_or_insert(first_name='Mari', last_name='Hargis', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Ismael', last_name='Nolin', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Sherry', last_name='Febres', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Barabara', last_name='Gamino', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Augustina', last_name='Northam', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Artie', last_name='Timms', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Kimberely', last_name='Lamey', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Ignacio', last_name='Crumble', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Vinnie', last_name='Launius', gender=1, age_group=1)
+db.pr_person.update_or_insert(first_name='Roxane', last_name='Cremin', gender=1, age_group=1)
+
+
 tablename = "hrm_roster_type" #type: event, scenario, project etc.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('type'))
 

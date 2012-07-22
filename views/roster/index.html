@@ -8,7 +8,11 @@ jQuery(document).ready(function(){
     $('.remv').hide();
     $('.addpf').hide();
     $('.rempf').show();
-    $('#addrow').click(function(){$('#newrole').toggle(); $('#addrow').hide();});
+    $('#addrow').click(function()
+        {
+        $('#newrole').toggle();
+        $('#addrow').hide();
+        });
     $('#new_job_role').change(function(){$('#roster_info_form').submit();});
     $('#occasion').change(function(){$('#roster_info_form').submit();});
     $('#project_selector').change(function(){$('#roster_info_form').submit();});
@@ -65,7 +69,9 @@ jQuery(document).ready(function(){
     $('#cross').click(function(){$('#r_varea').hide();});
     $('#save').click(function()
     {
-    var roster_dets={};
+    //var roster_dets=new Array();
+    //var roster_dets={};
+    var roster_array=new Array();
     var i=0;
     $('.allotted').each(function()
         {
@@ -74,14 +80,16 @@ jQuery(document).ready(function(){
                     "col":$(this).data('col'),
                     "vid":$(this).data('vid')
                     };
-        roster_dets[i]=v_json;
-        i=i+1;     
+        roster_array[i]=v_json;
+        i=i+1;
+        //alert(roster_dets[i-1].vid);
         });
+    var roster_dets={"array":roster_array};
     $.ajax(
             {
             type: "POST",
             url: "roster_submit",
-            data: roster_dets 
+            data: roster_dets
             }).done(function( msg ) 
                 {
                 $("#vn").html(msg);
@@ -162,7 +170,7 @@ jQuery(document).ready(function(){
     <td>
         {{ for filled_slot in filled_slots: }}
             {{if r==filled_slot['row'] and c==filled_slot['col']:}}
-                <div class='vcell allotted' data-col={{=c}} data-row={{=r}} > 
+                <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}> 
                     <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div> 
                     {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv addpf')}}
                     {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv rempf')}}
