@@ -23,11 +23,14 @@ def index():
     rows=db().select(db.hrm_roster_roles.roles)
     for row in rows:
         alloted_roles.append(row['roles'])
-    volunteers={'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble','a9':'Vinnie Launius','a10':'Roxane Cremin'}; # {volunteer_id:volunteer_name}
+    volunteers={} # {volunteer_id:volunteer_name}
+    rows=db(db.pr_person).select()
+    for row in rows:
+        volunteers[str(row['id'])]=row['first_name']+' '+row['last_name']
     time_dets=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     project_date=datetime.date(2012,4,4);
     rows=db(db.hrm_roster_shift).select()
-    filled_slots=[{'row':3, 'col':2, 'vid':'a5'}]
+    filled_slots=[{'row':3, 'col':2, 'vid':'14'}]
     for row in rows:
         #determine col
         exploded_date=row['date'].split('-')
@@ -54,7 +57,11 @@ def index():
                
     slots=['8:00 - 12:00','12:00 - 4:00','4:00 - 8:00']
     job_roles=['-- Select --']
-    job_roles+=['Team Leader', 'Team Member', 'Trainee']
+    jr=[]
+    rows=db().select(db.hrm_job_role.name)
+    for row in rows:
+        jr.append(row['name'])
+    job_roles+=jr
     occasion=['Project','Organisation','Scenario','Site','Incident']
     projects=['Project Alpha', 'Project Beta', 'Peoject Gamma', 'Project Delta', 'Project Epsilon', 'Project Zeta', 'Project Eta']
     return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date,filled_slots=filled_slots,occasion=occasion)
@@ -63,7 +70,18 @@ def people():
     """
         List of people specific to a job role
     """
-    volunteers={'Team Leader':{'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms'}, 'Team Member':{'a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble'},  'Trainee':{'a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble','a9':'Vinnie Launius','a10':'Roxane Cremin'}}; # {volunteer_id:volunteer_name}
+    rows=db(db.hrm_job_role).select()
+    subrows=db(db.hrm_person_role).select()
+    #people=db(db.pr_person).select()
+    volunteers={}    
+    for row in rows:    #Seems inefficient, will try db chaining later to improvise
+        specific_volunteers={}
+        for subrow in subrows:
+            if subrow['job_role_id']==row['id']:
+                person=db(db.pr_person.id == subrow['person_id']).select()
+                specific_volunteers[str(person[0]['id'])] = person[0]['first_name'] + ' ' + person[0]['last_name']
+        volunteers[str(row['name'])]=specific_volunteers
+    #volunteers={'Team Leader':{'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms'}, 'Team Member':{'a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble'},  'Trainee':{'a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble','a9':'Vinnie Launius','a10':'Roxane Cremin'}}; # {volunteer_id:volunteer_name}
     alloted_roles=[]
     rows=db().select(db.hrm_roster_roles.roles)
     for row in rows:
