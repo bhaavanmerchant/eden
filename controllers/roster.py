@@ -73,7 +73,7 @@ def people():
     rows=db(db.hrm_job_role).select()
     subrows=db(db.hrm_person_role).select()
     #people=db(db.pr_person).select()
-    volunteers={}    
+    volunteers={}    # {volunteer_id:volunteer_name}
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers={}
         for subrow in subrows:
@@ -81,7 +81,6 @@ def people():
                 person=db(db.pr_person.id == subrow['person_id']).select()
                 specific_volunteers[str(person[0]['id'])] = person[0]['first_name'] + ' ' + person[0]['last_name']
         volunteers[str(row['name'])]=specific_volunteers
-    #volunteers={'Team Leader':{'a1':'Mari Hargis', 'a2':'Ismael Nolin','a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms'}, 'Team Member':{'a3':'Sherry Febres','a4':'Barabara Gamino','a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble'},  'Trainee':{'a5':'Augustina Northam','a6':'Artie Timms','a7':'Kimberely Lamey','a8':'Ignacio Crumble','a9':'Vinnie Launius','a10':'Roxane Cremin'}}; # {volunteer_id:volunteer_name}
     alloted_roles=[]
     rows=db().select(db.hrm_roster_roles.roles)
     for row in rows:
@@ -95,23 +94,25 @@ def roster_submit():
     import datetime
     import dateutil
     j=0
-    #roster_info = json.JSONDecoder().decode(request.vars)
-    #roster_info = json.loads('{"array[7][row]": "6", "array[4][col]": "2", "array[0][row]": "0", "array[2][vid]": "a7", "array[0][col]": "1", "array[2][row]": "2", "array[4][vid]": "a5", "array[3][vid]": "a7", "array[5][col]": "0", "array[1][col]": "1", "array[3][col]": "1", "array[0][vid]": "a2", "array[6][vid]": "a9", "array[5][vid]": "a8", "array[1][row]": "1", "array[4][row]": "3", "array[6][row]": "5", "array[7][col]": "0", "array[7][vid]": "a5", "array[6][col]": "0", "array[2][col]": "0", "array[5][row]": "4", "array[3][row]": "3", "array[1][vid]": "a5"}')
     roster_info = str(request.vars)    
     roster_info = roster_info[9:-1]
-    #roster_info = {'array[1][vid]': 'a5', 'array[1][col]': '2', 'array[0][row]': '1', 'array[0][vid]': 'a5', 'array[1][row]': '3', 'array[0][col]': '0'}
-    #alloted_roles=[]
-    #items = json.loads(roster_info)
-    #rows=db().select(db.hrm_roster_roles.roles)
-    #for row in rows:
-    #    alloted_roles.append(row['roles'])
+    alloted_roles=[]
+    roster_info=str(roster_info)
+    roster_info=roster_info.replace("'",'"')
+    items = json.loads(roster_info)
+    rows=db().select(db.hrm_roster_roles.roles)
+    for row in rows:
+        alloted_roles.append(row['roles'])
     table_id=1;
-    #a=db.hrm_roster.insert()
-    #roster_col=2
-    #roster_row=4
-    #date_from_week=datetime.date(2012,4,4)+dateutil.relativedelta.relativedelta( days = roster_col);
-    #db.hrm_roster_shift.insert(roster_id=a, table_id=table_id, date=date_from_week, role=alloted_roles[roster_row])
-    return DIV("Successfully saved! " +  str(roster_info))
+    db(db.hrm_roster_shift.table_id==table_id).delete()
+    for i in range(len(items)/3):
+        a=db.hrm_roster.insert()
+        roster_col=str(items["array["+str(i)+"][col]"])
+        roster_row=str(items["array["+str(i)+"][row]"])
+        person=str(items["array["+str(i)+"][vid]"])
+        date_from_week=datetime.date(2012,4,4)+dateutil.relativedelta.relativedelta( days = int(roster_col));
+        db.hrm_roster_shift.insert(roster_id=a, table_id=table_id, date=date_from_week, role=alloted_roles[int(roster_row)], person_id=person)
+    return DIV("Successfully saved! " + str(len(items)))
 
 def add_role():
     table_id=1
