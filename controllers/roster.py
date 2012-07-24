@@ -30,13 +30,14 @@ def index():
     time_dets=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     project_date=datetime.date(2012,4,4);
     rows=db(db.hrm_roster_shift).select()
-    filled_slots=[{'row':3, 'col':2, 'vid':'14'}]
+    filled_slots=[]
     for row in rows:
         #determine col
         exploded_date=row['date'].split('-')
-        col = (project_date - datetime.date(int(exploded_date[0]),int(exploded_date[1]),int(exploded_date[2]))).days
-        #v_id = row['vid']
-        v_id='a4'
+        
+        col = (datetime.date(int(exploded_date[0]),int(exploded_date[1]),int(exploded_date[2]))-project_date).days
+        v_id = str(row['person_id'])
+        #v_id='4'
         #determine row
         row_tbi=len(alloted_roles)+2 #To prevent garbage value raising an exception
         for i in range(len(alloted_roles)):
@@ -49,11 +50,11 @@ def index():
                 #if free populate filled_slots
             if already_filled:
                 continue
-            else:
+            if alloted_roles[i] == row['role']:
                 row_tbi=i
                 break
         slot=dict(row=row_tbi, col=col, vid=v_id)
-        #filled_slots.append(slot)
+        filled_slots.append(slot)
                
     slots=['8:00 - 12:00','12:00 - 4:00','4:00 - 8:00']
     job_roles=['-- Select --']

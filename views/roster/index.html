@@ -18,6 +18,10 @@ jQuery(document).ready(function(){
     $('#project_selector').change(function(){$('#roster_info_form').submit();});
     $('#timeframe').change(function(){$('#roster_info_form').submit();});
     $('#timeslot').change(function(){$('#roster_info_form').submit();});
+    $('#vn').on('keypress','#volunteer_quick_search',function(event){
+    alert('Going to filter results.');
+    });
+
     $('.addv').click(function()
         {
         $('#r_varea').show();
@@ -168,21 +172,25 @@ jQuery(document).ready(function(){
     </td>
     {{for c in range(len(time_dets)):}}
     <td>
+        {{ is_filled=False}}
         {{ for filled_slot in filled_slots: }}
             {{if r==filled_slot['row'] and c==filled_slot['col']:}}
                 <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}> 
                     <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div> 
+                    {{ is_filled=True}}
                     {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv addpf')}}
                     {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv rempf')}}
                 </div>
-            {{else:}}
+            {{pass}}
+        {{pass}}
+        {{ if not is_filled:}}
                 <div class='vcell' data-col={{=c}} data-row={{=r}} >
                     <div class='vcelln'></div>
                     {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}
                     {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}}
                 </div> 
-            {{pass}}
-        {{pass}} 
+        {{pass}}
+
     </td>
     {{pass}}
 </tr>
