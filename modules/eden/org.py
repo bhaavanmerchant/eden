@@ -67,6 +67,7 @@ class S3OrganisationModel(S3Model):
 
     names = ["org_sector",
              "org_sector_id",
+             "org_sector_opts",
              #"org_subsector",
              "org_organisation_type",
              "org_organisation_type_id",
@@ -284,7 +285,7 @@ class S3OrganisationModel(S3Model):
                                    length=128,           # Mayon Compatibility
                                    label = T("Name")),
                              # http://hxl.humanitarianresponse.info/#abbreviation
-                             Field("acronym", length=8,
+                             Field("acronym", length=16,
                                    label = T("Acronym"),
                                    represent = lambda val: val or "",
                                    comment = DIV(_class="tooltip",
@@ -626,9 +627,26 @@ class S3OrganisationModel(S3Model):
         #
         return Storage(
                     org_sector_id = sector_id,
+                    org_sector_opts = self.org_sector_opts,
                     org_organisation_type_id = organisation_type_id,
                     org_organisation_id = organisation_id,
                 )
+
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def org_sector_opts():
+        """
+            Provide the options for the Sector search filter
+        """
+        db = current.db
+        table = db.org_sector
+        opts = db(table.deleted == False).select(table.id,
+                                                 table.name,
+                                                 orderby=table.name)
+        od = OrderedDict()
+        for opt in opts:
+            od[opt.id] = opt.name
+        return od
 
     # -------------------------------------------------------------------------
     @staticmethod
@@ -1060,7 +1078,7 @@ class S3SiteModel(S3Model):
                                   Field("obsolete", "boolean",
                                         label = T("Obsolete"),
                                         represent = lambda bool: \
-                                          (bool and [T("Obsolete")] or [messages.NONE])[0],
+                                          (bool and [T("Obsolete")] or [current.messages.NONE])[0],
                                         default = False,
                                         readable = False,
                                         writable = False),
@@ -1316,7 +1334,7 @@ class S3FacilityModel(S3Model):
                              Field("obsolete", "boolean",
                                    label = T("Obsolete"),
                                    represent = lambda bool: \
-                                     (bool and [T("Obsolete")] or [messages.NONE])[0],
+                                     (bool and [T("Obsolete")] or [current.messages.NONE])[0],
                                    default = False,
                                    readable = False,
                                    writable = False),
@@ -2331,9 +2349,6 @@ def org_office_controller():
             if r.record and r.record.type == 5: # 5 = Warehouse
                 s3.crud_strings["org_office"] = s3.org_warehouse_crud_strings
 
-            if r.id:
-                table.obsolete.readable = table.obsolete.writable = True
-
             if r.component:
 
                 cname = r.component.name
@@ -2356,6 +2371,8 @@ def org_office_controller():
                     # Hide fields which don't make sense in a Create form
                     # inc list_create (list_fields over-rides)
                     s3db.req_create_form_mods()
+            elif r.id:
+                table.obsolete.readable = table.obsolete.writable = True
 
         return True
     s3.prep = prep
