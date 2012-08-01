@@ -65,6 +65,39 @@ def index():
     job_roles+=jr
     occasion=['Project','Organisation','Scenario','Site','Incident']
     projects=['Project Alpha', 'Project Beta', 'Peoject Gamma', 'Project Delta', 'Project Epsilon', 'Project Zeta', 'Project Eta']
+    if len(request.args)>0 and request.args[0]=="pdf":
+        from gluon.contrib.pyfpdf import FPDF, HTMLMixin
+        rows = [THEAD(TR(TH("Key",_width="70%"), TH("Value",_width="30%"))),
+        TBODY(TR(TD("Hello"),TD("60")), 
+                  TR(TD("World"),TD("40")))]
+        table = TABLE(*rows, _border="0", _align="center", _width="50%")
+
+        # create a custom class with the required functionalities 
+        class MyFPDF(FPDF, HTMLMixin):
+            def header(self): 
+                "hook to draw custom page header (logo and title)"
+                logo=os.path.join(request.env.web2py_path,"applications",request.application,"static","img","sahanasmall_05.png")
+                self.image(logo,10,8,33)
+                self.set_font('Arial','B',15)
+                self.cell(65) # padding
+                self.cell(60,10,"Roster",1,0,'C')
+                self.ln(20)
+                
+            def footer(self):
+                "hook to draw custom page footer (printing page numbers)"
+                self.set_y(-15)
+                self.set_font('Arial','I',8)
+                txt = 'Page %s of %s' % (self.page_no(), self.alias_nb_pages())
+                self.cell(0,10,txt,0,0,'C')
+        pdf=MyFPDF()
+        # create a page and serialize/render HTML objects
+        pdf.add_page()
+        pdf.write_html(str(XML(table, sanitize=False)))
+        # prepare PDF to download:
+        response.headers['Content-Type']='application/pdf'
+        return pdf.output(dest='S')
+
+
     return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date,filled_slots=filled_slots,occasion=occasion)
 
 def people():
@@ -134,3 +167,8 @@ def del_role():
     remap_table(table_id)
     redirect(URL('index'))
     return result
+
+def admin():
+    occasion=['Project','Organisation','Scenario','Site','Incident']
+    projects=['Project Alpha', 'Project Beta', 'Peoject Gamma', 'Project Delta', 'Project Epsilon', 'Project Zeta', 'Project Eta']
+    return dict(message='Panel', occasion=occasion, projects=projects)

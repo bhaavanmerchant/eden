@@ -1,0 +1,20 @@
+{{extend 'layout.html'}}
+<head>
+<link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
+</head>
+<body>
+<div id="maincontent">
+<h1>{{=message}}</h1>
+Panel | <a href='index'>Roster</a>
+</div>
+        <select name='occasion' id='occasion'>
+        {{for x in range(len(occasion)):}}<option value={{=x}}>{{=occasion[x]}}</option>{{pass}}
+        </select>
+        <select name='project_selector' id='project_selector'>
+        {{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
+        </select>
+        <form>
+        #Add project / event ? <input type="text" id='name'/>
+        <input type="submit" value="Add!" id='add'/>
+        </form>
+</body>
