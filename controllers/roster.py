@@ -171,4 +171,8 @@ def del_role():
 def admin():
     occasion=['Project','Organisation','Scenario','Site','Incident']
     projects=['Project Alpha', 'Project Beta', 'Peoject Gamma', 'Project Delta', 'Project Epsilon', 'Project Zeta', 'Project Eta']
-    return dict(message='Panel', occasion=occasion, projects=projects)
+    jr=[]
+    rows=db().select(db.hrm_job_role.name)
+    for row in rows:
+        jr.append(row['name'])
+    return dict(message='Panel', occasion=occasion, projects=projects, job_roles=jr)
