@@ -26,9 +26,9 @@ position:relative;
 left:80px;
 }
 #r_varea{
-width:160px;
+width:190px;
 background:#AAA;
-border-radius:10px;
+border-radius:6px;
 padding: 15px;
 position: absolute;
 max-height:450px;
@@ -61,10 +61,10 @@ right:0px;
 }
 .allotted{
 background:#3F6;
-padding:3px;
+
 }
 .volunteer_names{
-width:130px;
+width:160px;
 background:#A0A0A0;
 height:15px;
 border:solid 1px #878787;
@@ -79,7 +79,7 @@ position:relative;
 left:35px;
 }
 #volunteer_quick_search{
-width:130px;
+width:160px;
 height:18px;
 position:relative;
 left:13px;
