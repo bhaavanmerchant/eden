@@ -1,4 +1,5 @@
 {{extend 'layout.html'}}
+
 <head>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
 </head>
@@ -7,23 +8,51 @@
 <h1>{{=message}}</h1>
 Panel | <a href='index'>Roster</a>
 </div>
-        <select name='occasion' id='occasion'>
-        {{for x in range(len(occasion)):}}<option value={{=x}}>{{=occasion[x]}}</option>{{pass}}
-        </select>
-        <select name='project_selector' id='project_selector'>
-        {{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
-        </select>
-        <form>
-        #Add project / event ? <input type="text" id='name'/>
-        <input type="submit" value="Add!" id='add'/>
-        </form>
-    {{for job_role in job_roles:}}
-    <input type="checkbox" name="roles" checked=1 />{{=job_role}}<br/>
-    {{pass}}
-        #Add job role <input type="text" id='name'/>
-        <input type="submit" value="Add!"/>
-        Change request:
-        <table style='position:relative;left:450px;top:-100px;'>
+<div class='aside'>
+<div id='menu_options'>
+<ul id='subnav'>
+<li>
+<div class='hoverable'>
+<a href='hrm'>People</a>
+</div>
+<ul class='submenu'>
+<li>
+<a href='#'>Manage People</a>
+<a href='#'>Specify Skills</a>
+</li>
+</ul>
+</li>
+<li>
+<div class='hoverable'>
+<a href='hrm'>Projects</a>
+</div>
+<ul class='submenu'>
+<li>
+<a href='#'>Manage People</a>
+<a href='#'>Specify Skills</a>
+</li>
+</ul>
+</li>
+<li>
+<div class='hoverable'>
+<a href='hrm'>Requests</a>
+</div>
+</li>
+<li>
+<div class='hoverable'>
+<a href='hrm'>Tables</a>
+</div>
+<ul class='submenu'>
+<li>
+<a href='#'>Create table</a>
+<a href='#'>Add Roles</a>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+        <div id='changes'><h4>Change request:</h4>
+        <table id='changetable'>
         <thead>
         <tr>
         <th>Approve</th><th>Volunteer Name</th><th>From</th><th>To</th><th>Reason</th>
@@ -36,5 +65,8 @@ Panel | <a href='index'>Roster</a>
         <td><input type="checkbox" name="change" value="2" /></td><td>Beta</td><td>2012/23/11 1:00</td><td style="background:	#F76541">2012/22/11 1:00</td><td>Birthday</td>
         </tr>
         </table>
-<input type="submit" value="Submit"/>
+        <br/>
+<input type="submit" value="Submit"/>        
+        </div>
+
 </body>

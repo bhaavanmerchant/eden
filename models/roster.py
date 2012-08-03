@@ -11,7 +11,9 @@ tablename = "hrm_roster"
 table = db.define_table(tablename, 
 #                                Field('roster_table',
 #                                    db.hrm_roster_table),
-                                 *s3_meta_fields())
+                                 Field('change_req'),
+                                 *s3_meta_fields()
+                        )
 tablename = "hrm_roster_organisation"
 table = db.define_table(tablename, 
                                 Field('roster',db.hrm_roster), 
@@ -89,3 +91,8 @@ db.hrm_person_role.update_or_insert(job_role_id='3', person_id='20')
 tablename = "hrm_roster_type" #type: event, scenario, project etc.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('type'))
 
+tablename = "hrm_roster_change"
+table = db.define_table(tablename,
+                                Field('initial_shift',db.hrm_roster_shift),
+                                Field('requested_date'),
+                                Field('requested_table',db.hrm_roster_shift))

@@ -175,4 +175,12 @@ def admin():
     rows=db().select(db.hrm_job_role.name)
     for row in rows:
         jr.append(row['name'])
-    return dict(message='Panel', occasion=occasion, projects=projects, job_roles=jr)
+    rows=db(db.pr_person.id).select()
+    persons=[]
+    for row in rows:
+        persons.append([row['id'],row['first_name']+' '+row['last_name']])
+    return dict(message='Panel', occasion=occasion, projects=projects, job_roles=jr, persons=persons)
+
+def hrm():
+    output = s3_rest_controller("pr", "person")
+    return output

@@ -84,3 +84,17 @@ height:18px;
 position:relative;
 left:13px;
 }
+#changes{
+position:absolute;
+width:950px;
+top:100px;
+left:250px;
+}
+#changetable{
+width:950px;
+border:0px;
+}
+#changetable td{
+border:0px;
+padding:5px;
+}
