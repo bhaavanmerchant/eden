@@ -98,3 +98,17 @@ border:0px;
 border:0px;
 padding:5px;
 }
+.index_colour{
+width:10px;
+height:10px;
+}
+#change_accepted{
+background:#3F6;
+}
+#change_denied{
+background:#F76541;
+}
+#change_index{
+width:250px;
+height:20px;
+}
