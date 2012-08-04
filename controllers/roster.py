@@ -97,8 +97,8 @@ def index():
         response.headers['Content-Type']='application/pdf'
         return pdf.output(dest='S')
 
-
-    return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date,filled_slots=filled_slots,occasion=occasion)
+    defaults=[request.vars.occasion,request.vars.project_selector,request.vars.timeframe,request.vars.timeslot]
+    return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date,filled_slots=filled_slots,occasion=occasion,defaults=defaults)
 
 def people():
     """

@@ -13,11 +13,26 @@ jQuery(document).ready(function(){
         $('#newrole').toggle();
         $('#addrow').hide();
         });
-    $('#new_job_role').change(function(){$('#roster_info_form').submit();});
-    $('#occasion').change(function(){$('#roster_info_form').submit();});
-    $('#project_selector').change(function(){$('#roster_info_form').submit();});
-    $('#timeframe').change(function(){$('#roster_info_form').submit();});
-    $('#timeslot').change(function(){$('#roster_info_form').submit();});
+    $('#new_job_role').change(function()
+        {
+        $('#roster_info_form').submit();
+        });
+    $('#occasion').change(function()
+        {
+        $('#table_info_form').submit();
+        });
+    $('#project_selector').change(function()
+        {
+        $('#table_info_form').submit();
+        });
+    $('#timeframe').change(function()
+        {
+        $('#table_info_form').submit();
+        });
+    $('#timeslot').change(function()
+        {
+        $('#table_info_form').submit();
+        });
     $('#vn').on('keypress','#volunteer_quick_search',function(event){
     //alert('Going to filter results.');
         $('.volunteer_names').each(function(){
@@ -195,24 +210,40 @@ jQuery(document).ready(function(){
 </span>
 <span style="position:absolute; right:50px;">
 <div id="r_tablearea">
-<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL('add_role')}}" method="post">
+<form enctype="multipart/form-data" id="table_info_form" method="post">
 <div id="selectboxes">
     <span>Event:
-        <select name='occasion' id='occasion'>
-        {{for x in range(len(occasion)):}}<option value={{=x}}>{{=occasion[x]}}</option>{{pass}}
+        <select name='occasion' id='occasion' >
+        {{for x in range(len(occasion)):}}
+            <option value={{=x}} 
+            {{if defaults[0] and x == int(defaults[0]):}}
+                selected="selected"
+            {{pass}}
+            >{{=occasion[x]}}</option>
+        {{pass}}
         </select>
     </span>
 
     <span style="position:relative; left:60px;">
         <select name='project_selector' id='project_selector'>
-        {{for x in range(len(projects)):}}<option value={{=x}}>{{=projects[x]}}</option>{{pass}}
+        {{for x in range(len(projects)):}}
+            <option value={{=x}}
+            {{if defaults[1] and x == int(defaults[1]):}}
+                selected="selected"
+            {{pass}}
+            >{{=projects[x]}}</option>
+        {{pass}}
         </select>
     </span>
 
     <span style="position:relative; left:180px;">
         <select name='timeframe' id='timeframe'>
         {{for i in range(numb):}}
-            <option value={{=i+1}}>Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}
+            <option value={{=i+1}}
+                {{if defaults[2] and x == int(defaults[2]):}}
+                    selected="selected"
+                {{pass}}
+            >Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}
             </option>
         {{pass}}
         </select>
@@ -221,7 +252,13 @@ jQuery(document).ready(function(){
     <span style="position:relative; left:240px;">
     Slot:
         <select name='timeslot' id='timeslot'>
-        {{for x in range(len(slots)):}}<option value={{=x}}>{{=slots[x]}}</option>{{pass}}
+        {{for x in range(len(slots)):}}
+            <option value={{=x}}
+                {{if defaults[3] and x == int(defaults[3]):}}
+                    selected="selected"
+                {{pass}}
+            >{{=slots[x]}}</option>
+        {{pass}}
         </select>
     </span>
     <span style="position:relative; left:290px;">
@@ -268,6 +305,7 @@ jQuery(document).ready(function(){
 {{pass}}
 
 <tr id='newrole'><td>
+<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL('add_role')}}" method="post">
 <select name="new_job_role" id="new_job_role">
 {{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}
 </select></form></td>

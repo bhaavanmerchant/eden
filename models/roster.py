@@ -35,7 +35,7 @@ tablename = "hrm_roster_incident"
 table = db.define_table(tablename, 
                                 Field('roster',db.hrm_roster), 
                                 #s3db.super_link("id", "event_incident")
-                                s3db.event_incident_id()
+                                s3db.irs_ireport_id()
                         )
 tablename = "hrm_roster_scenario"
 table = db.define_table(tablename, 
@@ -87,7 +87,19 @@ db.hrm_person_role.update_or_insert(job_role_id='3', person_id='17')
 db.hrm_person_role.update_or_insert(job_role_id='3', person_id='18')
 db.hrm_person_role.update_or_insert(job_role_id='3', person_id='19')
 db.hrm_person_role.update_or_insert(job_role_id='3', person_id='20')
-
+db.org_organisation.update_or_insert(name='OrgAlpha',organisation_type_id='2',country='IN')
+db.org_organisation.update_or_insert(name='OrgBeta',organisation_type_id='2',country='IN')
+db.org_organisation.update_or_insert(name='OrgGamma',organisation_type_id='2',country='IN')
+db.org_organisation.update_or_insert(name='OrgDelta',organisation_type_id='2',country='IN')
+db.project_project.update_or_insert(organisation_id='1',name='Project Alpha',code='Project Alpha',description='sad',status='2',start_date='2012-08-04',end_date='2012-08-23',currency='USD')
+db.project_project.update_or_insert(organisation_id='2',name='Project Beta',code='Project Beta',description='',status='2',start_date='2012-07-14',end_date='2012-08-23',currency='USD')
+db.project_project.update_or_insert(organisation_id='2',name='Project Gamma',code='Project Gamma',description='',status='2',start_date='2012-08-01',end_date='2012-09-23',currency='USD')
+db.project_project.update_or_insert(organisation_id='2',name='Project Delta',code='Project Delta',description='',status='2',start_date='2011-08-04',end_date='2011-08-23',currency='USD')
+db.project_project.update_or_insert(organisation_id='3',name='Project Epsilon',code='Project Epsilon',description='',status='2',start_date='2012-02-21',end_date='2012-08-23',currency='USD')
+db.irs_ireport.update_or_insert(sit_id='1',doc_id='2',name='iAlpha',location_id='250',datetime='2012-08-04 14:55:51',affected='1228',closed=False,comments='LOL',L3='Bangalore',L1='Karnataka',L0='India')
+db.irs_ireport.update_or_insert(sit_id='1',doc_id='2',name='iBeta',location_id='250',datetime='2012-04-01 14:55:51',affected='1228',closed=False,comments='LOL',L3='Bangalore',L1='Karnataka',L0='India')
+db.irs_ireport.update_or_insert(sit_id='1',doc_id='2',name='iGamma',location_id='250',datetime='2012-11-24 14:55:51',affected='1228',closed=False,comments='LOL',L3='Bangalore',L1='Karnataka',L0='India')
+db.irs_ireport.update_or_insert(sit_id='1',doc_id='2',name='iDelta',location_id='250',datetime='2012-10-10 14:55:51',affected='1228',closed=False,comments='LOL',L3='Bangalore',L1='Karnataka',L0='India')
 tablename = "hrm_roster_type" #type: event, scenario, project etc.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('type'))
 
