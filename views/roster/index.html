@@ -57,6 +57,7 @@ jQuery(document).ready(function(){
     $('.addv').click(function()
         {
         $('#r_varea').show();
+        $('.aside').hide();
         var cell=$(this).parent();
         current_cell.r=cell.data('row');
         current_cell.c=cell.data('col');
@@ -102,7 +103,11 @@ jQuery(document).ready(function(){
     $(this).parent().children('.addv').show();
     $(this).parent().removeClass('allotted');
     });
-    $('#cross').click(function(){$('#r_varea').hide();});
+    $('#cross').click(function()
+        {
+        $('#r_varea').hide();
+        $('.aside').show();
+        });
     $('#save').click(function()
     {
     //var roster_dets=new Array();
@@ -251,8 +256,8 @@ jQuery(document).ready(function(){
     <span style="position:relative; left:180px;">
         <select name='timeframe' id='timeframe'>
         {{for i in range(numb):}}
-            <option value={{=i+1}}
-                {{if defaults[2] and x == int(defaults[2]):}}
+            <option value={{=i}}
+                {{if defaults[2] and i == int(defaults[2]):}}
                     selected="selected"
                 {{pass}}
             >Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}

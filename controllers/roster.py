@@ -19,6 +19,9 @@ def index():
     """
     import datetime;
     import dateutil;
+    def string_to_date(StringDate):
+        exploded_date=StringDate.split('-')
+        return datetime.date(int(exploded_date[0]),int(exploded_date[1]),int(exploded_date[2]))
     alloted_roles=[]
     rows=db().select(db.hrm_roster_roles.roles)
     for row in rows:
@@ -27,15 +30,15 @@ def index():
     rows=db(db.pr_person).select()
     for row in rows:
         volunteers[str(row['id'])]=row['first_name']+' '+row['last_name']
-    time_dets=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-    project_date=datetime.date(2012,4,4);
-    rows=db(db.hrm_roster_shift).select()
+    defaults=[request.vars.occasion,request.vars.project_selector,request.vars.timeframe,request.vars.timeslot]
+    table_id=db.hrm_roster_table.update_or_insert(week=defaults[2],slot=defaults[3])
+    rows=db(db.hrm_roster_shift.table_id==table_id).select()
     filled_slots=[]
     for row in rows:
         #determine col
-        exploded_date=row['date'].split('-')
         
-        col = (datetime.date(int(exploded_date[0]),int(exploded_date[1]),int(exploded_date[2]))-project_date).days
+        
+        col = (string_to_date(row['date'])-project_date).days
         v_id = str(row['person_id'])
         #v_id='4'
         #determine row
@@ -64,7 +67,49 @@ def index():
         jr.append(row['name'])
     job_roles+=jr
     occasion=['Project','Organisation','Scenario','Site','Incident']
-    projects=['Project Alpha', 'Project Beta', 'Peoject Gamma', 'Project Delta', 'Project Epsilon', 'Project Zeta', 'Project Eta']
+    time_dets=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    project_date=datetime.date.today()
+    projects=[]
+    for i in range(len(defaults)):
+        if not defaults[i]:
+            defaults[i]='0'
+    if defaults[0] == '0':
+        rows=db(db.project_project).select()
+        i=0
+        for row in rows:
+            projects.append(row['code'])
+            if int(defaults[1]) == i:
+                project_date=row['start_date']
+            i+=1
+
+    elif defaults[0] == '1':
+        rows=db().select(db.org_organisation.name)
+        for row in rows:
+            projects.append(row['name'])
+    elif defaults[0] == '2':
+        True
+        #rows=db().select(db.org_organisation.name)
+        #for row in rows:
+        #    projects.append(row['name'])
+    elif defaults[0] == '3':
+        True
+        #rows=db().select(db.org_organisation.name)
+        #for row in rows:
+        #    projects.append(row['name'])
+    elif defaults[0] == '4':
+        rows=db(db.irs_ireport).select()
+        i=0
+        for row in rows:
+            projects.append(row['name'])
+            if int(defaults[1]) == i:
+                project_date=row['datetime'].date()
+            i+=1            
+    else:
+        defaults[0] == '0'
+
+    project_day=datetime.date.weekday(project_date)
+    project_date=project_date-datetime.timedelta(days=project_day)
+
     if len(request.args)>0 and request.args[0]=="pdf":
         from gluon.contrib.pyfpdf import FPDF, HTMLMixin
         rows = [THEAD(TR(TH("Key",_width="70%"), TH("Value",_width="30%"))),
@@ -97,7 +142,7 @@ def index():
         response.headers['Content-Type']='application/pdf'
         return pdf.output(dest='S')
 
-    defaults=[request.vars.occasion,request.vars.project_selector,request.vars.timeframe,request.vars.timeslot]
+
     return dict(message=T("Rostering Tool"), numb=6, projects=projects,slots=slots,job_roles=job_roles, alloted_roles=alloted_roles,volunteers=volunteers,time_dets=time_dets,project_date=project_date,filled_slots=filled_slots,occasion=occasion,defaults=defaults)
 
 def people():

@@ -69,12 +69,13 @@ Panel | <a href='index'>Roster</a>
         </ul>
     </div>
 </div>
-        <div id='changes'><h4>Change request:</h4>
-        <table id='changetable'>
+
+<div id='changes'><h4>Change request:</h4>
+    <table id='changetable'>
         <thead>
-        <tr>
-        <th>Approve</th><th>Volunteer Name</th><th>From</th><th>To</th><th>Reason</th>
-        </tr>
+            <tr>
+                <th>Approve</th><th>Volunteer Name</th><th>From</th><th>To</th><th>Reason</th>
+            </tr>
         </thead>
         <tr>
         <td><input type="checkbox" name="change" value="1" /></td><td>Alpha</td><td>2011/31/12 21:00</td><td style="background:#3F6">2011/31/12 16:00</td><td>too late to drive back home</td>
@@ -82,9 +83,27 @@ Panel | <a href='index'>Roster</a>
         <tr>
         <td><input type="checkbox" name="change" value="2" /></td><td>Beta</td><td>2012/23/11 1:00</td><td style="background:	#F76541">2012/22/11 1:00</td><td>Birthday</td>
         </tr>
-        </table>
-        <br/>
-<span> <input type="submit" value="Submit"/> </span><span style="position:absolute; right:200px;"><div id='change_index'><span> <div id='change_accepted' class='index_colour'/></span><span style="position:absolute; left:20px;"> Free </span> <span style="position:absolute; left:100px;"><div id='change_denied' class='index_colour'/></span><span style="position:absolute; left:20px;"> Filled </span> </div></span>
+    </table>
+    <br/>
+    <span>
+        <input type="submit" value="Submit"/>
+    </span>
+    <span style="position:absolute; right:200px;">
+        <div id='change_index'>
+            <span>
+                <div id='change_accepted' class='index_colour'/>
+            </span>
+            <span style="position:absolute; left:20px;">
+                 Free 
+            </span>
+            <span style="position:absolute; left:100px;">
+                <div id='change_denied' class='index_colour'/>
+            </span>
+            <span style="position:absolute; left:20px;">
+                 Filled 
+            </span>
         </div>
+    </span>
+</div>
 
 </body>
