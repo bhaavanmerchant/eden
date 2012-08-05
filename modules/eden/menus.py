@@ -910,7 +910,7 @@ class S3OptionsMenu(object):
         if job_roles(""):
             jt_catalog_label = "Job Title Catalog"
         else:
-            jt_catalog_label = "Job Role Catalog"
+            jt_catalog_label = "Volunteer Role Catalog"
 
         return M(c="vol")(
                     M("Volunteers", f="volunteer",
@@ -1429,12 +1429,6 @@ class S3OptionsMenu(object):
                         M("Search Community Contacts", f="community_contact",
                           m="search"),
                      ),
-                    M("Partner Orgnisations",  f="organisation")(
-                        M("New", m="create"),
-                        M("List All"),
-                        M("Search", m="search"),
-                        M("Import", m="import", p="create"),
-                    ),
                     )
             else:
                 menu(
@@ -1446,8 +1440,8 @@ class S3OptionsMenu(object):
                      )
                     )
             menu(
-                 M("Reports", f="report")(
-                    M("Who is doing What Where", f="location", m="report"),
+                 M("Reports", f="location", m="report")(
+                    M("3W", f="location", m="report"),
                     M("Beneficiaries", f="beneficiary", m="report"),
                     M("Funding", f="organisation", args="report"),
                  ),
@@ -1459,6 +1453,12 @@ class S3OptionsMenu(object):
                     M(IMPORT, f="location",
                       m="import", p="create"),
                  ),
+                M("Partner Orgnisations",  f="partners")(
+                    M("New", m="create"),
+                    M("List All"),
+                    M("Search", m="search"),
+                    M("Import", m="import", p="create"),
+                ),
                  M("Themes", f="theme")(
                     M("New", m="create"),
                     M("List All"),

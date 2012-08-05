@@ -112,22 +112,25 @@ class S3HRModel(S3Model):
             elif controller == "vol":
                 group = "volunteer"
 
-        job_roles = current.deployment_settings.get_hrm_job_roles()
+        settings = current.deployment_settings
+        job_roles = settings.get_hrm_job_roles()
+        organisation_label = settings.get_hrm_organisation_label()
 
         tablename = "hrm_human_resource"
         table = self.define_table(tablename,
                                   self.super_link("track_id", "sit_trackable"),
                                   self.org_organisation_id(
+                                    label = organisation_label,
                                     widget=S3OrganisationAutocompleteWidget(
                                         default_from_profile=True),
                                     empty=False
                                     ),
+                                  self.org_site_id,
                                   self.pr_person_id(
                                     widget=S3AddPersonWidget(controller="hrm"),
                                     requires=IS_ADD_PERSON_WIDGET(),
                                     comment=None
                                     ),
-                                  self.org_site_id,
                                   Field("type", "integer",
                                         requires = IS_IN_SET(hrm_type_opts,
                                                              zero=None),
@@ -1129,7 +1132,6 @@ class S3HRSkillModel(S3Model):
         person_id = self.pr_person_id
         organisation_id = self.org_organisation_id
         site_id = self.org_site_id
-        job_role_id = self.hrm_job_role_id
 
         messages = current.messages
         NONE = messages.NONE
@@ -1396,7 +1398,7 @@ class S3HRSkillModel(S3Model):
         #                          Field("name", notnull=True, unique=True,
         #                                length=32,    # Mayon compatibility
         #                                label=T("Name")),
-        #                          job_role_id(),
+        #                          self.hrm_job_role_id(),
         #                          skill_id(),
         #                          competency_id(),
         #                          Field("priority", "integer",
@@ -1486,7 +1488,7 @@ class S3HRSkillModel(S3Model):
         tablename = "hrm_credential"
         table = define_table(tablename,
                              person_id(),
-                             job_role_id(),
+                             self.hrm_job_title_id(),
                              organisation_id(empty=False,
                                              widget = S3OrganisationAutocompleteWidget(
                                                         default_from_profile=True),
@@ -2695,7 +2697,7 @@ class S3HRExperienceModel(S3Model):
                                     widget = S3OrganisationAutocompleteWidget(
                                                 default_from_profile=True)
                                     ),
-                                  Field("job_title", label=T("Job Title")),
+                                  self.hrm_job_title_id(),
                                   s3_date("start_date",
                                           label=T("Start Date"),
                                           ),
@@ -2968,7 +2970,7 @@ def hrm_human_resource_represent(id, show_link=False):
 
     query = (htable.id == id) & \
             (htable.person_id == ptable.id)
-    row = current.db(query).select(htable.job_role_id,
+    row = current.db(query).select(htable.job_title_id,
                                    htable.organisation_id,
                                    htable.type,
                                    ptable.first_name,
@@ -2985,8 +2987,8 @@ def hrm_human_resource_represent(id, show_link=False):
     if hr.organisation_id and \
        current.deployment_settings.get_hrm_show_organisation():
         repr = ", %s" % s3db.org_organisation_represent(hr.organisation_id)
-    if hr.job_role_id:
-        repr = ", %s%s" % (hrm_job_role_represent(hr.job_role_id), repr)
+    if hr.job_title_id:
+        repr = ", %s%s" % (hrm_job_title_represent(hr.job_title_id), repr)
     person = row["pr_person"]
     repr = "%s%s" % (s3_fullname(person), repr)
     if show_link:
@@ -3139,7 +3141,7 @@ def hrm_training_event_represent(id, row=None):
 #    db = current.db
 #    s3db = current.s3db
 #    table = s3db.hrm_position
-#    jtable = s3db.hrm_job_role
+#    jtable = s3db.hrm_job_title
 #    otable = s3db.org_organisation
 #    query = (table.id == id) & \
 #            (table.job_role_id == jtable.id)
@@ -3148,7 +3150,7 @@ def hrm_training_event_represent(id, row=None):
 #                                otable.name,
 #                                limitby = (0, 1)).first()
 #    try:
-#        represent = position.hrm_job_role.name
+#        represent = position.hrm_job_title.name
 #        if position.org_organisation:
 #            represent = "%s (%s)" % (represent,
 #                                     position.org_organisation.name)
@@ -3472,9 +3474,9 @@ def hrm_map_popup(r):
               TD(s3_fullname(r.record.person_id))))
 
     # Job Title
-    if r.record.job_role_id:
-        append(TR(TD(B("%s:" % r.table.job_role_id.label)),
-                  TD(r.table.job_role_id.represent(r.record.job_role_id))))
+    if r.record.job_title_id:
+        append(TR(TD(B("%s:" % r.table.job_title_id.label)),
+                  TD(r.table.job_title_id.represent(r.record.job_title_id))))
 
     # Organization (better with just name rather than Represent)
     # @ToDo: Make this configurable - some deployments will only see
@@ -4053,9 +4055,9 @@ class HRMTrainingVirtualFields:
             return current.messages.NONE
 
     # -------------------------------------------------------------------------
-    def job_role(self):
+    def job_title(self):
         """
-            Which Job Roles(s) the person is active with
+            Which Job Titles(s) the person is active with
         """
         try:
             person_id = self.hrm_training.person_id
@@ -4065,10 +4067,10 @@ class HRMTrainingVirtualFields:
         if person_id:
             s3db = current.s3db
             table = s3db.hrm_human_resource
-            jtable = s3db.hrm_job_role
+            jtable = s3db.hrm_job_title
             query = (table.person_id == person_id) & \
                     (table.status != 2) & \
-                    (table.job_role_id == jtable.id)
+                    (table.job_title_id == jtable.id)
             jobs = current.db(query).select(jtable.name,
                                             distinct=True,
                                             orderby=jtable.name)
@@ -4181,10 +4183,15 @@ def hrm_rheader(r, tabs=[]):
 
                 # Already formatted as HTML
                 active = TD(record.active)
-
+                tooltip = SPAN(_class="tooltip",
+                               _title="%s|%s" % \
+                    (T("Active"),
+                     T("A volunteer is defined as active if they've participated in an average of 8 or more hours of Programme work or Trainings per month in the last year")),
+                               _style="display:inline-block"
+                               )
                 row1 = TR(TH("%s:" % T("Programme")),
                           record.programme,
-                          TH("%s:" % T("Active?")),
+                          TH("%s:" % T("Active?"), tooltip),
                           active
                           )
                 row2 = TR(TH("%s:" % T("Programme Hours (Month)")),
@@ -4236,14 +4243,10 @@ def hrm_rheader(r, tabs=[]):
             teams_tab = None
         if current.session.s3.hrm.mode is not None:
             # Configure for personal mode
-            if group == "staff":
-                address_tab_name = T("Home Address")
-            else:
-                address_tab_name = T("Addresses")
             tabs = [(T("Person Details"), None),
                     (T("ID"), "identity"),
                     (T("Description"), "physical_description"),
-                    (address_tab_name, "address"),
+                    (T("Address"), "address"),
                     (T("Contacts"), "contacts"),
                     (T("Trainings"), "training"),
                     (T("Certificates"), "certification"),
@@ -4258,16 +4261,14 @@ def hrm_rheader(r, tabs=[]):
             # Configure for HR manager mode
             if group == "staff":
                 hr_record = T("Staff Record")
-                address_tab_name = T("Home Address")
             elif group == "volunteer":
                 hr_record = T("Volunteer Record")
-                address_tab_name = T("Addresses")
             tabs = [(T("Person Details"), None),
                     (hr_record, "human_resource"),
                     (T("ID"), "identity"),
                     education_tab,
                     (T("Description"), "physical_description"),
-                    (address_tab_name, "address"),
+                    (T("Address"), "address"),
                     (T("Contacts"), "contacts"),
                     (T("Trainings"), "training"),
                     (T("Certificates"), "certification"),
@@ -4392,9 +4393,9 @@ def hrm_training_event_controller():
             field.readable = False
             field.writable = False
             field.default = record.hours
-            # Suitable liset_fields
+            # Suitable list_fields
             list_fields = ["person_id",
-                           (T("Job Role"), "job_role"),
+                           (T("Job Title"), "job_title"),
                            (T("Organization"), "organisation"),
                            ]
             current.s3db.configure("hrm_training",
@@ -4432,7 +4433,7 @@ def hrm_training_controller():
             T = current.T
             list_fields = ["course_id",
                            "person_id",
-                           (T("Job Role"), "job_role"),
+                           (T("Job Title"), "job_title"),
                            (T("Organization"), "organisation"),
                            "date",
                            ]
