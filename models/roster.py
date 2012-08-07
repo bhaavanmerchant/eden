@@ -3,9 +3,23 @@
 #table = db.define_table(tablename, Field('event'), Field('event_id'), Field('slot'))
 tablename = "hrm_roster_table"
 table = db.define_table(tablename, 
+                                Field('occasion'),
                                 Field('week'), 
-                                Field('slot')
+                                Field('slot'),
+                                s3db.project_project_id()
                         )
+#tablename = "hrm_roster_event"
+#table = db.define_table(tablename,
+#                                Field('occasion'),
+#                
+#                        )
+#tablename = "hrm_roster_date"
+#table = db.define_table(tablename,
+#                            Field('type'),
+#                            #Field('foreign_key'),
+#                            Field('start_date','datetime'),
+#                            s3db.project_project_id()
+#                        )
 #db.hrm_roster_table.insert(week='21', slot='1')
 tablename = "hrm_roster"
 table = db.define_table(tablename, 
@@ -14,35 +28,35 @@ table = db.define_table(tablename,
                                  Field('change_req'),
                                  *s3_meta_fields()
                         )
-tablename = "hrm_roster_organisation"
-table = db.define_table(tablename, 
-                                Field('roster',db.hrm_roster), 
-                                #s3db.super_link("id", "org_organisation")
-                                s3db.org_organisation_id()
-                        )
-tablename = "hrm_roster_project"
-table = db.define_table(tablename, 
-                                Field('roster',db.hrm_roster), 
-                                #s3db.super_link("id", "project_project")
-                                s3db.project_project_id()
-                        )
-tablename = "hrm_roster_site"
-table = db.define_table(tablename, 
-                                Field('roster',db.hrm_roster), 
-                                s3db.super_link("site_id", "org_site")
-                        )
-tablename = "hrm_roster_incident" 
-table = db.define_table(tablename, 
-                                Field('roster',db.hrm_roster), 
-                                #s3db.super_link("id", "event_incident")
-                                s3db.irs_ireport_id()
-                        )
-tablename = "hrm_roster_scenario"
-table = db.define_table(tablename, 
-                                Field('roster',db.hrm_roster), 
-                                #s3db.super_link("id", "scenario_scenario")
-                                s3db.scenario_scenario_id()
-                        )
+#tablename = "hrm_roster_organisation"
+#table = db.define_table(tablename, 
+#                                Field('roster',db.hrm_roster), 
+#                                #s3db.super_link("id", "org_organisation")
+#                                s3db.org_organisation_id()
+#                        )
+#tablename = "hrm_roster_project"
+#table = db.define_table(tablename, 
+#                                Field('roster',db.hrm_roster), 
+#                                #s3db.super_link("id", "project_project")
+#                                s3db.project_project_id()
+#                        )
+#tablename = "hrm_roster_site"
+#table = db.define_table(tablename, 
+#                                Field('roster',db.hrm_roster), 
+#                                s3db.super_link("site_id", "org_site")
+#                        )
+#tablename = "hrm_roster_incident" 
+#table = db.define_table(tablename, 
+#                                Field('roster',db.hrm_roster), 
+#                                #s3db.super_link("id", "event_incident")
+#                                s3db.irs_ireport_id()
+#                        )
+#tablename = "hrm_roster_scenario"
+#table = db.define_table(tablename, 
+#                                Field('roster',db.hrm_roster), 
+#                                #s3db.super_link("id", "scenario_scenario")
+#                                s3db.scenario_scenario_id()
+#                        )
 tablename = "hrm_roster_shift"
 table = db.define_table(tablename,
                             Field("roster_id",db.hrm_roster),

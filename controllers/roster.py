@@ -31,7 +31,7 @@ def index():
     for row in rows:
         volunteers[str(row['id'])]=row['first_name']+' '+row['last_name']
     defaults=[request.vars.occasion,request.vars.project_selector,request.vars.timeframe,request.vars.timeslot]
-    table_id=db.hrm_roster_table.update_or_insert(week=defaults[2],slot=defaults[3])
+    table_id=db.hrm_roster_table.update_or_insert(occasion=defaults[0],week=defaults[2],slot=defaults[3])
     rows=db(db.hrm_roster_shift.table_id==table_id).select()
     filled_slots=[]
     for row in rows:
