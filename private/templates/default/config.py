@@ -539,6 +539,12 @@ settings.modules = OrderedDict([
            restricted = True,
            module_type = 10,
        )),
+    ("roster", Storage(
+           name_nice = T("Roster tool"),
+           #description = "Rostering tool for people",
+           restricted = True,
+           module_type = 10,
+       )),
     #("mpr", Storage(
     #       name_nice = T("Missing Person Registry"),
     #       #description = "Helps to report and search for missing persons",

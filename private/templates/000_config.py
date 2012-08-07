@@ -14,7 +14,7 @@
 """
 
 # Remove this line when you have edited this file sufficiently to proceed to the web interface
-FINISHED_EDITING_CONFIG_FILE = False
+FINISHED_EDITING_CONFIG_FILE = True
 
 # Select the Template
 # - which Modules are enabled
@@ -69,7 +69,7 @@ settings.base.debug = False
 #settings.base.cdn = True
 
 # This setting will be automatically changed _before_ registering the 1st user
-settings.auth.hmac_key = "akeytochange"
+settings.auth.hmac_key = "akeytochanga"
 
 # Email settings
 # Outbound server
