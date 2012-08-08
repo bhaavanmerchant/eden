@@ -80,7 +80,7 @@ import eden.menus as default
         #]
 
 # =============================================================================
-#class S3OptionsMenu(default.S3OptionsMenu):
+class S3OptionsMenu(default.S3OptionsMenu):
     #"""
         #Custom Controller Menus
 
@@ -101,16 +101,20 @@ import eden.menus as default
         #underscore prefix).
     #"""
 
-    #def cr(self):
-        #""" CR / Shelter Registry """
+    def roster(self):
+        #""" Rostering tool """
 
-        #return M(c="cr")(
-                    #M("Camp", f="shelter")(
-                        #M("New", m="create"),
-                        #M("List All"),
-                        #M("Map", m="map"),
-                        #M("Import", m="import"),
-                    #)
-                #)
+        return M(c="roster")(
+                    M("Roster", f="index"),
+                    M("Requests", f="requests"),
+                    M("People", f="hrm")(
+                        M("List"),
+                        M("Skills")
+                    ),
+                    M("Table", f="table")(
+                        M("Manage"),
+                        M("Roles")
+                    )
+                )
 
 # END =========================================================================

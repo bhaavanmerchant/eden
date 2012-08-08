@@ -41,6 +41,7 @@ import eden.sit
 import eden.proc
 import eden.project
 import eden.req
+import eden.roster
 import eden.scenario
 import eden.security
 import eden.stats
