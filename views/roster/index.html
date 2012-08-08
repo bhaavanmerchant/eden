@@ -147,69 +147,6 @@ jQuery(document).ready(function(){
 <body>
 <div id="maincontent">
 <h1>{{=message}}</h1>
-<a href='admin'>Panel </a> | Roster
-<br/><br/>
-<div class='aside'>
-    <div id='menu_options'>
-        <ul id='subnav'>
-            <li>
-                <div class='hoverable'>
-                    <a href='hrm'>People</a>
-                </div>
-                <ul class='submenu'>
-                    <li>
-                        <a href='hrm'>Manage People</a>
-                    </li>
-                    <li>
-                        {{=A('Specify Skills',callback=URL('#'))}}
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <div class='hoverable'>
-                    <a href='#'>Projects</a>
-                </div>
-                <ul class='submenu'>
-                    <li>
-                        {{=A('Manage Project',_href=URL('project','project'))}}
-                    </li>
-                    <li>
-                        <a href='#'>Manage Site</a>
-                    </li>
-                    <li>
-                        {{=A('Manage Incident',_href=URL('irs','ireport'))}}
-                    </li>
-                    <li>
-                        {{=A('Manage Scenario',_href=URL('scenario','index'))}}
-                    </li>
-                    <li>
-                        {{=A('Manage Organisation',_href=URL('org','organisation'))}}
-                    </li>
-                </ul>
-            </li>
-            <li>
-                <div class='hoverable'>
-                    <a href='admin'>Requests</a>
-                </div>
-                <ul class='submenu'>
-                </ul>
-            </li>
-            <li>
-                <div class='hoverable'>
-                    <a href='#'>Tables</a>
-                </div>
-                <ul class='submenu'>
-                    <li>
-                        <a href='#'>Create table</a>
-                    </li>
-                    <li>
-                        <a href='#'>Add Roles</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-</div>
 <span>
 <div id="r_varea">
 <div id="r_varea_head">Volunteers:</div>
@@ -225,7 +162,7 @@ jQuery(document).ready(function(){
 </div>
 </div>
 </span>
-<span style="position:absolute; right:50px;">
+<span style="position:absolute; left:30px;">
 <div id="r_tablearea">
 <form enctype="multipart/form-data" id="table_info_form" method="post">
 <div id="selectboxes">
@@ -282,6 +219,7 @@ jQuery(document).ready(function(){
     <a href='index/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
     </span>
 </div>
+</form>
 <br/>
 <table id="r_table">
 <thead>

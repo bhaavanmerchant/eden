@@ -213,7 +213,7 @@ def del_role():
     redirect(URL('index'))
     return result
 
-def admin():
+def requests():
     return dict(message='Panel')
 
 def hrm():

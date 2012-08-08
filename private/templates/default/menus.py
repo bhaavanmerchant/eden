@@ -106,7 +106,7 @@ class S3OptionsMenu(default.S3OptionsMenu):
 
         return M(c="roster")(
                     M("Roster", f="index"),
-                    M("Requests", f="admin"),
+                    M("Requests", f="requests"),
                     M("People", f="hrm")(
                         M("List"),
                         M("Skills")
