@@ -1,20 +1,34 @@
 # -*- coding: utf-8 -*-
-"""
-    This is just a commented template to copy/paste from when implementing
-    new models. Be sure you replace this docstring by something more
-    appropriate, e.g. a short module description and a license statement.
+"""Sahana Eden Roster Tool
 
-    The module prefix is the same as the filename (without the ".py"), in this
-    case "skeleton". Remember to always add an import statement for your module
-    to:
+    @copyright: 2011-2012 (c) Sahana Software Foundation
+    @license: MIT
 
-    models/00_tables.py
+    Rostering utility
 
-    like:
+    For more details see the blueprint at:
+    http://eden.sahanafoundation.org/wiki/BluePrintRoster
 
-    import eden.skeleton
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following
+    conditions:
 
-    (Yeah - not this one of course :P it's just an example)
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
 """
 
 # mandatory __all__ statement:
