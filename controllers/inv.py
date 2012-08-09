@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
     Inventory Management
@@ -43,7 +44,7 @@ def warehouse():
     def prep(r):
 
         if r.id:
-            table.obsolete.readable = table.obsolete.writable = True
+            r.table.obsolete.readable = r.table.obsolete.writable = True
 
         if r.component:
             if r.component.name == "inv_item":
@@ -106,7 +107,7 @@ def warehouse():
     csv_stylesheet = "%s.xsl" % resourcename
 
     output = s3_rest_controller(module, resourcename,
-                                rheader=s3db.org_rheader,
+                                rheader=s3db.inv_warehouse_rheader,
                                 csv_template = resourcename,
                                 csv_stylesheet = csv_stylesheet,
                                 # Extra fields for CSV uploads:
@@ -257,7 +258,15 @@ def inv_item():
 # -----------------------------------------------------------------------------
 def track_movement():
     """ REST Controller """
+
     table = s3db.inv_track_item
+
+    s3db.configure("inv_track_item",
+                   create=False,
+                   listadd=False,
+                   editable=False,
+                   deletable=False,
+                   )
 
     def prep(r):
         if r.interactive:
@@ -267,18 +276,10 @@ def track_movement():
                          (table.recv_inv_item_id == item_id)
                 s3.filter = filter
         return True
-
-    s3db.configure("inv_track_item",
-                    create=False,
-                    listadd=False,
-                    editable=False,
-                    deletable=False,
-                   )
-
     s3.prep = prep
-    output =  s3_rest_controller("inv",
-                                 "track_item",
-                                 rheader=s3db.inv_warehouse_rheader,
+
+    output = s3_rest_controller("inv", "track_item",
+                                rheader=s3db.inv_warehouse_rheader,
                                 )
     if "add_btn" in output:
         del output["add_btn"]
@@ -1299,10 +1300,11 @@ def track_item():
     table = s3db.inv_track_item
 
     s3db.configure("inv_track_item",
-                    create=False,
-                    listadd=False,
-                    editable=False,
-                    deletable=False,
+                   create=False,
+                   listadd=False,
+                   insertable=False,
+                   editable=False,
+                   deletable=False,
                    )
 
     vars = request.get_vars
