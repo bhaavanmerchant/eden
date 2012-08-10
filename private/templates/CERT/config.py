@@ -26,10 +26,10 @@ T = current.T
 # ["roles", "user"]
 # Unless doing a manual DB migration, where prepopulate = 0
 # In Production, prepopulate = 0 (to save 1x DAL hit every page)
-#settings.base.prepopulate = 1
+settings.base.prepopulate = ["CERT"]
 
 # Theme (folder to use for views/layout.html)
-#settings.base.theme = "default"
+settings.base.theme = "CERT"
 
 # Authentication settings
 # These settings should be changed _after_ the 1st (admin) user is
