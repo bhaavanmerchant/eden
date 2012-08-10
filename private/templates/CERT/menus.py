@@ -112,7 +112,7 @@ class S3OptionsMenu(default.S3OptionsMenu):
                         M("Skills")
                     ),
                     M("Table", f="table")(
-                        M("Manage"),
+                        M("Manage", f="tables"),
                         M("Roles")
                     )
                 )

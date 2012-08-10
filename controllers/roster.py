@@ -311,3 +311,6 @@ def requests():
 def hrm():
     output = s3_rest_controller("pr", "person")
     return output
+
+def tables():
+    return s3_rest_controller("hrm","roster_table")
