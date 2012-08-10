@@ -17,8 +17,6 @@ table = db.define_table(tablename,
 ##db.hrm_roster_table.insert(week='21', slot='1')
 tablename = "hrm_roster"
 table = db.define_table(tablename, 
-#                                Field('roster_table',
-#                                    db.hrm_roster_table),
                                  Field('change_req'),
                                  *s3_meta_fields()
                         )
@@ -32,9 +30,6 @@ table = db.define_table(tablename,
                         )
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'), Field('position_in_table','integer'))
-
-tablename = "hrm_person_role" #Clarification needed if the naming of this is apt or should be changed ?
-table = db.define_table(tablename, s3db.hrm_job_role_id(), s3db.pr_person_id())
 
 #tablename = "hrm_roster_change"
 #table = db.define_table(tablename,

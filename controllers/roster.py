@@ -189,13 +189,13 @@ def people():
         List of people specific to a job role
     """
     rows = db(db.hrm_job_role).select()
-    subrows = db(db.hrm_person_role).select()
+    subrows = db(db.hrm_human_resource).select()
     #people=db(db.pr_person).select()
     volunteers={}    # {volunteer_id:volunteer_name}
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers = {}
         for subrow in subrows:
-            if subrow["job_role_id"] == row["id"]:
+            if subrow["job_role_id"][0] == row["id"]:
                 person = db(
                             db.pr_person.id == subrow["person_id"]
                             ).select()
