@@ -195,11 +195,12 @@ def people():
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers = {}
         for subrow in subrows:
-            if subrow["job_role_id"][0] == row["id"]:
-                person = db(
-                            db.pr_person.id == subrow["person_id"]
-                            ).select()
-                specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
+            for job_role in subrow["job_role_id"]:
+                if job_role == row["id"]:
+                    person = db(
+                                db.pr_person.id == subrow["person_id"]
+                                ).select()
+                    specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
         volunteers[ str( row["name"] ) ] = specific_volunteers
     
     alloted_roles = []
