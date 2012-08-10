@@ -58,87 +58,87 @@ def index():
     for row in rows:
         #determine col
         col = (string_to_date(row["date"]) - project_date).days
-        v_id = str(row['person_id'])
+        v_id = str(row["person_id"])
         #determine row
         row_tbi = len(alloted_roles) + 2 #To prevent garbage value raising an exception
         for i in range(len(alloted_roles)):
             already_filled = False
-            if alloted_roles[i] == row['role']:
+            if alloted_roles[i] == row["role"]:
                 for filled_slot in filled_slots:
-                    if (filled_slot['col'] == col and filled_slot['row'] == i):
+                    if (filled_slot["col"] == col and filled_slot["row"] == i):
                         already_filled=True
                 #logic to check if this i th row is free
                 #if free populate filled_slots
             if already_filled:
                 continue
-            if alloted_roles[i] == row['role']:
+            if alloted_roles[i] == row["role"]:
                 row_tbi = i
                 break
         
         slot = dict( row = row_tbi, col = col, vid = v_id)
         filled_slots.append(slot)
                
-    slots = ['8:00 - 12:00','12:00 - 4:00','4:00 - 8:00']
-    job_roles = ['-- Select --']
+    slots = ["8:00 - 12:00","12:00 - 4:00","4:00 - 8:00"]
+    job_roles = ["-- Select --"]
     jr = []
     rows = db().select(
                         db.hrm_job_role.name
                         )
 
     for row in rows:
-        jr.append(row['name'])
+        jr.append(row["name"])
 
     job_roles += jr
     
-    occasion = ['Project','Organisation','Scenario','Site','Incident']
-    time_dets = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    occasion = ["Project","Organisation","Scenario","Site","Incident"]
+    time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     project_date = datetime.date.today() #Default starting day of roster is current date.
     projects=[]
     
     for i in range(len(defaults)):
         if not defaults[i]:
-            defaults[i] = '0'
+            defaults[i] = "0"
 
-    if defaults[0] == '0':
+    if defaults[0] == "0":
         rows = db(
                     db.project_project
                 ).select()
         i = 0
         for row in rows:
-            projects.append(row['code'])
+            projects.append(row["code"])
             if int(defaults[1]) == i:
-                project_date = row['start_date']
+                project_date = row["start_date"]
             i += 1
 
-    elif defaults[0] == '1':
+    elif defaults[0] == "1":
         rows = db().select(db.org_organisation.name)
         
         for row in rows:
-            projects.append(row['name'])
+            projects.append(row["name"])
         
-    elif defaults[0] == '2':
+    elif defaults[0] == "2":
         True
         #rows=db().select(db.org_organisation.name)
         #for row in rows:
-        #    projects.append(row['name'])
+        #    projects.append(row["name"])
     
-    elif defaults[0] == '3':
+    elif defaults[0] == "3":
         True
         #rows=db().select(db.org_organisation.name)
         #for row in rows:
-        #    projects.append(row['name'])
+        #    projects.append(row["name"])
 
-    elif defaults[0] == '4':
+    elif defaults[0] == "4":
         rows = db(db.irs_ireport).select()
         i=0
         for row in rows:
-            projects.append(row['name'])
+            projects.append(row["name"])
             if int(defaults[1]) == i:
-                project_date = row['datetime'].date()
+                project_date = row["datetime"].date()
             i+=1            
 
     else:
-        defaults[0] == '0'
+        defaults[0] == "0"
 
     project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
     project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
@@ -160,17 +160,17 @@ def index():
                 "hook to draw custom page header (logo and title)"
                 logo = os.path.join( request.env.web2py_path, "applications", request.application, "static", "img", "sahanasmall_05.png" )
                 self.image(logo, 10, 8, 33)
-                self.set_font('Arial', 'B', 15)
+                self.set_font("Arial", "B", 15)
                 self.cell(65) # padding
-                self.cell(60, 10, "Roster", 1, 0, 'C')
+                self.cell(60, 10, "Roster", 1, 0, "C")
                 self.ln(20)
                 
             def footer(self):
                 "hook to draw custom page footer (printing page numbers)"
                 self.set_y(-15)
-                self.set_font('Arial','I',8)
-                txt = 'Page %s of %s' % (self.page_no(), self.alias_nb_pages())
-                self.cell(0,10,txt,0,0,'C')
+                self.set_font("Arial","I",8)
+                txt = "Page %s of %s" % (self.page_no(), self.alias_nb_pages())
+                self.cell(0,10,txt,0,0,"C")
         pdf=MyFPDF()
         # create a page and serialize/render HTML objects
         pdf.add_page()
@@ -178,8 +178,8 @@ def index():
                         str(XML(table, sanitize=False))
                         )
         # prepare PDF to download:
-        response.headers['Content-Type'] = 'application/pdf'
-        return pdf.output(dest='S')
+        response.headers["Content-Type"] = "application/pdf"
+        return pdf.output(dest="S")
 
 
     return dict(message = T("Rostering Tool"), numb = 6, projects = projects, slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, volunteers = volunteers, time_dets = time_dets, project_date = project_date, filled_slots = filled_slots, occasion = occasion, defaults = defaults)
@@ -195,12 +195,12 @@ def people():
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers = {}
         for subrow in subrows:
-            if subrow['job_role_id'] == row['id']:
+            if subrow["job_role_id"] == row["id"]:
                 person = db(
-                            db.pr_person.id == subrow['person_id']
+                            db.pr_person.id == subrow["person_id"]
                             ).select()
-                specific_volunteers[str(person[0]['id'])] = person[0]['first_name'] + ' ' + person[0]['last_name']
-        volunteers[ str( row['name'] ) ] = specific_volunteers
+                specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
+        volunteers[ str( row["name"] ) ] = specific_volunteers
     
     alloted_roles = []
     rows=db().select(
@@ -208,12 +208,12 @@ def people():
                     )
 
     for row in rows:
-        alloted_roles.append(row['roles'])
+        alloted_roles.append(row["roles"])
 
     r = int(request.vars.row);
     return DIV(
-                DIV(alloted_roles[r], _id='volunteer_role'), FORM(
-                                                                    INPUT( _name='volunteer_quick_search', _id='volunteer_quick_search')
+                DIV(alloted_roles[r], _id="volunteer_role"), FORM(
+                                                                    INPUT( _name="volunteer_quick_search", _id="volunteer_quick_search")
                                                                 ),
                 *[ DIV(volunteers[alloted_roles[r]][v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers [ alloted_roles[r] ] ] 
               )
@@ -244,7 +244,7 @@ def roster_submit():
                     )
 
     for row in rows:
-        alloted_roles.append(row['roles'])
+        alloted_roles.append(row["roles"])
 
     table_id=1 #Hard coded. Needs to change
     db(
@@ -267,12 +267,12 @@ def add_role():
     Add volunteers role to the corresponding table
     """
     table_id = 1
-    job_roles = ['Team Leader', 'Team Member', 'Trainee']
+    job_roles = ["Team Leader", "Team Member", "Trainee"]
     pt = db( db.hrm_roster_roles.table_id == table_id ).count()
     db.hrm_roster_roles.insert(
                                 table_id = table_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
                                 )
-    redirect( URL('index') )
+    redirect( URL("index") )
     return job_roles[ request.vars.new_job_role ]
 
 def del_role():
@@ -302,7 +302,7 @@ def del_role():
     return result
 
 def requests():
-    return dict(message = 'Panel')
+    return dict(message = "Panel")
 
 def hrm():
     output = s3_rest_controller("pr", "person")
