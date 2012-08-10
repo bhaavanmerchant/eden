@@ -260,7 +260,7 @@ def roster_submit():
         db.hrm_roster_shift.insert(
                                     roster_id = a, table_id = table_id, date = date_from_week, role = alloted_roles[ int(roster_row) ], person_id = person
                                     )
-    return DIV("Successfully saved!")
+    return "Successfully saved!"
 
 def add_role():
     """
@@ -302,6 +302,9 @@ def del_role():
     return result
 
 def requests():
+    """
+    Managing Change requests
+    """
     return dict(message = "Panel")
 
 def hrm():

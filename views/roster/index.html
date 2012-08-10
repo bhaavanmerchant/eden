@@ -133,11 +133,8 @@ jQuery(document).ready(function(){
             data: roster_dets
             }).done(function( msg ) 
                 {
-                $("#vn").html(msg);
+                $("#flash_message").html(msg);
                 });
-
-        
-    //alert(roster_dets[0].row);
     });
     
 });
@@ -150,81 +147,83 @@ jQuery(document).ready(function(){
 <span>
 <div id="r_varea">
 <div id="r_varea_head">Volunteers:</div>
-{{=IMG(_src='/eden/static/img/cross.png',_alt='cross',_id='cross')}}
+{{=IMG(_src='/eden/static/img/cross.png', _alt='cross', _id='cross')}}
 <br/>
-<div class='vn' id='vn'>
-<form>
-<input type='text' id='volunteer_quick_search'>
-</form>
-{{for v_id in volunteers:}}
-<div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
-{{pass}}
-</div>
+    <div class='vn' id='vn'>
+        <form>
+        <input type='text' id='volunteer_quick_search'>
+        </form>
+            {{for v_id in volunteers:}}
+                <div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
+            {{pass}}
+    </div>
 </div>
 </span>
 <span style="position:absolute; left:30px;">
 <div id="r_tablearea">
 <form enctype="multipart/form-data" id="table_info_form" method="post">
-<div id="selectboxes">
-    <span>Event:
-        <select name='occasion' id='occasion' >
-        {{for x in range(len(occasion)):}}
-            <option value={{=x}} 
-            {{if defaults[0] and x == int(defaults[0]):}}
-                selected="selected"
-            {{pass}}
-            >{{=occasion[x]}}</option>
-        {{pass}}
-        </select>
-    </span>
-
-    <span style="position:relative; left:60px;">
-        <select name='project_selector' id='project_selector'>
-        {{for x in range(len(projects)):}}
-            <option value={{=x}}
-            {{if defaults[1] and x == int(defaults[1]):}}
-                selected="selected"
-            {{pass}}
-            >{{=projects[x]}}</option>
-        {{pass}}
-        </select>
-    </span>
-
-    <span style="position:relative; left:180px;">
-        <select name='timeframe' id='timeframe'>
-        {{for i in range(numb):}}
-            <option value={{=i}}
-                {{if defaults[2] and i == int(defaults[2]):}}
+    <div id="selectboxes">
+        <span>Event:
+            <select name='occasion' id='occasion' >
+            {{for x in range(len(occasion)):}}
+                <option value={{=x}} 
+                {{if defaults[0] and x == int(defaults[0]):}}
                     selected="selected"
                 {{pass}}
-            >Week {{=i+1}} {{=project_date}} {{project_date=project_date+datetime.timedelta(days=6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}
-            </option>
-        {{pass}}
-        </select>
-    </span>
+                >{{=occasion[x]}}</option>
+            {{pass}}
+            </select>
+        </span>
 
-    <span style="position:relative; left:240px;">
-    Slot:
-        <select name='timeslot' id='timeslot'>
-        {{for x in range(len(slots)):}}
-            <option value={{=x}}
-                {{if defaults[3] and x == int(defaults[3]):}}
+        <span style="position:relative; left:60px;">
+            <select name='project_selector' id='project_selector'>
+            {{for x in range(len(projects)):}}
+                <option value={{=x}}
+                {{if defaults[1] and x == int(defaults[1]):}}
                     selected="selected"
                 {{pass}}
-            >{{=slots[x]}}</option>
-        {{pass}}
-        </select>
-    </span>
-    <span style="position:relative; left:290px;">
-    <a href='index/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
-    </span>
-</div>
+                >{{=projects[x]}}</option>
+            {{pass}}
+            </select>
+        </span>
+
+        <span style="position:relative; left:180px;">
+            <select name='timeframe' id='timeframe'>
+            {{for i in range(numb):}}
+                <option value={{=i}}
+                    {{if defaults[2] and i == int(defaults[2]):}}
+                        selected="selected"
+                    {{pass}}
+                >Week {{=i+1}} {{=project_date}} {{project_date = project_date + datetime.timedelta(days = 6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}
+                </option>
+            {{pass}}
+            </select>
+        </span>
+
+        <span style="position:relative; left:240px;">
+        Slot:
+            <select name='timeslot' id='timeslot'>
+            {{for x in range(len(slots)):}}
+                <option value={{=x}}
+                    {{if defaults[3] and x == int(defaults[3]):}}
+                        selected="selected"
+                    {{pass}}
+                >{{=slots[x]}}</option>
+            {{pass}}
+            </select>
+        </span>
+        <span style="position:relative; left:290px;">
+        <a href='index/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
+        </span>
+    </div>
 </form>
 <br/>
 <table id="r_table">
 <thead>
-<tr><th>Role</th>{{for d in time_dets:}}<th>{{=d}}</th>{{pass}}
-</tr></thead>
+    <tr>
+        <th>Role</th>{{for d in time_dets:}}<th>{{=d}}</th>{{pass}}
+    </tr>
+</thead>
 {{for r in range(len(alloted_roles)):}}
 <tr>
     <td>
@@ -266,11 +265,10 @@ jQuery(document).ready(function(){
 </select></form></td>
 {{for x in range(len(time_dets)):}}<td></td>{{pass}}
 </tr>
-
 </table>
 {{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow')}}
 <br/>
-<span> <input type="button" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> 
+<span> <input type="button" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
 </div>
 </span>
 </div>
