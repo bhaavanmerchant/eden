@@ -297,6 +297,7 @@ class S3OrganisationModel(S3Model):
         #
         tablename = "org_organisation"
         table = define_table(tablename,
+                             self.super_link("roster_event_id", "hrm_roster_event"),
                              self.super_link("pe_id", "pr_pentity"),
                              #Field("privacy", "integer", default=0),
                              #Field("archived", "boolean", default=False),
@@ -499,7 +500,7 @@ class S3OrganisationModel(S3Model):
         configure(tablename,
                   onaccept=self.org_organisation_onaccept,
                   ondelete=self.org_organisation_ondelete,
-                  super_entity="pr_pentity",
+                  super_entity=("hrm_roster_event", "pr_pentity"),
                   referenced_by=[(utablename, "organisation_id")],
                   search_method=organisation_search,
                   deduplicate=self.organisation_duplicate,

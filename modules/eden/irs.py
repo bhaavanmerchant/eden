@@ -237,6 +237,7 @@ class S3IRSModel(S3Model):
         #}
         tablename = "irs_ireport"
         table = define_table(tablename,
+                             super_link("roster_event_id", "hrm_roster_event"),
                              super_link("sit_id", "sit_situation"),
                              super_link("doc_id", "doc_entity"),
                              Field("name",
@@ -399,7 +400,7 @@ class S3IRSModel(S3Model):
 
         # Resource Configuration
         configure(tablename,
-                  super_entity = ("sit_situation", "doc_entity"),
+                  super_entity = ("hrm_roster_event", "sit_situation", "doc_entity"),
                   search_method = ireport_search,
                   report_options=Storage(
                       search=[
