@@ -45,12 +45,12 @@ def index():
         volunteers[str(row["id"])]=row["first_name"]+" "+row["last_name"]
 
     defaults = [
-                request.vars.occasion,
+                request.vars.event,
                 request.vars.project_selector,
                 request.vars.timeframe,
                 request.vars.timeslot
                 ] # Return the default selection for the drop downs.
-    table_id = db.hrm_roster_table.update_or_insert(occasion=defaults[0],week=defaults[2],slot=defaults[3])
+    table_id = db.hrm_roster_table.update_or_insert(event=defaults[0],week=defaults[2],slot=defaults[3])
     rows = db(
                 db.hrm_roster_shift.table_id==table_id
             ).select()
@@ -90,7 +90,7 @@ def index():
 
     job_roles += jr
     
-    occasion = ["Project","Organisation","Scenario","Site","Incident"]
+    event = ["Project","Organisation","Scenario","Site","Incident"]
     time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     project_date = datetime.date.today() #Default starting day of roster is current date.
     projects=[]
@@ -182,7 +182,7 @@ def index():
         return pdf.output(dest="S")
 
 
-    return dict(message = T("Rostering Tool"), numb = 6, projects = projects, slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, volunteers = volunteers, time_dets = time_dets, project_date = project_date, filled_slots = filled_slots, occasion = occasion, defaults = defaults)
+    return dict(message = T("Rostering Tool"), numb = 6, projects = projects, slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, volunteers = volunteers, time_dets = time_dets, project_date = project_date, filled_slots = filled_slots, event = event, defaults = defaults)
 
 def people():
     """

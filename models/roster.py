@@ -1,7 +1,7 @@
 ## -*- coding: utf-8 -*-
 tablename = "hrm_roster_table"
 table = db.define_table(tablename, 
-                                Field('occasion'),
+                                Field('event'),
                                 Field('week'), 
                                 Field('slot'),
                                 s3db.project_project_id()

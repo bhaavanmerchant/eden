@@ -87,6 +87,9 @@ class S3RosterDataModel(S3Model):
         #    makes sure the table won't be re-defined if it's already in db
         # -> use s3_meta_fields to include meta fields (not s3_meta_fields!),
         #    of course this needs the s3 assignment above
+        tablename = "hrm_roster_event"        
+
+    
         tablename = "skeleton_example"
         table = self.define_table(tablename,
                                   Field("name"),
