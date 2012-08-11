@@ -1,12 +1,25 @@
 ## -*- coding: utf-8 -*-
+event_types = Storage(
+                project_project = T("Project"),
+                irs_ireport = T("Incident"),
+                scenario_scenario = T("Scenario"),
+                org_organisation = T("Organisation"),
+                #org_site = T("Site")
+                )
+
+tablename = "hrm_roster_event"
+table = s3db.super_entity(tablename, "roster_table_id",
+                            event_types,
+                              Field("name"))
 tablename = "hrm_roster_table"
 table = db.define_table(tablename, 
                                 Field('event'),
                                 Field('week'), 
                                 Field('slot'),
-                                s3db.project_project_id()
+                                s3db.super_link("roster_table_id", "hrm_roster_event"),
                         )
-
+s3db.configure(table, super_entity = db.hrm_roster_event)
+s3db.add_component(table, hrm_roster_event=s3db.super_key(db.hrm_roster_event))
 ##tablename = "hrm_roster_date"
 ##table = db.define_table(tablename,
 ##                            Field('type'),

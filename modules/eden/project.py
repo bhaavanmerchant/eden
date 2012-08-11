@@ -290,6 +290,7 @@ class S3ProjectModel(S3Model):
 
         tablename = "project_project"
         table = define_table(tablename,
+                             super_link("roster_table_id", "hrm_roster_event"),
                              super_link("doc_id", "doc_entity"),
                              # multi_orgs deployments use the separate project_organisation table
                              # - although Lead Org is still cached here to avoid the need for a virtual field to lookup
@@ -523,7 +524,7 @@ class S3ProjectModel(S3Model):
         report_fields = list_fields
 
         configure(tablename,
-                  super_entity="doc_entity",
+                  super_entity=("hrm_roster_event", "doc_entity"),
                   deduplicate=self.project_project_deduplicate,
                   onvalidation=self.project_project_onvalidation,
                   create_next=create_next,

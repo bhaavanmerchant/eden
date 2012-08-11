@@ -80,10 +80,9 @@ def index():
                
     slots = ["8:00 - 12:00","12:00 - 4:00","4:00 - 8:00"]
     job_roles = ["-- Select --"]
+    table=s3db.hrm_job_role
     jr = []
-    rows = db().select(
-                        db.hrm_job_role.name
-                        )
+    rows = db(table).select()
 
     for row in rows:
         jr.append(row["name"])
@@ -100,9 +99,8 @@ def index():
             defaults[i] = "0"
 
     if defaults[0] == "0":
-        rows = db(
-                    db.project_project
-                ).select()
+        table = s3db.project_project
+        rows = db(table).select()
         i = 0
         for row in rows:
             projects.append(row["code"])

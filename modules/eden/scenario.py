@@ -70,6 +70,7 @@ class S3ScenarioModel(S3Model):
 
         tablename = "scenario_scenario"
         table = self.define_table(tablename,
+                                  self.super_link("roster_table_id", "hrm_roster_event"),
                                   self.event_incident_type_id(),
                                   Field("name", notnull=True,
                                         length=64,    # Mayon compatiblity
@@ -78,6 +79,7 @@ class S3ScenarioModel(S3Model):
                                   *s3_meta_fields())
 
         self.configure(tablename,
+                       super_entity="hrm_roster_event",
                        # Open Map Config to set the default Location
                        create_next=URL(args=["[id]", "config"]),
                        deduplicate=self.scenario_duplicate,

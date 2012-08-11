@@ -87,7 +87,7 @@ class S3RosterDataModel(S3Model):
         #    makes sure the table won't be re-defined if it's already in db
         # -> use s3_meta_fields to include meta fields (not s3_meta_fields!),
         #    of course this needs the s3 assignment above
-        tablename = "hrm_roster_event"        
+
 
     
         tablename = "skeleton_example"
@@ -114,15 +114,15 @@ class S3RosterDataModel(S3Model):
         # If you need to reference external tables, always use the table-method.
         # This will automatically load the respective model unless it is already
         # loaded at this point:
-        xy_table = self.table("xy_table")
-        # Alternatively, you can also use on of these:
-        xy_table = self.xy_table
-        xy_table = self["xy_table"]
+#        xy_table = self.table("xy_table")
+#        # Alternatively, you can also use on of these:
+#        xy_table = self.xy_table
+#        xy_table = self["xy_table"]
 
-        # The following two are equivalent:
-        xy_variable = self.xy_variable
-        # and:
-        xy_variable = response.s3.xy_variable
+#        # The following two are equivalent:
+#        xy_variable = self.xy_variable
+#        # and:
+#        xy_variable = response.s3.xy_variable
         # However, if "xy_variable" is also a tablename, then the first
         # variant would return that table instead. Thus, make sure your
         # response.s3-global variables do not use tablenames as names
