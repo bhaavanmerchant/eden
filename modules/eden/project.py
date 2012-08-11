@@ -290,7 +290,7 @@ class S3ProjectModel(S3Model):
 
         tablename = "project_project"
         table = define_table(tablename,
-                             super_link("roster_table_id", "hrm_roster_event"),
+                             super_link("roster_event_id", "hrm_roster_event"),
                              super_link("doc_id", "doc_entity"),
                              # multi_orgs deployments use the separate project_organisation table
                              # - although Lead Org is still cached here to avoid the need for a virtual field to lookup

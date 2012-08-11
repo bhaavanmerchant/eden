@@ -297,7 +297,7 @@ class S3OrganisationModel(S3Model):
         #
         tablename = "org_organisation"
         table = define_table(tablename,
-                             self.super_link("roster_table_id", "hrm_roster_event"),
+                             self.super_link("roster_event_id", "hrm_roster_event"),
                              self.super_link("pe_id", "pr_pentity"),
                              #Field("privacy", "integer", default=0),
                              #Field("archived", "boolean", default=False),

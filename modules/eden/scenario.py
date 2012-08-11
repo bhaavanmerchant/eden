@@ -70,7 +70,7 @@ class S3ScenarioModel(S3Model):
 
         tablename = "scenario_scenario"
         table = self.define_table(tablename,
-                                  self.super_link("roster_table_id", "hrm_roster_event"),
+                                  self.super_link("roster_event_id", "hrm_roster_event"),
                                   self.event_incident_type_id(),
                                   Field("name", notnull=True,
                                         length=64,    # Mayon compatiblity

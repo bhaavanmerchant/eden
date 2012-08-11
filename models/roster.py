@@ -8,26 +8,22 @@ event_types = Storage(
                 )
 
 tablename = "hrm_roster_event"
-table = s3db.super_entity(tablename, "roster_table_id",
+table = s3db.super_entity(tablename, "roster_event_id",
                             event_types,
                               Field("name"))
 tablename = "hrm_roster_table"
 table = db.define_table(tablename, 
-                                Field('event'),
                                 Field('week'), 
                                 Field('slot'),
-                                s3db.super_link("roster_table_id", "hrm_roster_event"),
+                                s3db.super_link("roster_event_id", "hrm_roster_event"),
                         )
 s3db.configure(table, super_entity = db.hrm_roster_event)
 s3db.add_component(table, hrm_roster_event=s3db.super_key(db.hrm_roster_event))
-##tablename = "hrm_roster_date"
-##table = db.define_table(tablename,
-##                            Field('type'),
-##                            #Field('foreign_key'),
-##                            Field('start_date','datetime'),
-##                            s3db.project_project_id()
-##                        )
-##db.hrm_roster_table.insert(week='21', slot='1')
+tablename = "hrm_roster_date"
+table = db.define_table(tablename,
+                            Field("table_id",db.hrm_roster_table),
+                            Field('start_date','datetime'),
+                        )
 tablename = "hrm_roster"
 table = db.define_table(tablename, 
                                  Field('change_req'),
@@ -44,8 +40,8 @@ table = db.define_table(tablename,
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
 table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'), Field('position_in_table','integer'))
 
-#tablename = "hrm_roster_change"
-#table = db.define_table(tablename,
-#                                Field('initial_shift',db.hrm_roster_shift),
-#                                Field('requested_date'),
-#                                Field('requested_table',db.hrm_roster_shift))
+tablename = "hrm_roster_change"
+table = db.define_table(tablename,
+                                Field('initial_shift',db.hrm_roster_shift),
+                                Field('requested_date'),
+                                Field('requested_table',db.hrm_roster_shift))

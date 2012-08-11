@@ -237,7 +237,7 @@ class S3IRSModel(S3Model):
         #}
         tablename = "irs_ireport"
         table = define_table(tablename,
-                             super_link("roster_table_id", "hrm_roster_event"),
+                             super_link("roster_event_id", "hrm_roster_event"),
                              super_link("sit_id", "sit_situation"),
                              super_link("doc_id", "doc_entity"),
                              Field("name",
