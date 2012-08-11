@@ -50,7 +50,8 @@ def index():
                 request.vars.timeframe,
                 request.vars.timeslot
                 ] # Return the default selection for the drop downs.
-    table_id = db.hrm_roster_table.update_or_insert(event=defaults[0],week=defaults[2],slot=defaults[3])
+    table_id=1
+    #table_id = db.hrm_roster_table.update_or_insert(event=defaults[0],week=defaults[2],slot=defaults[3])
     rows = db(
                 db.hrm_roster_shift.table_id==table_id
             ).select()
