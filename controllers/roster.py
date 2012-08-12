@@ -66,6 +66,7 @@ def index():
     table=s3db.hrm_roster_table
     rows = db(table.id == table_id).select()
     for row in rows:
+        event_id = row["roster_event_id"]
         subrows = db(s3db.hrm_roster_slots.id == row["slots_id"]).select()
         for subrow in subrows:
             if subrow["slot1"]:
@@ -88,33 +89,25 @@ def index():
         jr.append(row["name"])
 
     job_roles += jr
-    event_id=1
+
     event = ["Project","Organisation","Scenario","Site","Incident"]
     time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-    project_date = datetime.date.today() #Default starting day of roster is current date.
+    #project_date = datetime.date.today() #Default starting day of roster is current date.
+    
     projects=[]
     
     for i in range(len(defaults)):
         if not defaults[i]:
             defaults[i] = "0"
 
+    
     if defaults[0] == "0":
         table = s3db.project_project
-        rows = db(table).select()
-        for row in rows:
-            projects.append([row["id"], row["code"]])
-            if int(defaults[1]) == row["id"]:
-                project_date = row["start_date"]
-                event_id=row["roster_event_id"]
 
+        
     elif defaults[0] == "1":
         table=s3db.org_organisation
-        rows = db(table).select()
-        for row in rows:
-            projects.append([row["id"], row["name"]])
-            if int(defaults[1]) == row["id"]:
-                #project_date = row["start_date"]
-                event_id=row["roster_event_id"]
+
         
     elif defaults[0] == "2":
         True
@@ -130,15 +123,18 @@ def index():
         #    projects.append([row["id"], row["name"]])
 
     elif defaults[0] == "4":
-        rows = db(db.irs_ireport).select()
-        for row in rows:
-            projects.append([row["id"], row["name"]])
-            if int(defaults[1]) == row["id"]:
-                project_date = row["datetime"].date()
-                event_id=row["roster_event_id"]
+        table = s3db.irs_ireport
 
     else:
         defaults[0] == "0"
+
+    rows = db(table).select()
+    for row in rows:
+        projects.append([row["id"], row["code"]])
+
+    rows = db(s3db.hrm_roster_table.roster_event_id == event_id).select()
+    for row in rows:
+        project_date = row["start_date"].date()    
 
     project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
     project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
@@ -247,12 +243,24 @@ def roster_submit():
         db.hrm_roster_shift.instance_id==instance_id
       ).delete()
 
+    table=s3db.hrm_roster_table
+    rows = db(table.id == table_id).select()
+    for row in rows:
+        event_id = row["roster_event_id"]
+
+    rows = db(s3db.hrm_roster_table.roster_event_id == event_id).select()
+    for row in rows:
+        project_date = row["start_date"].date()    
+
+    project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
+    project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
+
     for i in range( len(items) / 3 ):
         a = db.hrm_roster.insert()
         roster_col = str( items["array[" + str(i) + "][col]"] )
         roster_row = str( items["array[" + str(i) + "][row]"] )
         person = str( items["array[" + str(i) + "][vid]"] )
-        date_from_week = datetime.date(2012,4,4) + dateutil.relativedelta.relativedelta( days = int(roster_col) ) #Hard coded. Date needs to change
+        date_from_week = project_date + dateutil.relativedelta.relativedelta( days = int(roster_col) ) #Hard coded. Date needs to change
         db.hrm_roster_shift.insert(
                                     roster_id = a, instance_id = instance_id, date = date_from_week, 
                                     role = alloted_roles[ int(roster_row) ], person_id = person
