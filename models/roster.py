@@ -10,19 +10,30 @@ event_types = Storage(
 tablename = "hrm_roster_event"
 table = s3db.super_entity(tablename, "roster_event_id",
                             event_types,
-                              Field("name"))
+                              Field("name")
+                        )
+tablename = "hrm_roster_slots"
+table = db.define_table(tablename,
+                            Field('slot1'),
+                            Field('slot2'),
+                            Field('slot3'),
+                            Field('slot4'),
+                            Field('slot5')
+                        )
 tablename = "hrm_roster_table"
-table = db.define_table(tablename, 
-                                Field('week'), 
-                                Field('slot'),
+table = db.define_table(tablename,
+                                Field('type'), 
+                                Field('start_date',"datetime"), 
+                                Field('slots_id',db.hrm_roster_slots),
                                 s3db.super_link("roster_event_id", "hrm_roster_event"),
                         )
 s3db.configure(table, super_entity = db.hrm_roster_event)
 s3db.add_component(table, hrm_roster_event=s3db.super_key(db.hrm_roster_event))
-tablename = "hrm_roster_date"
+tablename = "hrm_roster_instance"
 table = db.define_table(tablename,
                             Field("table_id",db.hrm_roster_table),
-                            Field('start_date','datetime'),
+                            Field('week'),
+                            Field('slot')
                         )
 tablename = "hrm_roster"
 table = db.define_table(tablename, 
@@ -44,4 +55,5 @@ tablename = "hrm_roster_change"
 table = db.define_table(tablename,
                                 Field('initial_shift',db.hrm_roster_shift),
                                 Field('requested_date'),
-                                Field('requested_table',db.hrm_roster_shift))
+                                Field('requested_table',db.hrm_roster_shift)
+                        )

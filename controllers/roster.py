@@ -109,7 +109,8 @@ def index():
                 event_id=row["roster_event_id"]
 
     elif defaults[0] == "1":
-        rows = db().select(db.org_organisation.name)
+        table=s3db.org_organisation
+        rows = db(table).select()
         for row in rows:
             projects.append([row["id"], row["name"]])
             if int(defaults[1]) == row["id"]:
@@ -119,7 +120,7 @@ def index():
     elif defaults[0] == "2":
         True
         #table=s3db.scenario_scenario
-        #rows=db().select(table.name)
+        #rows=db(table).select()
         #for row in rows:
         #   projects.append([row["id"], row["name"]])
     
@@ -182,7 +183,11 @@ def index():
         return pdf.output(dest="S")
 
 
-    return dict(message = T("Rostering Tool"), numb = 6, projects = projects, slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, volunteers = volunteers, time_dets = time_dets, project_date = project_date, filled_slots = filled_slots, event = event, defaults = defaults)
+    return dict(message = T("Rostering Tool"), numb = 6, projects = projects, 
+                                slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, 
+                                volunteers = volunteers, time_dets = time_dets, project_date = project_date, 
+                                filled_slots = filled_slots, event = event, defaults = defaults
+                )
 
 def people():
     """
@@ -259,7 +264,8 @@ def roster_submit():
         person = str( items["array[" + str(i) + "][vid]"] )
         date_from_week = datetime.date(2012,4,4) + dateutil.relativedelta.relativedelta( days = int(roster_col) ) #Hard coded. Date needs to change
         db.hrm_roster_shift.insert(
-                                    roster_id = a, table_id = table_id, date = date_from_week, role = alloted_roles[ int(roster_row) ], person_id = person
+                                    roster_id = a, table_id = table_id, date = date_from_week, 
+                                    role = alloted_roles[ int(roster_row) ], person_id = person
                                     )
     return "Successfully saved!"
 
@@ -312,5 +318,71 @@ def hrm():
     output = s3_rest_controller("pr", "person")
     return output
 
+def slots():
+    return s3_rest_controller("hrm","roster_slots")
+
+
 def tables():
-    return s3_rest_controller("hrm","roster_table")
+    selection = [
+                request.vars.event,
+                request.vars.project_selector,
+                request.vars.slot_selector,
+                request.vars.start_date
+                ] # Return the default selection for the drop downs.
+    event = ["Project","Organisation","Scenario","Site","Incident"]
+    time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    projects=[]
+    
+
+    for i in range(len(selection)):
+        if not selection[i]:
+            selection[i] = "0"
+
+    if selection[0] == "0":
+        table = s3db.project_project
+        rows = db(table).select()
+        for row in rows:
+            projects.append([row["id"], row["code"]])
+            if int(selection[1]) == row["id"]:
+                event_id=row["roster_event_id"]
+
+    elif selection[0] == "1":
+        table=s3db.org_organisation
+        rows = db(table).select()
+        for row in rows:
+            projects.append([row["id"], row["name"]])
+            if int(selection[1]) == row["id"]:
+                event_id=row["roster_event_id"]
+        
+    elif selection[0] == "2":
+        True
+        #table=s3db.scenario_scenario
+        #rows=db(table).select()
+        #for row in rows:
+        #   projects.append([row["id"], row["name"]])
+    
+    elif selection[0] == "3":
+        True
+
+
+    elif selection[0] == "4":
+        rows = db(db.irs_ireport).select()
+        for row in rows:
+            projects.append([row["id"], row["name"]])
+            if int(selection[1]) == row["id"]:
+                event_id=row["roster_event_id"]
+
+    else:
+        selection[0] == "0"
+    
+
+    table = s3db.hrm_roster_slots
+    rows = db(table).select()
+    slots=[]
+    for row in rows:
+        slots.append(row["id"])
+    
+    if selection[1] != "0":
+        table=s3db.hrm_roster_table
+        rows=table.update_or_insert(roster_event_id=event_id, type=event[int(selection[0])], slots_id=1)
+    return dict(message = T("Rostering Tool"), projects = projects, event=event, slots=slots)
