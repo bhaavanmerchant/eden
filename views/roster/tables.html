@@ -23,4 +23,8 @@
             <input type="text" id="start_date" />
     </div>
     <input type="submit" value="Create table">
+    <br/>
+    {{for row in roster_table:}}
+        {{=row["id"]}} {{=row["type"]}} {{=row["start_date"]}} {{=row["slots_id"]}} {{=row["roster_event_id"]}} <a href= index/{{=row["id"]}}>Roster</a> <br/>
+    {{pass}}
 </form>

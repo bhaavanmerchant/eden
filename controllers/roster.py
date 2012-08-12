@@ -50,10 +50,10 @@ def index():
                 request.vars.timeframe,
                 request.vars.timeslot
                 ] # Return the default selection for the drop downs.
-    table_id=1
-    #table_id = db.hrm_roster_table.update_or_insert(event=defaults[0],week=defaults[2],slot=defaults[3])
+    instance_id=1
+    #instance_id = db.hrm_roster_table.update_or_insert(event=defaults[0],week=defaults[2],slot=defaults[3])
     rows = db(
-                db.hrm_roster_shift.table_id==table_id
+                db.hrm_roster_shift.instance_id==instance_id
             ).select()
     filled_slots = []
     for row in rows:
@@ -252,9 +252,9 @@ def roster_submit():
     for row in rows:
         alloted_roles.append(row["roles"])
 
-    table_id=1 #Hard coded. Needs to change
+    instance_id=1 #Hard coded. Needs to change
     db(
-        db.hrm_roster_shift.table_id==table_id
+        db.hrm_roster_shift.instance_id==instance_id
       ).delete()
 
     for i in range( len(items) / 3 ):
@@ -264,7 +264,7 @@ def roster_submit():
         person = str( items["array[" + str(i) + "][vid]"] )
         date_from_week = datetime.date(2012,4,4) + dateutil.relativedelta.relativedelta( days = int(roster_col) ) #Hard coded. Date needs to change
         db.hrm_roster_shift.insert(
-                                    roster_id = a, table_id = table_id, date = date_from_week, 
+                                    roster_id = a, instance_id = instance_id, date = date_from_week, 
                                     role = alloted_roles[ int(roster_row) ], person_id = person
                                     )
     return "Successfully saved!"
@@ -273,11 +273,11 @@ def add_role():
     """
     Add volunteers role to the corresponding table
     """
-    table_id = 1
+    instance_id = 1
     job_roles = ["Team Leader", "Team Member", "Trainee"]
-    pt = db( db.hrm_roster_roles.table_id == table_id ).count()
+    pt = db( db.hrm_roster_roles.instance_id == instance_id ).count()
     db.hrm_roster_roles.insert(
-                                table_id = table_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
+                                instance_id = instance_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
                                 )
     redirect( URL("index") )
     return job_roles[ request.vars.new_job_role ]
@@ -286,25 +286,25 @@ def del_role():
     """
     Delete volunteers role from the corresponding table
     """
-    table_id = 1
+    instance_id = 1
     result = db(
-                db.hrm_roster_roles.table_id == table_id and db.hrm_roster_roles.position_in_table == request.args[0]
+                db.hrm_roster_roles.instance_id == instance_id and db.hrm_roster_roles.position_in_table == request.args[0]
                 ).delete()
 
-    def remap_table(table_id):
-        #pt=db(db.hrm_roster_roles.table_id==table_id).count()
+    def remap_table(instance_id):
+        #pt=db(db.hrm_roster_roles.instance_id==instance_id).count()
         rows = db(
-                    db.hrm_roster_roles.table_id == table_id
+                    db.hrm_roster_roles.instance_id == instance_id
                 ).select()
 
         for i in range( len(rows) ):
             db(
-                db.hrm_roster_roles.table_id == table_id and db.hrm_roster_roles.position_in_table == rows[i].position_in_table
+                db.hrm_roster_roles.instance_id == instance_id and db.hrm_roster_roles.position_in_table == rows[i].position_in_table
                 ).update(
                         position_in_table = i
                         )
 
-    remap_table(table_id)
+    remap_table(instance_id)
     redirect( URL("index") )
     return result
 
@@ -385,4 +385,8 @@ def tables():
     if selection[1] != "0":
         table=s3db.hrm_roster_table
         rows=table.update_or_insert(roster_event_id=event_id, type=event[int(selection[0])], slots_id=1)
-    return dict(message = T("Rostering Tool"), projects = projects, event=event, slots=slots)
+
+    table = s3db.hrm_roster_table
+    roster_table = db(table).select()
+
+    return dict(message = T("Rostering Tool"), projects = projects, event=event, slots=slots,  roster_table=roster_table)

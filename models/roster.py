@@ -43,13 +43,13 @@ table = db.define_table(tablename,
 tablename = "hrm_roster_shift"
 table = db.define_table(tablename,
                             Field("roster_id",db.hrm_roster),
-                            Field("table_id",db.hrm_roster_table),
+                            Field("instance_id",db.hrm_roster_instance),
                             Field("date"),
                             Field("role"),
                             s3db.pr_person_id()
                         )
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.
-table = db.define_table(tablename, Field("table_id", db.hrm_roster_table), Field('roles'), Field('position_in_table','integer'))
+table = db.define_table(tablename, Field("instance_id", db.hrm_roster_instance), Field('roles'), Field('position_in_table','integer'))
 
 tablename = "hrm_roster_change"
 table = db.define_table(tablename,
