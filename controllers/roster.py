@@ -30,6 +30,24 @@ def index():
                                 int(exploded_date[2])
                                         )
 
+    defaults = [
+                request.vars.event,
+                request.vars.project_selector,
+                request.vars.timeframe,
+                request.vars.timeslot
+                ] # Return the default selection for the drop downs.
+    table=s3db.hrm_roster_instance    
+    if len(request.args)>0:
+        table_id=int(request.args[0])
+        instance_id = table.update_or_insert(table_id=table_id,week=defaults[2],slot=defaults[3])
+    else:
+        redirect( URL(c='roster', f='tables') )
+    rows=db(table.table_id==table_id).select()
+    for row in rows:
+        if row["week"] == defaults[2]:
+            instance_id=row['id']
+
+
     alloted_roles = []
     rows = db().select(
                         db.hrm_roster_roles.roles
@@ -44,42 +62,23 @@ def index():
     for row in rows:
         volunteers[str(row["id"])]=row["first_name"]+" "+row["last_name"]
 
-    defaults = [
-                request.vars.event,
-                request.vars.project_selector,
-                request.vars.timeframe,
-                request.vars.timeslot
-                ] # Return the default selection for the drop downs.
-    instance_id=1
-    #instance_id = db.hrm_roster_table.update_or_insert(event=defaults[0],week=defaults[2],slot=defaults[3])
-    rows = db(
-                db.hrm_roster_shift.instance_id==instance_id
-            ).select()
-    filled_slots = []
+    slots = []
+    table=s3db.hrm_roster_table
+    rows = db(table.id == table_id).select()
     for row in rows:
-        #determine col
-        col = (string_to_date(row["date"]) - project_date).days
-        v_id = str(row["person_id"])
-        #determine row
-        row_tbi = len(alloted_roles) + 2 #To prevent garbage value raising an exception
-        for i in range(len(alloted_roles)):
-            already_filled = False
-            if alloted_roles[i] == row["role"]:
-                for filled_slot in filled_slots:
-                    if (filled_slot["col"] == col and filled_slot["row"] == i):
-                        already_filled=True
-                #logic to check if this i th row is free
-                #if free populate filled_slots
-            if already_filled:
-                continue
-            if alloted_roles[i] == row["role"]:
-                row_tbi = i
-                break
-        
-        slot = dict( row = row_tbi, col = col, vid = v_id)
-        filled_slots.append(slot)
-               
-    slots = ["8:00 - 12:00","12:00 - 4:00","4:00 - 8:00"]
+        subrows = db(s3db.hrm_roster_slots.id == row["slots_id"]).select()
+        for subrow in subrows:
+            if subrow["slot1"]:
+                slots.append(subrow["slot1"])
+            if subrow["slot2"]:
+                slots.append(subrow["slot2"])
+            if subrow["slot3"]:
+                slots.append(subrow["slot3"])
+            if subrow["slot4"]:
+                slots.append(subrow["slot4"])
+            if subrow["slot5"]:
+                slots.append(subrow["slot5"])
+    
     job_roles = ["-- Select --"]
     table=s3db.hrm_job_role
     jr = []
@@ -144,73 +143,64 @@ def index():
     project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
     project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
 
-    if len(request.args)>0 and request.args[0]=="pdf":
-
-        from gluon.contrib.pyfpdf import FPDF, HTMLMixin
-    
-        rows = [
-                THEAD(TR(TH("Key",_width="70%"), TH("Value",_width="30%"))),
-                TBODY(TR(TD("Hello"),TD("60")), 
-                TR(TD("World"),TD("40")))
-                ]
-        table = TABLE(*rows, _border = "0", _align = "center", _width = "50%")
-
-        # create a custom class with the required functionalities 
-        class MyFPDF(FPDF, HTMLMixin):
-            def header(self): 
-                "hook to draw custom page header (logo and title)"
-                logo = os.path.join( request.env.web2py_path, "applications", request.application, "static", "img", "sahanasmall_05.png" )
-                self.image(logo, 10, 8, 33)
-                self.set_font("Arial", "B", 15)
-                self.cell(65) # padding
-                self.cell(60, 10, "Roster", 1, 0, "C")
-                self.ln(20)
-                
-            def footer(self):
-                "hook to draw custom page footer (printing page numbers)"
-                self.set_y(-15)
-                self.set_font("Arial","I",8)
-                txt = "Page %s of %s" % (self.page_no(), self.alias_nb_pages())
-                self.cell(0,10,txt,0,0,"C")
-        pdf=MyFPDF()
-        # create a page and serialize/render HTML objects
-        pdf.add_page()
-        pdf.write_html(
-                        str(XML(table, sanitize=False))
-                        )
-        # prepare PDF to download:
-        response.headers["Content-Type"] = "application/pdf"
-        return pdf.output(dest="S")
+    rows = db(
+                db.hrm_roster_shift.instance_id==instance_id
+            ).select()
+    filled_slots = []
+    for row in rows:
+        #determine col
+        col = (string_to_date(row["date"]) - project_date).days
+        v_id = str(row["person_id"])
+        #determine row
+        row_tbi = len(alloted_roles) + 2 #To prevent garbage value raising an exception
+        for i in range(len(alloted_roles)):
+            already_filled = False
+            if alloted_roles[i] == row["role"]:
+                for filled_slot in filled_slots:
+                    if (filled_slot["col"] == col and filled_slot["row"] == i):
+                        already_filled=True
+                #logic to check if this i th row is free
+                #if free populate filled_slots
+            if already_filled:
+                continue
+            if alloted_roles[i] == row["role"]:
+                row_tbi = i
+                break
+        
+        slot = dict( row = row_tbi, col = col, vid = v_id)
+        filled_slots.append(slot)
+           
 
 
     return dict(message = T("Rostering Tool"), numb = 6, projects = projects, 
                                 slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, 
                                 volunteers = volunteers, time_dets = time_dets, project_date = project_date, 
-                                filled_slots = filled_slots, event = event, defaults = defaults
+                                filled_slots = filled_slots, event = event, defaults = defaults, instance_id=instance_id, table_id=table_id
                 )
 
 def people():
     """
         List of people specific to a job role
     """
-    rows = db(db.hrm_job_role).select()
-    subrows = db(db.hrm_human_resource).select()
+    rows = db(s3db.hrm_job_role).select()
+    subrows = db(s3db.hrm_human_resource).select()
     #people=db(db.pr_person).select()
     volunteers={}    # {volunteer_id:volunteer_name}
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers = {}
         for subrow in subrows:
-            for job_role in subrow["job_role_id"]:
-                if job_role == row["id"]:
-                    person = db(
-                                db.pr_person.id == subrow["person_id"]
-                                ).select()
-                    specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
+            if subrow["job_role_id"]:
+                for job_role in subrow["job_role_id"]:
+                    if job_role == row["id"]:
+                        person = db(
+                                    db.pr_person.id == subrow["person_id"]
+                                    ).select()
+                        specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
         volunteers[ str( row["name"] ) ] = specific_volunteers
     
     alloted_roles = []
     rows=db().select(
-                    db.hrm_roster_roles.roles
+                    s3db.hrm_roster_roles.roles
                     )
 
     for row in rows:
@@ -251,8 +241,8 @@ def roster_submit():
 
     for row in rows:
         alloted_roles.append(row["roles"])
-
-    instance_id=1 #Hard coded. Needs to change
+    table_id=request.args[0]
+    instance_id = request.args[1]
     db(
         db.hrm_roster_shift.instance_id==instance_id
       ).delete()
@@ -273,22 +263,24 @@ def add_role():
     """
     Add volunteers role to the corresponding table
     """
-    instance_id = 1
+    table_id=request.args[0]
+    instance_id = request.args[1]
     job_roles = ["Team Leader", "Team Member", "Trainee"]
     pt = db( db.hrm_roster_roles.instance_id == instance_id ).count()
     db.hrm_roster_roles.insert(
                                 instance_id = instance_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
                                 )
-    redirect( URL("index") )
+    redirect( URL(c='roster', f='index', args=[table_id, instance_id]) )
     return job_roles[ request.vars.new_job_role ]
 
 def del_role():
     """
     Delete volunteers role from the corresponding table
     """
-    instance_id = 1
+    table_id=request.args[0]
+    instance_id = request.args[1]
     result = db(
-                db.hrm_roster_roles.instance_id == instance_id and db.hrm_roster_roles.position_in_table == request.args[0]
+                db.hrm_roster_roles.instance_id == instance_id and db.hrm_roster_roles.position_in_table == request.args[2]
                 ).delete()
 
     def remap_table(instance_id):
@@ -305,7 +297,7 @@ def del_role():
                         )
 
     remap_table(instance_id)
-    redirect( URL("index") )
+    redirect( URL(c='roster', f='index', args=[table_id, instance_id]) )
     return result
 
 def requests():
@@ -323,6 +315,15 @@ def slots():
 
 
 def tables():
+    def string_to_date(string_date):
+        """
+            Convert a string date into datetime by exploding by '-'
+        """
+        exploded_date = string_date.split("-")
+        return datetime.date(int(exploded_date[0]),
+                                int(exploded_date[1]),
+                                int(exploded_date[2])
+                                        )
     selection = [
                 request.vars.event,
                 request.vars.project_selector,
@@ -384,9 +385,9 @@ def tables():
     
     if selection[1] != "0":
         table=s3db.hrm_roster_table
-        rows=table.update_or_insert(roster_event_id=event_id, type=event[int(selection[0])], slots_id=1)
+        rows=table.update_or_insert(roster_event_id=event_id, type=event[int(selection[0])], slots_id=int(selection[2]), start_date=string_to_date(selection[3]))
 
     table = s3db.hrm_roster_table
     roster_table = db(table).select()
-
-    return dict(message = T("Rostering Tool"), projects = projects, event=event, slots=slots,  roster_table=roster_table)
+    
+    return dict(message = T("Rostering Tool"), projects = projects, event=event, slots=slots,  roster_table=roster_table, error=0)

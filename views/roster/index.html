@@ -64,7 +64,7 @@ jQuery(document).ready(function(){
         $.ajax(
             {
             type: "POST",
-            url: "people",
+            url: "{{=URL(c='roster', f='people', args=[table_id, instance_id])}}",
             data: { row: current_cell.r }
             }).done(function( msg ) 
                 {
@@ -75,7 +75,7 @@ jQuery(document).ready(function(){
     $('.remrole').click(function()
         {
         var cell=$(this).parent();
-        var url="{{=URL('del_role')}}"+"/"+cell.data('pos');
+        var url="{{=URL(c='roster', f='del_role', args=[table_id, instance_id])}}"+"/"+cell.data('pos');
         $(location).attr('href',url);
         });
     $('#vn').on('click','.volunteer_names',function(event)
@@ -128,7 +128,7 @@ jQuery(document).ready(function(){
     $.ajax(
             {
             type: "POST",
-            url: "roster_submit",
+            url: "{{=URL(c='roster', f='roster_submit', args=[table_id, instance_id])}}",
             data: roster_dets
             }).done(function( msg ) 
                 {
@@ -162,6 +162,7 @@ jQuery(document).ready(function(){
 <div id="r_tablearea">
 <form enctype="multipart/form-data" id="table_info_form" method="post">
     <div id="selectboxes">
+        <!---
         <span>Event:
             <select name='event' id='event' >
             {{for x in range(len(event)):}}
@@ -185,7 +186,7 @@ jQuery(document).ready(function(){
             {{pass}}
             </select>
         </span>
-
+        -->
         <span style="position:relative; left:180px;">
             <select name='timeframe' id='timeframe'>
             {{for i in range(numb):}}
@@ -258,7 +259,7 @@ jQuery(document).ready(function(){
 {{pass}}
 
 <tr id='newrole'><td>
-<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL('add_role')}}" method="post">
+<form enctype="multipart/form-data" id="roster_info_form" action="{{=URL(c='roster', f='add_role', args=[table_id, instance_id])}}" method="post">
 <select name="new_job_role" id="new_job_role">
 {{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}
 </select></form></td>
