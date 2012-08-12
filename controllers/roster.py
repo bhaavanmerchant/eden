@@ -89,7 +89,7 @@ def index():
         jr.append(row["name"])
 
     job_roles += jr
-    
+    event_id=1
     event = ["Project","Organisation","Scenario","Site","Incident"]
     time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     project_date = datetime.date.today() #Default starting day of roster is current date.
@@ -102,39 +102,40 @@ def index():
     if defaults[0] == "0":
         table = s3db.project_project
         rows = db(table).select()
-        i = 0
         for row in rows:
-            projects.append(row["code"])
-            if int(defaults[1]) == i:
+            projects.append([row["id"], row["code"]])
+            if int(defaults[1]) == row["id"]:
                 project_date = row["start_date"]
-            i += 1
+                event_id=row["roster_event_id"]
 
     elif defaults[0] == "1":
         rows = db().select(db.org_organisation.name)
-        
         for row in rows:
-            projects.append(row["name"])
+            projects.append([row["id"], row["name"]])
+            if int(defaults[1]) == row["id"]:
+                #project_date = row["start_date"]
+                event_id=row["roster_event_id"]
         
     elif defaults[0] == "2":
         True
-        #rows=db().select(db.org_organisation.name)
+        #table=s3db.scenario_scenario
+        #rows=db().select(table.name)
         #for row in rows:
-        #    projects.append(row["name"])
+        #   projects.append([row["id"], row["name"]])
     
     elif defaults[0] == "3":
         True
         #rows=db().select(db.org_organisation.name)
         #for row in rows:
-        #    projects.append(row["name"])
+        #    projects.append([row["id"], row["name"]])
 
     elif defaults[0] == "4":
         rows = db(db.irs_ireport).select()
-        i=0
         for row in rows:
-            projects.append(row["name"])
-            if int(defaults[1]) == i:
+            projects.append([row["id"], row["name"]])
+            if int(defaults[1]) == row["id"]:
                 project_date = row["datetime"].date()
-            i+=1            
+                event_id=row["roster_event_id"]
 
     else:
         defaults[0] == "0"

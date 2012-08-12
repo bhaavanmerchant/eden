@@ -177,11 +177,11 @@ jQuery(document).ready(function(){
         <span style="position:relative; left:60px;">
             <select name='project_selector' id='project_selector'>
             {{for x in range(len(projects)):}}
-                <option value={{=x}}
-                {{if defaults[1] and x == int(defaults[1]):}}
+                <option value={{=projects[x][0]}}
+                {{if defaults[1] and projects[x][0] == int(defaults[1]):}}
                     selected="selected"
                 {{pass}}
-                >{{=projects[x]}}</option>
+                >{{=projects[x][1]}}</option>
             {{pass}}
             </select>
         </span>
