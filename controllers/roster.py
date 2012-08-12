@@ -265,7 +265,15 @@ def add_role():
     """
     table_id=request.args[0]
     instance_id = request.args[1]
-    job_roles = ["Team Leader", "Team Member", "Trainee"]
+    job_roles = []
+    table=s3db.hrm_job_role
+    jr = []
+    rows = db(table).select()
+
+    for row in rows:
+        jr.append(row["name"])
+
+    job_roles += jr
     pt = db( db.hrm_roster_roles.instance_id == instance_id ).count()
     db.hrm_roster_roles.insert(
                                 instance_id = instance_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
