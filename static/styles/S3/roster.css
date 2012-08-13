@@ -1,5 +1,5 @@
 #r_tablearea{
-background:#c9c9c9;
+background:#EEEEEE;
 border-radius:10px;
 width:900px;
 padding:20px;
@@ -13,10 +13,10 @@ border:1px solid black;
 padding:5px;
 }
 tr:hover{
-background:#bfbfbf;
+background:#DCDCDC;
 }
 thead{
-background:#c3c3c3;
+background:#cccccc;
 }
 #selectarea{
 width:900px;
@@ -27,7 +27,7 @@ left:80px;
 }
 #r_varea{
 width:170px;
-background:#AAA;
+background:#EEEEEE;
 border-radius:6px;
 padding: 15px;
 position: fixed;
@@ -62,19 +62,19 @@ bottom:0px;
 right:0px;
 }
 .allotted{
-background:#3F6;
+background:#2A2;
 
 }
 .volunteer_names{
 width:140px;
-background:#A0A0A0;
+background:#EBEBEB;
 height:15px;
 border:solid 1px #878787;
 padding:10px;
 margin:5px;
 }
 .volunteer_names:hover{
-background:#959595;
+background:#DCDCDC;
 }
 #volunteer_role{
 position:relative;

@@ -260,12 +260,24 @@ def roster_submit():
         roster_col = str( items["array[" + str(i) + "][col]"] )
         roster_row = str( items["array[" + str(i) + "][row]"] )
         person = str( items["array[" + str(i) + "][vid]"] )
-        date_from_week = project_date + dateutil.relativedelta.relativedelta( days = int(roster_col) ) #Hard coded. Date needs to change
+        date_from_week = project_date + dateutil.relativedelta.relativedelta( days = int(roster_col) )
         db.hrm_roster_shift.insert(
                                     roster_id = a, instance_id = instance_id, date = date_from_week, 
                                     role = alloted_roles[ int(roster_row) ], person_id = person
                                     )
     return "Successfully saved!"
+
+def reset():
+    """
+    To reset the given instance of table
+    """
+    table_id=request.args[0]
+    instance_id = request.args[1]
+    db(
+        db.hrm_roster_shift.instance_id==instance_id
+      ).delete()
+    redirect( URL(c='roster', f='index', args=[table_id, instance_id]) )
+    return "Table reset!"
 
 def add_role():
     """

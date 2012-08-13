@@ -187,7 +187,7 @@ jQuery(document).ready(function(){
             </select>
         </span>
         -->
-        <span style="position:relative; left:180px;">
+        <span>
             <select name='timeframe' id='timeframe'>
             {{for i in range(numb):}}
                 <option value={{=i}}
@@ -200,7 +200,7 @@ jQuery(document).ready(function(){
             </select>
         </span>
 
-        <span style="position:relative; left:240px;">
+        <span style="position:relative; left:130px;">
         Slot:
             <select name='timeslot' id='timeslot'>
             {{for x in range(len(slots)):}}
@@ -212,9 +212,9 @@ jQuery(document).ready(function(){
             {{pass}}
             </select>
         </span>
-        <span style="position:relative; left:290px;">
-        <a href='index/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
-        </span>
+<!--        <span style="position:relative; left:290px;">
+            <a href='index/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
+            </span>-->
     </div>
 </form>
 <br/>
@@ -268,7 +268,9 @@ jQuery(document).ready(function(){
 </table>
 {{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow')}}
 <br/>
-<span> <input type="button" value="Save" id='save'/> </span> <span> <a>Cancel</a> </span> <span> <a>Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
+<span style="position:absolute;left:500px;"> <div style="background:#2A2;height:15px;width:35px;"></div> Assigned </span> <span style="position:absolute;left:600px;"> <div style="background:#C22;height:15px;width:35px;"></div> Required </span> <span style="position:absolute;left:700px;"> <div style="background:#CCC;height:15px;width:35px;"></div> Optional </span><br/>
+<span> <input type="button" value="Save" id='save'/> </span> <span> <a href="{{=URL(c='roster', f='index', args=[table_id, instance_id])}}">Cancel</a> </span> <span> <a href="{{=URL(c='roster', f='reset', args=[table_id, instance_id])}}">Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
+
 </div>
 </span>
 </div>
