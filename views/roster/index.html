@@ -82,26 +82,42 @@ jQuery(document).ready(function(){
         {
         var vname=$(this).html();
         var vid=$(this).attr('id');
+        var duplicate=0;
         $('.vcell').each(function()
             {
-            if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
+            if($(this).data('col')==current_cell.c && $(this).data('vid')==vid)
                 {
-                var cell_c=vname;
-                $(this).children('.vcelln').html(cell_c);
-                $(this).children('.addv').hide();
-                $(this).children('.remv').show();
-                $(this).data("vid",vid);
-                $(this).addClass('allotted');
-                
-                }; 
+                duplicate=1;
+                };
             });
+        if(duplicate==1)
+            {
+                alert("The same person cannot do more than one role in a given slot.");
+            }
+        else
+            {
+            $('.vcell').each(function()
+                {
+                if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
+                    {
+                    var cell_c=vname;
+                    $(this).children('.vcelln').html(cell_c);
+                    $(this).children('.addv').hide();
+                    $(this).children('.remv').show();
+                    $(this).data("vid",vid);
+                    $(this).addClass('allotted');
+                    
+                    }; 
+                });
+           };
         });
-    $('.remv').click(function(){
-    $(this).parent().children('.vcelln').html("");
-    $(this).parent().children('.remv').hide();
-    $(this).parent().children('.addv').show();
-    $(this).parent().removeClass('allotted');
-    });
+    $('.remv').click(function()
+        {
+        $(this).parent().children('.vcelln').html("");
+        $(this).parent().children('.remv').hide();
+        $(this).parent().children('.addv').show();
+        $(this).parent().removeClass('allotted');
+        });
     $('#cross').click(function()
         {
         $('#r_varea').hide();
