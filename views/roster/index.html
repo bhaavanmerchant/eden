@@ -53,14 +53,23 @@ jQuery(document).ready(function(){
         });
     });
 
-    $('.addv').click(function()
+    $('.adds').click(function()
         {
+        var cell=$(this).parent();
+        cell.addClass('sloted');
+        cell.data("sloted",1);
+        cell.html("<a class='addv'>Assign</a>");
+        //current_cell.r=cell.data('row');
+        //current_cell.c=cell.data('col');
+        });
+    $("#r_table").on("click",".addv",function(event)
+       {
         $('#r_varea').show();
+        
         $('.aside').hide();
         var cell=$(this).parent();
         current_cell.r=cell.data('row');
         current_cell.c=cell.data('col');
-        //ajax('people',['row'],'vn');
         $.ajax(
             {
             type: "POST",
@@ -106,7 +115,7 @@ jQuery(document).ready(function(){
                     $(this).children('.remv').show();
                     $(this).data("vid",vid);
                     $(this).addClass('allotted');
-                    
+                    $(this).removeClass('sloted');
                     }; 
                 });
            };
@@ -256,7 +265,7 @@ jQuery(document).ready(function(){
                 <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}> 
                     <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div> 
                     {{ is_filled=True}}
-                    {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv addpf')}}
+                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv addpf')}}
                     {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv rempf')}}
                 </div>
             {{pass}}
@@ -264,7 +273,7 @@ jQuery(document).ready(function(){
         {{ if not is_filled:}}
                 <div class='vcell' data-col={{=c}} data-row={{=r}} >
                     <div class='vcelln'></div>
-                    {{=IMG(_src='/eden/static/img/plus.png',_alt='addv',_class='addv symbv')}}
+                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv')}}
                     {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}}
                 </div> 
         {{pass}}

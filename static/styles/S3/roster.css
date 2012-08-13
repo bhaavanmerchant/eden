@@ -56,6 +56,11 @@ width:100px;
 height:35px;
 position:relative;
 }
+.addv{
+position:absolute;
+bottom:0px;
+left:0px;
+}
 .symbv{
 position:absolute;
 bottom:0px;
