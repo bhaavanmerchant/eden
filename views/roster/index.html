@@ -5,7 +5,7 @@
 jQuery(document).ready(function(){
     $('#newrole').hide();
     $('#r_varea').hide();
-    $('.remv').hide();
+    $('.rems').hide();
     $('.addpf').hide();
     $('.rempf').show();
     $('#addrow').click(function()
@@ -58,16 +58,18 @@ jQuery(document).ready(function(){
         var cell=$(this).parent();
         cell.addClass('sloted');
         cell.data("sloted",1);
-        cell.html("<a class='addv'>Assign</a>");
-        //current_cell.r=cell.data('row');
-        //current_cell.c=cell.data('col');
+        cell.children('.scelln').html('<a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}');
+        cell.children('.adds').hide();
+        cell.children('.rems').show();
+        $('#r_varea').hide();
+        $('.aside').show();
         });
     $("#r_table").on("click",".addv",function(event)
        {
         $('#r_varea').show();
         
         $('.aside').hide();
-        var cell=$(this).parent();
+        var cell=$(this).parent().parent();
         current_cell.r=cell.data('row');
         current_cell.c=cell.data('col');
         $.ajax(
@@ -111,8 +113,7 @@ jQuery(document).ready(function(){
                     {
                     var cell_c=vname;
                     $(this).children('.vcelln').html(cell_c);
-                    $(this).children('.addv').hide();
-                    $(this).children('.remv').show();
+                    $(this).children('.scelln').html("<a class='remv'>Release</a>");
                     $(this).data("vid",vid);
                     $(this).addClass('allotted');
                     $(this).removeClass('sloted');
@@ -120,12 +121,31 @@ jQuery(document).ready(function(){
                 });
            };
         });
-    $('.remv').click(function()
+    $("#r_table").on("click",".remv",function(event)
         {
+        var cell=$(this).parent().parent();
+        cell.children('.vcelln').html("");
+        cell.removeClass('allotted');
+        cell.addClass('sloted');
+        cell.data("vid",0);
+        $(this).parent().html('<a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}');
+        });
+    $('.rems').click(function()
+        {
+        $(this).parent().children('.scelln').html("");
         $(this).parent().children('.vcelln').html("");
-        $(this).parent().children('.remv').hide();
-        $(this).parent().children('.addv').show();
+        $(this).parent().children('.rems').hide();
+        $(this).parent().children('.adds').show();
+        $(this).parent().data("vid",0);
+        $(this).parent().data("sloted",0);
+        $(this).parent().removeClass('sloted');
         $(this).parent().removeClass('allotted');
+        $(this).parent().removeClass('essential');
+        });
+    $("#r_table").on("click",".star",function(event)
+        {
+        $(this).parent().parent().addClass('essential');
+        $(this).parent().parent().data("sloted",2)
         });
     $('#cross').click(function()
         {
@@ -263,18 +283,20 @@ jQuery(document).ready(function(){
         {{ for filled_slot in filled_slots: }}
             {{if r==filled_slot['row'] and c==filled_slot['col']:}}
                 <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}> 
-                    <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div> 
+                    <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div>
+                    <div class='scelln'> </div> 
                     {{ is_filled=True}}
                     {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv addpf')}}
-                    {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv rempf')}}
+                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv rempf')}}
                 </div>
             {{pass}}
         {{pass}}
         {{ if not is_filled:}}
                 <div class='vcell' data-col={{=c}} data-row={{=r}} >
                     <div class='vcelln'></div>
+                    <div class='scelln'> </div> 
                     {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv')}}
-                    {{=IMG(_src='/eden/static/img/minus.png',_alt='remv',_class='remv symbv')}}
+                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv')}}
                 </div> 
         {{pass}}
 
