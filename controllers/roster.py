@@ -59,7 +59,8 @@ def roster():
         if row["week"] == defaults[2] and row["slot"] == defaults[3]:
             instance_id=row['id']
 
-
+    if len(request.args) >= 2 and int(request.args[2]) == 1:
+        instance_id=int(request.args[1])
     alloted_roles = []
     rows = db(s3db.hrm_roster_roles.instance_id == instance_id).select()
 
@@ -306,7 +307,7 @@ def add_role():
     db.hrm_roster_roles.insert(
                                 instance_id = instance_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
                                 )
-    redirect( URL(c='roster', f='roster', args=[table_id, instance_id]) )
+    redirect( URL(c='roster', f='roster', args=[table_id, instance_id, 1]) )
     return job_roles[ request.vars.new_job_role ]
 
 def del_role():
@@ -333,7 +334,7 @@ def del_role():
                         )
 
     remap_table(instance_id)
-    redirect( URL(c='roster', f='roster', args=[table_id, instance_id]) )
+    redirect( URL(c='roster', f='roster', args=[table_id, instance_id, 1]) )
     return result
 
 def requests():
