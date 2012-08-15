@@ -326,8 +326,11 @@ def slots():
 def shifts():
     return s3_rest_controller("hrm","roster_slots")
 
-
 def tables():
+    return s3_rest_controller("hrm", "roster_table")
+
+
+def tables1():
     def string_to_date(string_date):
         """
             Convert a string date into datetime by exploding by '-'
