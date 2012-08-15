@@ -198,10 +198,12 @@ def people():
                         specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
         volunteers[ str( row["name"] ) ] = specific_volunteers
     
+
+    table_id=int(request.args[0])
+    instance_id = int(request.args[1])
+
     alloted_roles = []
-    rows=db().select(
-                    s3db.hrm_roster_roles.roles
-                    )
+    rows=db(s3db.hrm_roster_roles.instance_id == instance_id).select()
 
     for row in rows:
         alloted_roles.append(row["roles"])
@@ -213,6 +215,7 @@ def people():
                                                                 ),
                 *[ DIV(volunteers[alloted_roles[r]][v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers [ alloted_roles[r] ] ] 
               )
+
 
 
 def roster_submit():
