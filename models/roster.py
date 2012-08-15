@@ -46,6 +46,7 @@ table = db.define_table(tablename,
                             Field("instance_id",db.hrm_roster_instance),
                             Field("date"),
                             Field("role"),
+                            Field("slot_level"),
                             s3db.pr_person_id()
                         )
 tablename = "hrm_roster_roles" #roles: volunteer, team leader etc. defined for a table.

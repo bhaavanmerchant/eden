@@ -154,8 +154,6 @@ jQuery(document).ready(function(){
         });
     $('#save').click(function()
     {
-    //var roster_dets=new Array();
-    //var roster_dets={};
     var roster_array=new Array();
     var i=0;
     $('.allotted').each(function()
@@ -163,11 +161,24 @@ jQuery(document).ready(function(){
         var v_json= {
                     "row":$(this).data('row'),
                     "col":$(this).data('col'),
-                    "vid":$(this).data('vid')
+                    "vid":$(this).data('vid'),
+                    "slot_level":$(this).data('row')
                     };
         roster_array[i]=v_json;
         i=i+1;
         //alert(roster_dets[i-1].vid);
+        });
+    $('.sloted').each(function()
+        {
+        var v_json= {
+                    "row":$(this).data('row'),
+                    "col":$(this).data('col'),
+                    "vid":"",
+                    "slot_level":$(this).data('sloted')
+                    };
+        roster_array[i]=v_json;
+        i=i+1;
+        //alert(v_json.slot_level);
         });
     var roster_dets={"array":roster_array};
     $.ajax(
@@ -282,9 +293,20 @@ jQuery(document).ready(function(){
         {{ is_filled=False}}
         {{ for filled_slot in filled_slots: }}
             {{if r==filled_slot['row'] and c==filled_slot['col']:}}
-                <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}> 
+                {{if filled_slot['vid'] and filled_slot['vid']!="None":}}
+                    <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}>
                     <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div>
-                    <div class='scelln'> </div> 
+                    <div class='scelln'></div> 
+                {{elif filled_slot['slot_level'] == "2" :}}
+                    <div class='vcell sloted essential' data-col={{=c}} data-row={{=r}} data-sloted=2>
+                    <div class='vcelln'></div> 
+                    <div class='scelln'><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}</div> 
+                {{else:}}
+                    <div class='vcell sloted' data-col={{=c}} data-row={{=r}} data-sloted=1>
+                    <div class='vcelln'></div>
+                    <div class='scelln'><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}</div> 
+                {{pass}}
+
                     {{ is_filled=True}}
                     {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv addpf')}}
                     {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv rempf')}}

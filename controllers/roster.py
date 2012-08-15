@@ -147,6 +147,7 @@ def index():
         #determine col
         col = (string_to_date(row["date"]) - project_date).days
         v_id = str(row["person_id"])
+        slot_level = str(row["slot_level"])
         #determine row
         row_tbi = len(alloted_roles) + 2 #To prevent garbage value raising an exception
         for i in range(len(alloted_roles)):
@@ -163,7 +164,7 @@ def index():
                 row_tbi = i
                 break
         
-        slot = dict( row = row_tbi, col = col, vid = v_id)
+        slot = dict( row = row_tbi, col = col, vid = v_id, slot_level = slot_level )
         filled_slots.append(slot)
            
 
@@ -255,15 +256,16 @@ def roster_submit():
     project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
     project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
 
-    for i in range( len(items) / 3 ):
+    for i in range( len(items) / 4 ):
         a = db.hrm_roster.insert()
         roster_col = str( items["array[" + str(i) + "][col]"] )
         roster_row = str( items["array[" + str(i) + "][row]"] )
         person = str( items["array[" + str(i) + "][vid]"] )
+        slot_level = str( items["array[" + str(i) + "][slot_level]"] )
         date_from_week = project_date + dateutil.relativedelta.relativedelta( days = int(roster_col) )
         db.hrm_roster_shift.insert(
                                     roster_id = a, instance_id = instance_id, date = date_from_week, 
-                                    role = alloted_roles[ int(roster_row) ], person_id = person
+                                    role = alloted_roles[ int(roster_row) ], person_id = person, slot_level=slot_level
                                     )
     return "Successfully saved!"
 
