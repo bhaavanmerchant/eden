@@ -247,7 +247,7 @@ jQuery(document).ready(function(){
             <select name='timeframe' id='timeframe'>
             {{for i in range(numb):}}
                 <option value={{=i}}
-                    {{if defaults[2] and i == int(defaults[2]):}}
+                    {{if defaults[0] and i == int(defaults[0]):}}
                         selected="selected"
                     {{pass}}
                 >Week {{=i+1}} {{=project_date}} {{project_date = project_date + datetime.timedelta(days = 6)}} {{=project_date}}{{project_date=project_date+datetime.timedelta(days=1)}}
@@ -261,7 +261,7 @@ jQuery(document).ready(function(){
             <select name='timeslot' id='timeslot'>
             {{for x in range(len(slots)):}}
                 <option value={{=x}}
-                    {{if defaults[3] and x == int(defaults[3]):}}
+                    {{if defaults[1] and x == int(defaults[1]):}}
                         selected="selected"
                     {{pass}}
                 >{{=slots[x]}}</option>

@@ -38,8 +38,6 @@ def roster():
                                         )
 
     defaults = [
-                request.vars.event,
-                request.vars.project_selector,
                 request.vars.timeframe,
                 request.vars.timeslot
                 ] # Return the default selection for the drop downs.
@@ -51,16 +49,18 @@ def roster():
     table=s3db.hrm_roster_instance    
     if len(request.args)>0:
         table_id=int(request.args[0])
-        instance_id = table.update_or_insert(table_id=table_id,week=defaults[2],slot=defaults[3])
+        instance_id = table.update_or_insert(table_id=table_id,week=defaults[0],slot=defaults[1])
     else:
         redirect( URL(c='roster', f='tables') )
+
     rows=db(table.table_id==table_id).select()
     for row in rows:
-        if row["week"] == defaults[2] and row["slot"] == defaults[3]:
+        if row["week"] == defaults[0] and row["slot"] == defaults[1]:
             instance_id=row['id']
 
-    if len(request.args) >= 2 and int(request.args[2]) == 1:
-        instance_id=int(request.args[1])
+#    if len(request.args) >= 3 and int(request.args[2]) == 1:
+#        instance_id=int(request.args[1])
+        
     alloted_roles = []
     rows = db(s3db.hrm_roster_roles.instance_id == instance_id).select()
 
@@ -105,8 +105,8 @@ def roster():
     projects=[]
     
   
-    if defaults[0] == "0":
-        table = s3db.project_project
+
+    table = s3db.project_project
 
 #        
 #    elif defaults[0] == "1":
