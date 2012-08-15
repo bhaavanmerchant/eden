@@ -114,7 +114,8 @@ class S3OptionsMenu(default.S3OptionsMenu):
                     M("Table", f="table")(
                         M("Manage", f="tables"),
                         M("Roles"),
-                        M("Slots", f="slots")
+                        M("Slots", f="slots"),
+                        M("Shifts", f="shifts")
                     )
                 )
 

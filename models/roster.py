@@ -12,28 +12,35 @@ table = s3db.super_entity(tablename, "roster_event_id",
                             event_types,
                               Field("name")
                         )
-tablename = "hrm_roster_slots"
-table = db.define_table(tablename,
-                            Field('slot1'),
-                            Field('slot2'),
-                            Field('slot3'),
-                            Field('slot4'),
-                            Field('slot5')
+tablename = "hrm_slots"
+table = db.define_table( tablename,
+                            Field('start'),
+                            Field('name'),
+                            Field('over')
                         )
+
+
+s3db.configure(table, super_entity = db.hrm_roster_event)
+s3db.add_component(table, hrm_roster_event=s3db.super_key(db.hrm_roster_event))
+
 tablename = "hrm_roster_table"
 table = db.define_table(tablename,
                                 Field('type'), 
                                 Field('start_date',"datetime"), 
-                                Field('slots_id',db.hrm_roster_slots),
-                                s3db.super_link("roster_event_id", "hrm_roster_event"),
+                                s3db.super_link("roster_event_id", "hrm_roster_event")
                         )
-s3db.configure(table, super_entity = db.hrm_roster_event)
-s3db.add_component(table, hrm_roster_event=s3db.super_key(db.hrm_roster_event))
+
 tablename = "hrm_roster_instance"
 table = db.define_table(tablename,
-                            Field("table_id",db.hrm_roster_table),
+                            Field("table_id",s3db.hrm_roster_table),
                             Field('week'),
                             Field('slot')
+                        )
+
+tablename = "hrm_roster_slots"
+table = db.define_table(tablename,
+                            Field('table_id',s3db.hrm_roster_table),
+                            Field('slots_id',s3db.hrm_slots)
                         )
 tablename = "hrm_roster"
 table = db.define_table(tablename, 

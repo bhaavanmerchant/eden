@@ -13,12 +13,12 @@
                 <option value={{=projects[x][0]}}>{{=projects[x][1]}}</option>
             {{pass}}
             </select>
-        Slot:
-            <select name='slot_selector' id='slot_selector'>
-            {{for x in range(len(slots)):}}
-                <option value={{=slots[x]}}>{{=slots[x]}}</option>
-            {{pass}}
-            </select>
+<!--        Slot:-->
+<!--            <select name='slot_selector' id='slot_selector'>-->
+<!--            {{for x in range(len(slots)):}}-->
+<!--                <option value={{=slots[x]}}>{{=slots[x]}}</option>-->
+<!--            {{pass}}-->
+<!--            </select>-->
         Start Date (yyyy-mm-dd) :
             <input type="text" name="start_date" id="start_date" />
 
@@ -26,6 +26,6 @@
     <br/>
 
     {{for row in roster_table:}}
-        {{=row["id"]}} {{=row["type"]}} {{=row["start_date"]}} {{=row["slots_id"]}} {{=row["roster_event_id"]}} <a href= index/{{=row["id"]}}>Roster</a> <br/>
+        {{=row["id"]}} {{=row["type"]}} {{=row["start_date"]}} {{=row["roster_event_id"]}} <a href= roster/{{=row["id"]}}>Roster</a> <br/>
     {{pass}}
 </form>

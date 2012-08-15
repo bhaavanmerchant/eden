@@ -13,7 +13,14 @@ resourcename = request.function
 #    raise HTTP(404, body="Module disabled: %s" % module)
 
 # -----------------------------------------------------------------------------
+
 def index():
+    redirect( URL(c='roster', f='tables') )
+    return True
+
+
+
+def roster():
     """
         Application Home page
     """
@@ -36,6 +43,11 @@ def index():
                 request.vars.timeframe,
                 request.vars.timeslot
                 ] # Return the default selection for the drop downs.
+
+    for i in range(len(defaults)):
+        if not defaults[i]:
+            defaults[i] = "0"
+
     table=s3db.hrm_roster_instance    
     if len(request.args)>0:
         table_id=int(request.args[0])
@@ -44,14 +56,12 @@ def index():
         redirect( URL(c='roster', f='tables') )
     rows=db(table.table_id==table_id).select()
     for row in rows:
-        if row["week"] == defaults[2]:
+        if row["week"] == defaults[2] and row["slot"] == defaults[3]:
             instance_id=row['id']
 
 
     alloted_roles = []
-    rows = db().select(
-                        db.hrm_roster_roles.roles
-                        )
+    rows = db(s3db.hrm_roster_roles.instance_id == instance_id).select()
 
     for row in rows:
         alloted_roles.append(row["roles"])
@@ -62,24 +72,21 @@ def index():
     for row in rows:
         volunteers[str(row["id"])]=row["first_name"]+" "+row["last_name"]
 
-    slots = []
+
     table=s3db.hrm_roster_table
     rows = db(table.id == table_id).select()
     for row in rows:
         event_id = row["roster_event_id"]
-        subrows = db(s3db.hrm_roster_slots.id == row["slots_id"]).select()
-        for subrow in subrows:
-            if subrow["slot1"]:
-                slots.append(subrow["slot1"])
-            if subrow["slot2"]:
-                slots.append(subrow["slot2"])
-            if subrow["slot3"]:
-                slots.append(subrow["slot3"])
-            if subrow["slot4"]:
-                slots.append(subrow["slot4"])
-            if subrow["slot5"]:
-                slots.append(subrow["slot5"])
+
     
+    slots = []
+    table=s3db.hrm_roster_slots
+    rows = db(table.table_id == table_id).select()
+    for row in rows:
+        subrows= db(s3db.hrm_slots.id == row["slots_id"]).select()
+        for slot in subrows:
+            slots.append(slot["name"])
+
     job_roles = ["-- Select --"]
     table=s3db.hrm_job_role
     jr = []
@@ -96,37 +103,33 @@ def index():
     
     projects=[]
     
-    for i in range(len(defaults)):
-        if not defaults[i]:
-            defaults[i] = "0"
-
-    
+  
     if defaults[0] == "0":
         table = s3db.project_project
 
-        
-    elif defaults[0] == "1":
-        table=s3db.org_organisation
+#        
+#    elif defaults[0] == "1":
+#        table=s3db.org_organisation
 
-        
-    elif defaults[0] == "2":
-        True
-        #table=s3db.scenario_scenario
-        #rows=db(table).select()
-        #for row in rows:
-        #   projects.append([row["id"], row["name"]])
-    
-    elif defaults[0] == "3":
-        True
-        #rows=db().select(db.org_organisation.name)
-        #for row in rows:
-        #    projects.append([row["id"], row["name"]])
+#        
+#    elif defaults[0] == "2":
+#        True
+#        #table=s3db.scenario_scenario
+#        #rows=db(table).select()
+#        #for row in rows:
+#        #   projects.append([row["id"], row["name"]])
+#    
+#    elif defaults[0] == "3":
+#        True
+#        #rows=db().select(db.org_organisation.name)
+#        #for row in rows:
+#        #    projects.append([row["id"], row["name"]])
 
-    elif defaults[0] == "4":
-        table = s3db.irs_ireport
+#    elif defaults[0] == "4":
+#        table = s3db.irs_ireport
 
-    else:
-        defaults[0] == "0"
+#    else:
+#        defaults[0] == "0"
 
     rows = db(table).select()
     for row in rows:
@@ -278,7 +281,7 @@ def reset():
     db(
         db.hrm_roster_shift.instance_id==instance_id
       ).delete()
-    redirect( URL(c='roster', f='index', args=[table_id, instance_id]) )
+    redirect( URL(c='roster', f='roster', args=[table_id, instance_id]) )
     return "Table reset!"
 
 def add_role():
@@ -300,7 +303,7 @@ def add_role():
     db.hrm_roster_roles.insert(
                                 instance_id = instance_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
                                 )
-    redirect( URL(c='roster', f='index', args=[table_id, instance_id]) )
+    redirect( URL(c='roster', f='roster', args=[table_id, instance_id]) )
     return job_roles[ request.vars.new_job_role ]
 
 def del_role():
@@ -327,7 +330,7 @@ def del_role():
                         )
 
     remap_table(instance_id)
-    redirect( URL(c='roster', f='index', args=[table_id, instance_id]) )
+    redirect( URL(c='roster', f='roster', args=[table_id, instance_id]) )
     return result
 
 def requests():
@@ -341,6 +344,9 @@ def hrm():
     return output
 
 def slots():
+    return s3_rest_controller("hrm","slots")
+
+def shifts():
     return s3_rest_controller("hrm","roster_slots")
 
 
@@ -357,7 +363,6 @@ def tables():
     selection = [
                 request.vars.event,
                 request.vars.project_selector,
-                request.vars.slot_selector,
                 request.vars.start_date
                 ] # Return the default selection for the drop downs.
     event = ["Project","Organisation","Scenario","Site","Incident"]
@@ -415,7 +420,7 @@ def tables():
     
     if selection[1] != "0":
         table=s3db.hrm_roster_table
-        rows=table.update_or_insert(roster_event_id=event_id, type=event[int(selection[0])], slots_id=int(selection[2]), start_date=string_to_date(selection[3]))
+        rows=table.update_or_insert(roster_event_id=event_id, type=event[int(selection[0])], start_date=string_to_date(selection[2]))
 
     table = s3db.hrm_roster_table
     roster_table = db(table).select()
