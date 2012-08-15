@@ -100,37 +100,10 @@ def roster():
 
     event = ["Project","Organisation","Scenario","Site","Incident"]
     time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-    #project_date = datetime.date.today() #Default starting day of roster is current date.
     
     projects=[]
     
-  
-
     table = s3db.project_project
-
-#        
-#    elif defaults[0] == "1":
-#        table=s3db.org_organisation
-
-#        
-#    elif defaults[0] == "2":
-#        True
-#        #table=s3db.scenario_scenario
-#        #rows=db(table).select()
-#        #for row in rows:
-#        #   projects.append([row["id"], row["name"]])
-#    
-#    elif defaults[0] == "3":
-#        True
-#        #rows=db().select(db.org_organisation.name)
-#        #for row in rows:
-#        #    projects.append([row["id"], row["name"]])
-
-#    elif defaults[0] == "4":
-#        table = s3db.irs_ireport
-
-#    else:
-#        defaults[0] == "0"
 
     rows = db(table).select()
     for row in rows:
