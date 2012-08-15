@@ -166,7 +166,6 @@ jQuery(document).ready(function(){
                     };
         roster_array[i]=v_json;
         i=i+1;
-        //alert(roster_dets[i-1].vid);
         });
     $('.sloted').each(function()
         {
@@ -178,7 +177,6 @@ jQuery(document).ready(function(){
                     };
         roster_array[i]=v_json;
         i=i+1;
-        //alert(v_json.slot_level);
         });
     var roster_dets={"array":roster_array};
     $.ajax(
@@ -218,31 +216,6 @@ jQuery(document).ready(function(){
 <div id="r_tablearea">
 <form enctype="multipart/form-data" id="table_info_form" method="post">
     <div id="selectboxes">
-        <!---
-        <span>Event:
-            <select name='event' id='event' >
-            {{for x in range(len(event)):}}
-                <option value={{=x}} 
-                {{if defaults[0] and x == int(defaults[0]):}}
-                    selected="selected"
-                {{pass}}
-                >{{=event[x]}}</option>
-            {{pass}}
-            </select>
-        </span>
-
-        <span style="position:relative; left:60px;">
-            <select name='project_selector' id='project_selector'>
-            {{for x in range(len(projects)):}}
-                <option value={{=projects[x][0]}}
-                {{if defaults[1] and projects[x][0] == int(defaults[1]):}}
-                    selected="selected"
-                {{pass}}
-                >{{=projects[x][1]}}</option>
-            {{pass}}
-            </select>
-        </span>
-        -->
         <span>
             <select name='timeframe' id='timeframe'>
             {{for i in range(numb):}}
