@@ -98,20 +98,12 @@ def roster():
 
     job_roles += jr
 
-    event = ["Project","Organisation","Scenario","Site","Incident"]
     time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     
-    projects=[]
-    
-    table = s3db.project_project
-
-    rows = db(table).select()
-    for row in rows:
-        projects.append([row["id"], row["code"]])
-
     rows = db(s3db.hrm_roster_table.roster_event_id == event_id).select()
     for row in rows:
-        project_date = row["start_date"].date()    
+        project_date = row["start_date"]
+        event_type = row["type"] 
 
     project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
     project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
@@ -146,10 +138,9 @@ def roster():
            
 
 
-    return dict(message = T("Rostering Tool"), numb = 6, projects = projects, 
-                                slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, 
+    return dict(message = T("Rostering Tool"), numb = 6, slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, 
                                 volunteers = volunteers, time_dets = time_dets, project_date = project_date, 
-                                filled_slots = filled_slots, event = event, defaults = defaults, instance_id=instance_id, table_id=table_id
+                                filled_slots = filled_slots, defaults = defaults, instance_id=instance_id, table_id=table_id
                 )
 
 def people():
@@ -158,7 +149,6 @@ def people():
     """
     rows = db(s3db.hrm_job_role).select()
     subrows = db(s3db.hrm_human_resource).select()
-    #people=db(db.pr_person).select()
     volunteers={}    # {volunteer_id:volunteer_name}
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers = {}
@@ -231,7 +221,7 @@ def roster_submit():
 
     rows = db(s3db.hrm_roster_table.roster_event_id == event_id).select()
     for row in rows:
-        project_date = row["start_date"].date()    
+        project_date = row["start_date"]  
 
     project_day = datetime.date.weekday(project_date) #To determine the previous Monday, determine the weekday of the starting date.
     project_date = project_date - datetime.timedelta( days = project_day )  #Subtract that day of the week, to get its previous Monday.
@@ -294,7 +284,6 @@ def del_role():
                 ).delete()
 
     def remap_table(instance_id):
-        #pt=db(db.hrm_roster_roles.instance_id==instance_id).count()
         rows = db(
                     db.hrm_roster_roles.instance_id == instance_id
                 ).select()
