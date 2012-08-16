@@ -26,7 +26,7 @@ s3db.add_component(table, hrm_roster_event=s3db.super_key(db.hrm_roster_event))
 tablename = "hrm_roster_table"
 table = db.define_table(tablename,
                                 Field('type'), 
-                                Field('start_date',"datetime"), 
+                                Field('start_date',"date"), 
                                 s3db.super_link("roster_event_id", "hrm_roster_event")
                         )
 

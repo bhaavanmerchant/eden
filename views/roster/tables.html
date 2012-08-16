@@ -1,31 +1,78 @@
 {{extend 'layout.html'}}
-<form enctype="multipart/form-data" id="table_info_form" method="post">
+<script>
+  $(document).ready(function() {
+    $("#start_date").datepicker(
+    { 
+    dateFormat: "yy-mm-dd"
+    });
+    $("#event").change(function(){
+       var url="{{=URL(c='roster', f='tables')}}/"+$("#event").val();
+     $(location).attr('href',url);
+    });
+  });
+</script>
+<div id="addtable">
+
+<fieldset style="border:1px solid black;padding:5px;border-radius:5px;">
+<legend>Add a roster table</legend>
 {{=error}}
-        Event:
+<div>
+        <label for="event">Event</label>
             <select name='event' id='event' >
             {{for x in range(len(event)):}}
-                <option value={{=x}}>{{=event[x]}}</option>
+                <option value={{=x}}
+                    {{if defaults[0] and x == int(defaults[0]):}}
+                        selected="selected"
+                    {{pass}}
+                >{{=event[x]}}</option>
             {{pass}}
             </select>
-
+</div> <br/>
+<span>
+<form enctype="multipart/form-data" id="table_info_form" method="post">
+<input type="hidden" value="{{if request.args:}}{{=int(request.args[0])}}{{else:}}0{{pass}}" name="event" />
+        <label for="project_selector">Name</label>
             <select name='project_selector' id='project_selector'>
             {{for x in range(len(projects)):}}
-                <option value={{=projects[x][0]}}>{{=projects[x][1]}}</option>
+                <option value={{=projects[x][0]}}
+                    {{if defaults[1] and x == int(defaults[1]):}}
+                        selected="selected"
+                    {{pass}}
+                >{{=projects[x][1]}}</option>
             {{pass}}
-            </select>
-<!--        Slot:-->
-<!--            <select name='slot_selector' id='slot_selector'>-->
-<!--            {{for x in range(len(slots)):}}-->
-<!--                <option value={{=slots[x]}}>{{=slots[x]}}</option>-->
-<!--            {{pass}}-->
-<!--            </select>-->
-        Start Date (yyyy-mm-dd) :
-            <input type="text" name="start_date" id="start_date" />
-
-    <input type="submit" value="Create table">
-    <br/>
-
-    {{for row in roster_table:}}
-        {{=row["id"]}} {{=row["type"]}} {{=row["start_date"]}} {{=row["roster_event_id"]}} <a href= roster/{{=row["id"]}}>Roster</a> <br/>
-    {{pass}}
+            </select> </span> <span style="position:relative;left:60px;">
+        <label for="start_date">Start Date</label>
+            <input type="text" name="start_date" id="start_date" value="{{if defaults[2]:}}{{=str(defaults[2])}}{{pass}}" size="10"/>
+</span> <span style="position:relative;left:130px;">
+    <input type="submit" value="Create table" class="action-btn" />
 </form>
+</fieldset>
+
+</div>
+    <br/><br/>
+
+<div id="table-container">
+<div id="list_wrapper" class="dataTables_wrapper" role="grid">
+
+<div class="dataTable_table">
+<table id="list" class="dataTable display" aria-describedby="list_info">
+<thead>
+<tr role="row">
+<th class="sorting_disabled" role="columnheader" rowspan="1" colspan="1" style="width: 160px;" aria-label=" "> </th>
+<th class="sorting_asc" role="columnheader" tabindex="0" aria-controls="list" rowspan="1" colspan="1" style="width: auto;" aria-label="Event: activate to sort column ascending">Event</th>
+<th class="sorting" role="columnheader" tabindex="0" aria-controls="list" rowspan="1" colspan="1" style="width: auto;" aria-label="Event Name: activate to sort column ascending">Event Name</th>
+<th class="sorting" role="columnheader" tabindex="0" aria-controls="list" rowspan="1" colspan="1" style="width: auto;" aria-label="Start Date: activate to sort column ascending">Start Date</th>
+</tr>
+</thead>
+    {{i=1}}
+    {{for row in roster_table:}}
+<tbody role="alert" aria-live="polite" aria-relevant="all">
+    <tr class="{{if i % 2 == 0:}}even{{else:}}odd{{pass}}">
+        <td> <a href= roster/{{=row.hrm_roster_table.id}} class="action-btn">Roster</a><a href= tables/delete/{{=row.hrm_roster_table.id}} class="delete-btn">Delete</a><a href= tables/edit/{{=row.hrm_roster_table.id}} class="action-btn">Edit</a></td><td class="sorting_1">{{=row.hrm_roster_table.type}} </td><td> {{=row.hrm_roster_event.name}}</td><td>{{=row.hrm_roster_table.start_date}} </td>
+    </tr>
+    {{i+=1}}
+    {{pass}}
+</tbody>
+    </table>
+</div></div></div>
+
