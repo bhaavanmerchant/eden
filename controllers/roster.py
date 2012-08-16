@@ -345,30 +345,44 @@ def tables():
                 ]
 
     if len(request.args)>0:
-        defaults[0] = request.args[0]
-        if request.args[0] == "0":
-            table = s3db.project_project
-            rows = db(table).select()
-            for row in rows:
-                projects.append([row["id"], row["code"]])
-                if int(selection[1]) == row["id"]:
-                    event_id=row["roster_event_id"]
+        if request.args[0] == "delete":
+            table = s3db.hrm_roster_table
+            db(table.id == int(request.args[1])).delete()
+            redirect( URL(c='roster', f='tables', args=[selection[0]]) )     
+        else:
+            defaults[0] = request.args[0]
+            if request.args[0] == "0":
+                table = s3db.project_project
+                rows = db(table).select()
+                for row in rows:
+                    projects.append([row["id"], row["code"]])
+                    if int(selection[1]) == row["id"]:
+                        event_id=row["roster_event_id"]
 
-        elif request.args[0] == "1":
-            table=s3db.org_organisation
-            rows = db(table).select()
-            for row in rows:
-                projects.append([row["id"], row["name"]])
-                if int(selection[1]) == row["id"]:
-                    event_id=row["roster_event_id"]
-            
-        elif request.args[0] == "2":
-            rows = db(db.irs_ireport).select()
-            for row in rows:
-                projects.append([row["id"], row["name"]])
-                if int(selection[1]) == row["id"]:
-                    event_id=row["roster_event_id"]
+            elif request.args[0] == "1":
+                table=s3db.org_organisation
+                rows = db(table).select()
+                for row in rows:
+                    projects.append([row["id"], row["name"]])
+                    if int(selection[1]) == row["id"]:
+                        event_id=row["roster_event_id"]
+                
+            elif request.args[0] == "2":
+                rows = db(db.irs_ireport).select()
+                for row in rows:
+                    projects.append([row["id"], row["name"]])
+                    if int(selection[1]) == row["id"]:
+                        event_id=row["roster_event_id"]
 
+        
+    
+    else:
+        table = s3db.project_project
+        rows = db(table).select()
+        for row in rows:
+            projects.append([row["id"], row["code"]])
+            if int(selection[1]) == row["id"]:
+                event_id=row["roster_event_id"]
     
 
     table = s3db.hrm_roster_slots

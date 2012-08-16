@@ -30,7 +30,7 @@
 </div> <br/>
 <span>
 <form enctype="multipart/form-data" id="table_info_form" method="post">
-<input type="hidden" value="{{if request.args:}}{{=int(request.args[0])}}{{else:}}0{{pass}}" name="event" />
+<input type="hidden" value="{{if request.args:}}{{=int(defaults[0])}}{{else:}}0{{pass}}" name="event" />
         <label for="project_selector">Name</label>
             <select name='project_selector' id='project_selector'>
             {{for x in range(len(projects)):}}
