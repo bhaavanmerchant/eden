@@ -313,7 +313,23 @@ def slots():
     return s3_rest_controller("hrm","slots")
 
 def shifts():
-    return s3_rest_controller("hrm","roster_slots")
+    if len(request.args) == 0:
+        redirect( URL(c='roster', f='tables') )
+
+    table_id=request.args[0]
+    table = s3db.hrm_slots
+    rows = db(table).select()
+    slots = []
+    for row in rows:
+        slots.append([row["id"],row["name"]])
+    if request.vars.slots and len(request.vars.slots)>0:
+
+        table=s3db.hrm_roster_slots
+        db(table.table_id == table_id).delete()
+        for slot in request.vars.slots:
+            table.insert(table_id=table_id, slots_id=slot)
+
+    return dict(message=T("Rostering Tool"), slots=slots)
 
 def tables():
     def string_to_date(string_date):
