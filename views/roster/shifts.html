@@ -1,0 +1,20 @@
+{{extend 'layout.html'}}
+<script type="text/javascript">
+//$(function(){
+//  $("#slots").multiselect();
+//});
+</script>
+<div st>
+<form enctype="multipart/form-data" method="post">
+<select multiple="multiple" id="slots" name="slots" >
+{{for slot in slots:}}
+<option value={{=slot[0]}}>{{=slot[1]}}</option>
+{{pass}}
+</select>
+<br/>
+<br/>
+<input type="submit" value="Add shifts" class="action-btn" />
+</form>
+<a href= "{{=URL(c='roster', f='slots')}}" class="action-btn">Add slots</a>
+</div>
+

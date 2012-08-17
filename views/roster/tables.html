@@ -68,7 +68,7 @@
     {{for row in roster_table:}}
 <tbody role="alert" aria-live="polite" aria-relevant="all">
     <tr class="{{if i % 2 == 0:}}even{{else:}}odd{{pass}}">
-        <td> <a href= "{{=URL(c='roster', f='roster', args=[row.hrm_roster_table.id])}}" class="action-btn">Roster</a><a href= "{{=URL(c='roster', f='tables', args=['delete',row.hrm_roster_table.id])}}" class="delete-btn">Delete</a><a href= "{{=URL(c='roster', f='tables', args=['delete',row.hrm_roster_table.id])}}" class="action-btn">Edit</a></td><td class="sorting_1">{{=row.hrm_roster_table.type}} </td><td> {{=row.hrm_roster_event.name}}</td><td>{{=row.hrm_roster_table.start_date}} </td>
+        <td> <a href= "{{=URL(c='roster', f='roster', args=[row.hrm_roster_table.id])}}" class="action-btn">Roster</a><a href= "{{=URL(c='roster', f='tables', args=['delete',row.hrm_roster_table.id])}}" class="delete-btn">Delete</a><a href= "{{=URL(c='roster', f='shifts', args=[row.hrm_roster_table.id])}}" class="action-btn">Manage Shifts</a></td><td class="sorting_1">{{=row.hrm_roster_table.type}} </td><td> {{=row.hrm_roster_event.name}}</td><td>{{=row.hrm_roster_table.start_date}} </td>
     </tr>
     {{i+=1}}
     {{pass}}

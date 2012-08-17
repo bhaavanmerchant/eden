@@ -230,7 +230,7 @@ jQuery(document).ready(function(){
         </span>
 
         <span style="position:relative; left:130px;">
-        Slot:
+        Shift:
             <select name='timeslot' id='timeslot'>
             {{for x in range(len(slots)):}}
                 <option value={{=x}}
@@ -244,6 +244,9 @@ jQuery(document).ready(function(){
 <!--        <span style="position:relative; left:290px;">
             <a href='roster/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
             </span>-->
+        <span style="position:relative; left:180px;">
+        <a href= "{{=URL(c='roster', f='shifts', args=[table_id])}}">Manage Shifts</a>
+        </span>
     </div>
 </form>
 <br/>

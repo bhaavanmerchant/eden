@@ -128,3 +128,18 @@ background:#F76541;
 width:250px;
 height:20px;
 }
+.circle{
+width:200px;
+border-radius:20px;
+background:#FFF;
+padding:10px;
+border:1px black solid;
+}
+.leftc{
+position:relative;
+left:300px;
+}
+.rightc{
+position:relative;
+left:480px;
+}

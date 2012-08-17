@@ -15,8 +15,8 @@ resourcename = request.function
 # -----------------------------------------------------------------------------
 
 def index():
-    redirect( URL(c='roster', f='tables') )
-    return True
+    #redirect( URL(c='roster', f='tables') )
+    return dict(message = T("Rostering Tool"))
 
 
 
@@ -328,6 +328,7 @@ def shifts():
         db(table.table_id == table_id).delete()
         for slot in request.vars.slots:
             table.insert(table_id=table_id, slots_id=slot)
+        redirect( URL(c='roster', f='roster', args=[table_id]) ) 
 
     return dict(message=T("Rostering Tool"), slots=slots)
 

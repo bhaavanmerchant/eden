@@ -105,17 +105,13 @@ class S3OptionsMenu(default.S3OptionsMenu):
         #""" Rostering tool """
 
         return M(c="roster")(
-                    M("Roster", f="index"),
-                    M("Requests", f="requests"),
+                    M("Roster", f="index")(
+                        M("Tables", f="tables"),
+                        M("Slots", f="slots"),
+                    ),
                     M("People", f="hrm")(
                         M("List"),
-                        M("Skills")
-                    ),
-                    M("Table", f="table")(
-                        M("Manage", f="tables"),
-                        M("Roles"),
-                        M("Slots", f="slots"),
-                        M("Shifts", f="shifts")
+                        M("Roles")
                     )
                 )
 
