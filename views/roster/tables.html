@@ -17,6 +17,8 @@
 <legend>Add a roster table</legend>
 {{=error}}
 <div>
+<div class="tooltip" title="Add a table|The event type, event and event start date to create a roster for.">
+</div>
         <label for="event">Event</label>
             <select name='event' id='event' >
             {{for x in range(len(event)):}}
@@ -26,8 +28,7 @@
                     {{pass}}
                 >{{=event[x]}}</option>
             {{pass}}
-            </select>
-</div> <br/>
+            </select> <br/>
 <span>
 <form enctype="multipart/form-data" id="table_info_form" method="post">
 <input type="hidden" value="{{if request.args:}}{{=int(defaults[0])}}{{else:}}0{{pass}}" name="event" />

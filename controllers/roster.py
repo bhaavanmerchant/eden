@@ -174,7 +174,7 @@ def people():
     return DIV(
                 DIV(alloted_roles[r], _id="volunteer_role"), FORM(
                                                                     INPUT( _name="volunteer_quick_search", _id="volunteer_quick_search")
-                                                                ),
+                                                                ), DIV(DIV(_class="tooltip", _title="Volunteers|List of volunteers matching the Job Title criteria. The panel can be use for quick searching.")),
                 *[ DIV(volunteers[alloted_roles[r]][v_id], _class="volunteer_names", _id=v_id) for v_id in volunteers [ alloted_roles[r] ] ] 
               )
 

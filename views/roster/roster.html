@@ -200,12 +200,13 @@ jQuery(document).ready(function(){
 <span>
 <div id="r_varea">
 <div id="r_varea_head">Volunteers:</div>
-{{=IMG(_src='/eden/static/img/cross.png', _alt='cross', _id='cross')}}
+{{=IMG(_src='/eden/static/img/cross.png', _alt='cross', _id='cross', _title='Close this panel.')}}
 <br/>
     <div class='vn' id='vn'>
         <form>
         <input type='text' id='volunteer_quick_search'>
         </form>
+        <div class="tooltip" title="Volunteers|List of volunteers matching the Job Title criteria. The panel can be use for quick searching."></div>
             {{for v_id in volunteers:}}
                 <div class="volunteer_names" id={{=v_id}}>{{=volunteers[v_id]}}</div>
             {{pass}}
@@ -228,7 +229,6 @@ jQuery(document).ready(function(){
             {{pass}}
             </select>
         </span>
-
         <span style="position:relative; left:130px;">
         Shift:
             <select name='timeslot' id='timeslot'>
@@ -245,8 +245,10 @@ jQuery(document).ready(function(){
             <a href='roster/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
             </span>-->
         <span style="position:relative; left:180px;">
-        <a href= "{{=URL(c='roster', f='shifts', args=[table_id])}}">Manage Shifts</a>
+        <a href= "{{=URL(c='roster', f='shifts', args=[table_id])}}" title="Change available shifts for this table.">Manage Shifts</a>
         </span>
+        <br/>
+        <div class="tooltip" title="Date and shift|Select the date and shift for rostering."></div>
     </div>
 </form>
 <br/>
@@ -261,7 +263,7 @@ jQuery(document).ready(function(){
     <td>
         <div class='vcell' data-pos={{=r}}>
         {{=alloted_roles[r]}}
-            {{=IMG(_src='/eden/static/img/minus.png', _class='symbv remrole')}}
+            {{=IMG(_src='/eden/static/img/minus.png', _class='symbv remrole', _title='Remove this role from the roster.')}}
         </div>
     </td>
     {{for c in range(len(time_dets)):}}
@@ -280,12 +282,12 @@ jQuery(document).ready(function(){
                 {{else:}}
                     <div class='vcell sloted' data-col={{=c}} data-row={{=r}} data-sloted=1>
                     <div class='vcelln'></div>
-                    <div class='scelln'><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}</div> 
+                    <div class='scelln'><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star", _title="Mark this position as 'Required'")}}</div> 
                 {{pass}}
 
                     {{ is_filled=True}}
-                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv addpf')}}
-                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv rempf')}}
+                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv addpf',_title='Roster this position as an optional slot. A volunteer can be assigned.')}}
+                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv rempf',_title='Remove this position from the roster.')}}
                 </div>
             {{pass}}
         {{pass}}
@@ -293,8 +295,8 @@ jQuery(document).ready(function(){
                 <div class='vcell' data-col={{=c}} data-row={{=r}} >
                     <div class='vcelln'></div>
                     <div class='scelln'> </div> 
-                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv')}}
-                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv')}}
+                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv',_title='Roster this position as an optional slot. A volunteer can be assigned.')}}
+                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv',_title='Remove this position from the roster.')}}
                 </div> 
         {{pass}}
 
@@ -311,10 +313,10 @@ jQuery(document).ready(function(){
 {{for x in range(len(time_dets)):}}<td></td>{{pass}}
 </tr>
 </table>
-{{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow')}}
+{{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow', _title='Add more rows to the table with a job title.')}}
 <br/>
 <span style="position:absolute;left:500px;"> <div style="background:#2A2;height:15px;width:35px;"></div> Assigned </span> <span style="position:absolute;left:600px;"> <div style="background:#C22;height:15px;width:35px;"></div> Required </span> <span style="position:absolute;left:700px;"> <div style="background:#CCC;height:15px;width:35px;"></div> Optional </span><br/>
-<span> <input type="button" value="Save" id='save'/> </span> <span> <a href="{{=URL(c='roster', f='roster', args=[table_id, instance_id])}}">Cancel</a> </span> <span> <a href="{{=URL(c='roster', f='reset', args=[table_id, instance_id])}}">Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
+<span> <input type="button" value="Save" id='save'/> </span> <span> <a href="{{=URL(c='roster', f='roster', args=[table_id, instance_id])}}" title="Cancel and return to the last saved state.">Cancel</a> </span> <span> <a href="{{=URL(c='roster', f='reset', args=[table_id, instance_id])}}" title="Clear the entire table of rosters.">Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
 
 </div>
 </span>

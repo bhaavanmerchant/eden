@@ -24,6 +24,7 @@ width:900px;
 #addrow{
 position:relative;
 left:80px;
+cursor:pointer;
 }
 #r_varea{
 width:170px;
@@ -60,15 +61,18 @@ position:relative;
 position:absolute;
 bottom:0px;
 left:0px;
+cursor:pointer;
 }
 .symbv{
 position:absolute;
 bottom:0px;
 right:0px;
+cursor:pointer;
 }
 .star{
 position:absolute;
 right:0px;
+cursor:pointer;
 }
 .sloted{
 background:#CCC;
