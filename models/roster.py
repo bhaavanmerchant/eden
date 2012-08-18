@@ -27,7 +27,8 @@ tablename = "hrm_roster_table"
 table = db.define_table(tablename,
                                 Field('type'), 
                                 Field('start_date',"date"), 
-                                s3db.super_link("roster_event_id", "hrm_roster_event")
+                                s3db.super_link("roster_event_id", "hrm_roster_event"),
+                                *s3_meta_fields()
                         )
 
 tablename = "hrm_roster_instance"

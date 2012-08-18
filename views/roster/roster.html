@@ -13,7 +13,7 @@ jQuery(document).ready(function(){
         $('#newrole').toggle();
         $('#addrow').hide();
         });
-    $('#new_job_role').change(function()
+    $('#new_job_title').change(function()
         {
         $('#roster_info_form').submit();
         });
@@ -305,8 +305,8 @@ jQuery(document).ready(function(){
 
 <tr id='newrole'><td>
 <form enctype="multipart/form-data" id="roster_info_form" action="{{=URL(c='roster', f='add_role', args=[table_id, instance_id])}}" method="post">
-<select name="new_job_role" id="new_job_role">
-{{for x in range(len(job_roles)):}}<option value={{=x}}>{{=job_roles[x]}}</option>{{pass}}
+<select name="new_job_title" id="new_job_title">
+{{for x in range(len(job_titles)):}}<option value={{=x}}>{{=job_titles[x]}}</option>{{pass}}
 </select></form></td>
 {{for x in range(len(time_dets)):}}<td></td>{{pass}}
 </tr>

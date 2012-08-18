@@ -88,15 +88,15 @@ def roster():
         for slot in subrows:
             slots.append(slot["name"])
 
-    job_roles = ["-- Select --"]
-    table=s3db.hrm_job_role
+    job_titles = ["-- Select --"]
+    table=s3db.hrm_job_title
     jr = []
     rows = db(table).select()
 
     for row in rows:
         jr.append(row["name"])
 
-    job_roles += jr
+    job_titles += jr
 
     time_dets = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     
@@ -138,7 +138,7 @@ def roster():
            
 
 
-    return dict(message = T("Rostering Tool"), numb = 6, slots = slots, job_roles = job_roles, alloted_roles = alloted_roles, 
+    return dict(message = T("Rostering Tool"), numb = 6, slots = slots, job_titles = job_titles, alloted_roles = alloted_roles, 
                                 volunteers = volunteers, time_dets = time_dets, project_date = project_date, 
                                 filled_slots = filled_slots, defaults = defaults, instance_id=instance_id, table_id=table_id
                 )
@@ -147,19 +147,17 @@ def people():
     """
         List of people specific to a job role
     """
-    rows = db(s3db.hrm_job_role).select()
+    rows = db(s3db.hrm_job_title).select()
     subrows = db(s3db.hrm_human_resource).select()
     volunteers={}    # {volunteer_id:volunteer_name}
     for row in rows:    #Seems inefficient, will try db chaining later to improvise
         specific_volunteers = {}
         for subrow in subrows:
-            if subrow["job_role_id"]:
-                for job_role in subrow["job_role_id"]:
-                    if job_role == row["id"]:
-                        person = db(
-                                    db.pr_person.id == subrow["person_id"]
-                                    ).select()
-                        specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
+            if subrow["job_title_id"] == row["id"]:
+                person = db(
+                            db.pr_person.id == subrow["person_id"]
+                            ).select()
+                specific_volunteers[str(person[0]["id"])] = person[0]["first_name"] + " " + person[0]["last_name"]
         volunteers[ str( row["name"] ) ] = specific_volunteers
     
 
@@ -257,21 +255,21 @@ def add_role():
     """
     table_id=request.args[0]
     instance_id = request.args[1]
-    job_roles = []
-    table=s3db.hrm_job_role
+    job_titles = []
+    table=s3db.hrm_job_title
     jr = []
     rows = db(table).select()
 
     for row in rows:
         jr.append(row["name"])
 
-    job_roles += jr
+    job_titles += jr
     pt = db( db.hrm_roster_roles.instance_id == instance_id ).count()
     db.hrm_roster_roles.insert(
-                                instance_id = instance_id, roles = job_roles[ int(request.vars.new_job_role)-1 ], position_in_table = pt
+                                instance_id = instance_id, roles = job_titles[ int(request.vars.new_job_title)-1 ], position_in_table = pt
                                 )
     redirect( URL(c='roster', f='roster', args=[table_id, instance_id, 1]) )
-    return job_roles[ request.vars.new_job_role ]
+    return job_titles[ request.vars.new_job_title ]
 
 def del_role():
     """
