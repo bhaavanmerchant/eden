@@ -108,14 +108,14 @@ class S3OrganisationModel(S3Model):
         tablename = "org_sector"
         table = define_table(tablename,
                              Field("name", length=128,
-                                   notnull=True, unique=True,
+                                   notnull=True,
                                    label=T("Name")),
                              Field("abrv", length=64,
-                                   notnull=True, unique=True,
+                                   notnull=True,
                                    label=T("Abbreviation")),
                              self.gis_location_id(
                                     widget=S3LocationAutocompleteWidget(),
-                                    requires=IS_LOCATION()
+                                    requires=IS_EMPTY_OR(IS_LOCATION())
                                 ),
                              s3_comments(),
                              *s3_meta_fields())
@@ -515,12 +515,20 @@ class S3OrganisationModel(S3Model):
 
         # Components
 
+        # Sites
+        add_component("org_site",
+                      org_organisation="organisation_id")
+
         # Offices
         add_component("org_office",
                       org_organisation="organisation_id")
 
-        # Sites
-        add_component("org_site",
+        # Warehouses
+        add_component("inv_warehouse",
+                      org_organisation="organisation_id")
+
+        # Facilities
+        add_component("org_facility",
                       org_organisation="organisation_id")
 
         # Staff
@@ -2301,8 +2309,11 @@ def org_rheader(r, tabs=[]):
 
     s3db = current.s3db
 
+    # Need to use this format as otherwise req_match?viewing=org_office.x
+    # doesn't have an rheader
     tablename, record = s3_rheader_resource(r)
-    table = s3db.table(tablename)
+    r.record = record
+    r.table = s3db[tablename]
 
     if record is None:
         # List or Create form: rheader makes no sense here
@@ -2319,7 +2330,9 @@ def org_rheader(r, tabs=[]):
         if not tabs:
             tabs = [(T("Basic Details"), None),
                     (T("Branches"), "branch"),
-                    (T("Facilities"), "site"),
+                    (T("Offices"), "office"),
+                    (T("Warehouses"), "warehouse"),
+                    (T("Facilities"), "facility"),
                     (T("Staff & Volunteers"), "human_resource"),
                     (T("Projects"), "project"),
                     (T("User Roles"), "roles"),
@@ -2327,7 +2340,6 @@ def org_rheader(r, tabs=[]):
                    ]
         rheader_tabs = s3_rheader_tabs(r, tabs)
 
-        # Lookup sector
         if table.sector_id.readable and record.sector_id:
             if settings.get_ui_cluster():
                 sector_label = T("Cluster(s)")
@@ -2338,33 +2350,29 @@ def org_rheader(r, tabs=[]):
         else:
             sectors = ""
 
-        # Lookup website
         if record.website:
             website = TR(TH("%s: " % table.website.label),
                          A(record.website, _href=record.website))
         else:
             website = ""
 
-        # Data
-        rheader_data = TABLE(TR(TH("%s: " % table.name.label),
-                                record.name,
-                               ),
-                               website,
-                               sectors,
-                            )
-
-        # Inject logo
+        rheader = DIV()
         logo = org_organisation_logo(record)
+        rData = TABLE(
+                        TR(
+                            TH("%s: " % table.name.label),
+                            record.name,
+                          ),
+                        website,
+                        sectors,
+                        )
         if logo:
-            rheader = DIV(TABLE(TR(TD(logo),
-                                   TD(rheader_data))))
+            rheader.append(TABLE(TR(TD(logo), TD(rData))))
         else:
-            rheader = DIV(rheader_data)
+            rheader.append(rData)
         rheader.append(rheader_tabs)
 
     elif tablename == "org_office":
-
-        # Tabs
         tabs = [(T("Basic Details"), None),
                 #(T("Contact Data"), "contact"),
                 (T("Staff"), "human_resource"),
@@ -2377,16 +2385,12 @@ def org_rheader(r, tabs=[]):
         tabs.append((T("Attachments"), "document"))
         tabs.append((T("User Roles"), "roles"))
 
-        # Fields
         rheader_fields = [["name", "organisation_id", "email"],
                           ["office_type_id", "location_id", "phone1"],
                           ]
 
-        # Build header
-        rheader = S3ResourceHeader(rheader_fields, tabs)
-        rheader_fields, rheader_tabs = rheader(r,
-                                               table=table,
-                                               record=record)
+        rheader_fields, rheader_tabs = S3ResourceHeader(rheader_fields,
+                                                        tabs)(r, as_div=True)
 
         # Inject logo
         logo = org_organisation_logo(record.organisation_id)
@@ -2395,6 +2399,7 @@ def org_rheader(r, tabs=[]):
                                    TD(rheader_fields))))
         else:
             rheader = DIV(rheader_fields)
+
         rheader.append(rheader_tabs)
 
         #if r.component and r.component.name == "req":
@@ -2402,21 +2407,15 @@ def org_rheader(r, tabs=[]):
             #rheader.append(s3.req_helptext_script)
 
     elif tablename in ("org_organisation_type", "org_office_type"):
-
-        # Tabs
         tabs = [(T("Basic Details"), None),
                 (T("Tags"), "tag"),
                ]
         rheader_tabs = s3_rheader_tabs(r, tabs)
-
-        # Header
-        rheader = DIV(
-                    TABLE(
-                        TR(
+        rheader = DIV(TABLE(TR(
                             TH("%s: " % table.name.label),
                             record.name,
-                        ),
-                    ), rheader_tabs)
+                            )),
+                      rheader_tabs)
 
     return rheader
 
