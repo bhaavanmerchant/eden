@@ -1,21 +1,23 @@
 {{extend "layout.html"}}
 <script type="text/javascript">
-    $(function(){
+    /*$(function(){
       $(".slots").multiselect({sortable: false, searchable: false, minWidth: 300});
-    });
+    });*/
 </script>
 <div>
+<h1>{{=message}}</h1>
+<h4>{{=specific}}</h4>
     <div class="tooltip" title="Roster Shifts|Each roster can have many shifts in a day. Each shift can be then rostered."></div>
+
     <form enctype="multipart/form-data" method="post">
-        <select multiple="multiple" class="slots" name="slots" title="Select shifts.">
+        <span> <select multiple="multiple" class="slots" name="slots" title="Select shifts." size="8" style="width:200px;">
         {{for slot in slots:}}
         <option value={{=slot[0]}}>{{=slot[1]}}</option>
         {{pass}}
-        </select>
+        </select> </span> <span style="position:relative;left:50px;"> <a href= "{{=URL(c='roster', f='slots')}}" class="action-btn" title="Add and manage shifts which can then be assigned to roster tables.">Add slots</a> </span>
     <br/>
     <br/>
-    <input type="submit" value="Add shifts" class="action-btn"  class="tooltip" title="Add the selected shifts to the roster table and proceed to rostering."/>
+    <input type="submit" value="Set shifts" class="action-btn"  class="tooltip" title="Add the selected shifts to the roster table and proceed to rostering."/>
     </form>
-<a href= "{{=URL(c='roster', f='slots')}}" class="action-btn" title="Add and manage shifts which can then be assigned to roster tables.">Add slots</a>
 </div>
 

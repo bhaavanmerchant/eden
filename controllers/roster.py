@@ -355,7 +355,7 @@ def shifts():
 
         redirect( URL(c="roster", f="roster", args=[table_id]) ) 
 
-    return dict(message=T("Rostering Tool"), slots = slots)
+    return dict(message=T("Rostering tool"), specific=T("Manage shifts"), slots = slots)
 
 def tables():
     """

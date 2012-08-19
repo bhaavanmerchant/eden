@@ -141,9 +141,22 @@ border:1px black solid;
 }
 .leftc{
 position:relative;
-left:300px;
+left:50px;
 }
 .rightc{
 position:relative;
-left:480px;
+left:230px;
+}
+#workflow{
+position:absolute;
+width:450px;
+left:500px;
+border-left: 1px dotted black;
+}
+#info{
+position:absolute;
+left:50px;
+text-align:justify;
+width:350px;
+font-size:17px;
 }
