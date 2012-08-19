@@ -1,4 +1,4 @@
-{{extend 'layout.html'}}
+{{extend "layout.html"}}
 
 <head>
 <link href="/{{=request.application}}/static/styles/S3/roster.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8" />
@@ -7,8 +7,8 @@
 <div>
 <h1>{{=message}}</h1>
 <div id="maincontent">
-<div id='changes'><h4>Change request:</h4>
-    <table id='changetable'>
+<div id="changes"><h4>Change request:</h4>
+    <table id="changetable">
         <thead>
             <tr>
                 <th>Approve</th><th>Volunteer Name</th><th>From</th><th>To</th><th>Reason</th>
@@ -26,15 +26,15 @@
         <input type="submit" value="Submit"/>
     </span>
     <span style="position:absolute; right:200px;">
-        <div id='change_index'>
+        <div id="change_index">
             <span>
-                <div id='change_accepted' class='index_colour'/>
+                <div id="change_accepted" class="index_colour"/>
             </span>
             <span style="position:absolute; left:20px;">
                  Free 
             </span>
             <span style="position:absolute; left:100px;">
-                <div id='change_denied' class='index_colour'/>
+                <div id="change_denied" class="index_colour"/>
             </span>
             <span style="position:absolute; left:20px;">
                  Filled 

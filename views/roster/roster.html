@@ -1,47 +1,47 @@
-{{extend 'layout.html'}}
+{{extend "layout.html"}}
 <head><script type="text/javascript">
     var current_cell={"r":0,
                       "c":0};
 jQuery(document).ready(function(){
-    $('#newrole').hide();
-    $('#r_varea').hide();
-    $('.rems').hide();
-    $('.addpf').hide();
-    $('.rempf').show();
-    $('#addrow').click(function()
+    $("#newrole").hide();
+    $("#r_varea").hide();
+    $(".rems").hide();
+    $(".addpf").hide();
+    $(".rempf").show();
+    $("#addrow").click(function()
         {
-        $('#newrole').toggle();
-        $('#addrow').hide();
+        $("#newrole").toggle();
+        $("#addrow").hide();
         });
-    $('#new_job_title').change(function()
+    $("#new_job_title").change(function()
         {
-        $('#roster_info_form').submit();
+        $("#roster_info_form").submit();
         });
-    $('#event').change(function()
+    $("#event").change(function()
         {
-        $('#table_info_form').submit();
+        $("#table_info_form").submit();
         });
-    $('#project_selector').change(function()
+    $("#project_selector").change(function()
         {
-        $('#table_info_form').submit();
+        $("#table_info_form").submit();
         });
-    $('#timeframe').change(function()
+    $("#timeframe").change(function()
         {
-        $('#table_info_form').submit();
+        $("#table_info_form").submit();
         });
-    $('#timeslot').change(function()
+    $("#timeslot").change(function()
         {
-        $('#table_info_form').submit();
+        $("#table_info_form").submit();
         });
-    $('#vn').on('keypress','#volunteer_quick_search',function(event){
-        $('.volunteer_names').each(function(){
-            if($('#volunteer_quick_search').val()=='')
+    $("#vn").on("keypress","#volunteer_quick_search",function(event){
+        $(".volunteer_names").each(function(){
+            if($("#volunteer_quick_search").val()=="")
             {
             $(this).show();
             }
             else
             {
-                if ($(this).html().toLowerCase().search($('#volunteer_quick_search').val().toLowerCase()) == -1)
+                if ($(this).html().toLowerCase().search($("#volunteer_quick_search").val().toLowerCase()) == -1)
                 {
                 $(this).hide();
                 }
@@ -53,25 +53,25 @@ jQuery(document).ready(function(){
         });
     });
 
-    $('.adds').click(function()
+    $(".adds").click(function()
         {
         var cell=$(this).parent();
-        cell.addClass('sloted');
+        cell.addClass("sloted");
         cell.data("sloted",1);
-        cell.children('.scelln').html('<a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}');
-        cell.children('.adds').hide();
-        cell.children('.rems').show();
-        $('#r_varea').hide();
-        $('.aside').show();
+        cell.children(".scelln").html('<a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}');
+        cell.children(".adds").hide();
+        cell.children(".rems").show();
+        $("#r_varea").hide();
+        $(".aside").show();
         });
     $("#r_table").on("click",".addv",function(event)
        {
-        $('#r_varea').show();
+        $("#r_varea").show();
         
-        $('.aside').hide();
+        $(".aside").hide();
         var cell=$(this).parent().parent();
-        current_cell.r=cell.data('row');
-        current_cell.c=cell.data('col');
+        current_cell.r=cell.data("row");
+        current_cell.c=cell.data("col");
         $.ajax(
             {
             type: "POST",
@@ -83,20 +83,20 @@ jQuery(document).ready(function(){
                 });
 
         });
-    $('.remrole').click(function()
+    $(".remrole").click(function()
         {
         var cell=$(this).parent();
         var url="{{=URL(c='roster', f='del_role', args=[table_id, instance_id])}}"+"/"+cell.data('pos');
-        $(location).attr('href',url);
+        $(location).attr("href",url);
         });
-    $('#vn').on('click','.volunteer_names',function(event)
+    $("#vn").on("click",".volunteer_names",function(event)
         {
         var vname=$(this).html();
-        var vid=$(this).attr('id');
+        var vid=$(this).attr("id");
         var duplicate=0;
-        $('.vcell').each(function()
+        $(".vcell").each(function()
             {
-            if($(this).data('col')==current_cell.c && $(this).data('vid')==vid)
+            if($(this).data("col")==current_cell.c && $(this).data("vid")==vid)
                 {
                 duplicate=1;
                 };
@@ -107,16 +107,16 @@ jQuery(document).ready(function(){
             }
         else
             {
-            $('.vcell').each(function()
+            $(".vcell").each(function()
                 {
-                if($(this).data('row')==current_cell.r && $(this).data('col')==current_cell.c)
+                if($(this).data("row")==current_cell.r && $(this).data("col")==current_cell.c)
                     {
                     var cell_c=vname;
-                    $(this).children('.vcelln').html(cell_c);
-                    $(this).children('.scelln').html("<a class='remv'>Release</a>");
+                    $(this).children(".vcelln").html(cell_c);
+                    $(this).children(".scelln").html("<a class='remv'>Release</a>");
                     $(this).data("vid",vid);
-                    $(this).addClass('allotted');
-                    $(this).removeClass('sloted');
+                    $(this).addClass("allotted");
+                    $(this).removeClass("sloted");
                     }; 
                 });
            };
@@ -124,56 +124,56 @@ jQuery(document).ready(function(){
     $("#r_table").on("click",".remv",function(event)
         {
         var cell=$(this).parent().parent();
-        cell.children('.vcelln').html("");
-        cell.removeClass('allotted');
-        cell.addClass('sloted');
+        cell.children(".vcelln").html("");
+        cell.removeClass("allotted");
+        cell.addClass("sloted");
         cell.data("vid",0);
         $(this).parent().html('<a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}');
         });
-    $('.rems').click(function()
+    $(".rems").click(function()
         {
-        $(this).parent().children('.scelln').html("");
-        $(this).parent().children('.vcelln').html("");
-        $(this).parent().children('.rems').hide();
-        $(this).parent().children('.adds').show();
+        $(this).parent().children(".scelln").html("");
+        $(this).parent().children(".vcelln").html("");
+        $(this).parent().children(".rems").hide();
+        $(this).parent().children(".adds").show();
         $(this).parent().data("vid",0);
         $(this).parent().data("sloted",0);
-        $(this).parent().removeClass('sloted');
-        $(this).parent().removeClass('allotted');
-        $(this).parent().removeClass('essential');
+        $(this).parent().removeClass("sloted");
+        $(this).parent().removeClass("allotted");
+        $(this).parent().removeClass("essential");
         });
     $("#r_table").on("click",".star",function(event)
         {
-        $(this).parent().parent().addClass('essential');
+        $(this).parent().parent().addClass("essential");
         $(this).parent().parent().data("sloted",2)
         });
-    $('#cross').click(function()
+    $("#cross").click(function()
         {
-        $('#r_varea').hide();
-        $('.aside').show();
+        $("#r_varea").hide();
+        $(".aside").show();
         });
-    $('#save').click(function()
+    $("#save").click(function()
     {
     var roster_array=new Array();
     var i=0;
-    $('.allotted').each(function()
+    $(".allotted").each(function()
         {
         var v_json= {
-                    "row":$(this).data('row'),
-                    "col":$(this).data('col'),
-                    "vid":$(this).data('vid'),
-                    "slot_level":$(this).data('row')
+                    "row":$(this).data("row"),
+                    "col":$(this).data("col"),
+                    "vid":$(this).data("vid"),
+                    "slot_level":$(this).data("row")
                     };
         roster_array[i]=v_json;
         i=i+1;
         });
-    $('.sloted').each(function()
+    $(".sloted").each(function()
         {
         var v_json= {
-                    "row":$(this).data('row'),
-                    "col":$(this).data('col'),
+                    "row":$(this).data("row"),
+                    "col":$(this).data("col"),
                     "vid":"",
-                    "slot_level":$(this).data('sloted')
+                    "slot_level":$(this).data("sloted")
                     };
         roster_array[i]=v_json;
         i=i+1;
@@ -200,11 +200,11 @@ jQuery(document).ready(function(){
 <span>
 <div id="r_varea">
 <div id="r_varea_head">Volunteers:</div>
-{{=IMG(_src='/eden/static/img/cross.png', _alt='cross', _id='cross', _title='Close this panel.')}}
+{{=IMG(_src="/eden/static/img/cross.png", _alt="cross", _id="cross", _title="Close this panel.")}}
 <br/>
-    <div class='vn' id='vn'>
+    <div class="vn" id="vn">
         <form>
-        <input type='text' id='volunteer_quick_search'>
+        <input type="text" id="volunteer_quick_search">
         </form>
         <div class="tooltip" title="Volunteers|List of volunteers matching the Job Title criteria. The panel can be use for quick searching."></div>
             {{for v_id in volunteers:}}
@@ -218,7 +218,7 @@ jQuery(document).ready(function(){
 <form enctype="multipart/form-data" id="table_info_form" method="post">
     <div id="selectboxes">
         <span>
-            <select name='timeframe' id='timeframe'>
+            <select name="timeframe" id="timeframe">
             {{for i in range(numb):}}
                 <option value={{=i}}
                     {{if defaults[0] and i == int(defaults[0]):}}
@@ -231,7 +231,7 @@ jQuery(document).ready(function(){
         </span>
         <span style="position:relative; left:130px;">
         Shift:
-            <select name='timeslot' id='timeslot'>
+            <select name="timeslot" id="timeslot">
             {{for x in range(len(slots)):}}
                 <option value={{=x}}
                     {{if defaults[1] and x == int(defaults[1]):}}
@@ -242,7 +242,7 @@ jQuery(document).ready(function(){
             </select>
         </span>
 <!--        <span style="position:relative; left:290px;">
-            <a href='roster/pdf'>{{=IMG(_src='/eden/static/img/silk/printer.png')}}</a>
+            <a href="roster/pdf">{{=IMG(_src="/eden/static/img/silk/printer.png")}}</a>
             </span>-->
         <span style="position:relative; left:180px;">
         <a href= "{{=URL(c='roster', f='shifts', args=[table_id])}}" title="Change available shifts for this table.">Manage Shifts</a>
@@ -261,42 +261,42 @@ jQuery(document).ready(function(){
 {{for r in range(len(alloted_roles)):}}
 <tr>
     <td>
-        <div class='vcell' data-pos={{=r}}>
+        <div class="vcell" data-pos={{=r}}>
         {{=alloted_roles[r]}}
-            {{=IMG(_src='/eden/static/img/minus.png', _class='symbv remrole', _title='Remove this role from the roster.')}}
+            {{=IMG(_src="/eden/static/img/minus.png", _class="symbv remrole", _title="Remove this role from the roster.")}}
         </div>
     </td>
     {{for c in range(len(time_dets)):}}
     <td>
         {{ is_filled=False}}
         {{ for filled_slot in filled_slots: }}
-            {{if r==filled_slot['row'] and c==filled_slot['col']:}}
-                {{if filled_slot['vid'] and filled_slot['vid']!="None":}}
-                    <div class='vcell allotted' data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot['vid']}}>
-                    <div class='vcelln'>{{=volunteers[filled_slot['vid']]}} </div>
-                    <div class='scelln'></div> 
-                {{elif filled_slot['slot_level'] == "2" :}}
-                    <div class='vcell sloted essential' data-col={{=c}} data-row={{=r}} data-sloted=2>
-                    <div class='vcelln'></div> 
-                    <div class='scelln'><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}</div> 
+            {{if r==filled_slot["row"] and c==filled_slot["col"]:}}
+                {{if filled_slot["vid"] and filled_slot["vid"]!="None":}}
+                    <div class="vcell allotted" data-col={{=c}} data-row={{=r}} data-vid={{=filled_slot["vid"]}}>
+                    <div class="vcelln">{{=volunteers[filled_slot["vid"]]}} </div>
+                    <div class="scelln"></div> 
+                {{elif filled_slot["slot_level"] == "2" :}}
+                    <div class="vcell sloted essential" data-col={{=c}} data-row={{=r}} data-sloted=2>
+                    <div class="vcelln"></div> 
+                    <div class="scelln"><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star")}}</div> 
                 {{else:}}
-                    <div class='vcell sloted' data-col={{=c}} data-row={{=r}} data-sloted=1>
-                    <div class='vcelln'></div>
-                    <div class='scelln'><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star", _title="Mark this position as 'Required'")}}</div> 
+                    <div class="vcell sloted" data-col={{=c}} data-row={{=r}} data-sloted=1>
+                    <div class="vcelln"></div>
+                    <div class="scelln"><a class="addv">Assign</a> {{=IMG(_src="/eden/static/img/star.png",_alt="star",_class="star", _title="Mark this position as 'Required'")}}</div> 
                 {{pass}}
 
                     {{ is_filled=True}}
-                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv addpf',_title='Roster this position as an optional slot. A volunteer can be assigned.')}}
-                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv rempf',_title='Remove this position from the roster.')}}
+                    {{=IMG(_src="/eden/static/img/plus.png",_alt="adds",_class="adds symbv addpf",_title="Roster this position as an optional slot. A volunteer can be assigned.")}}
+                    {{=IMG(_src="/eden/static/img/minus.png",_alt="rems",_class="rems symbv rempf",_title="Remove this position from the roster.")}}
                 </div>
             {{pass}}
         {{pass}}
         {{ if not is_filled:}}
-                <div class='vcell' data-col={{=c}} data-row={{=r}} >
-                    <div class='vcelln'></div>
-                    <div class='scelln'> </div> 
-                    {{=IMG(_src='/eden/static/img/plus.png',_alt='adds',_class='adds symbv',_title='Roster this position as an optional slot. A volunteer can be assigned.')}}
-                    {{=IMG(_src='/eden/static/img/minus.png',_alt='rems',_class='rems symbv',_title='Remove this position from the roster.')}}
+                <div class="vcell" data-col={{=c}} data-row={{=r}} >
+                    <div class="vcelln"></div>
+                    <div class="scelln"> </div> 
+                    {{=IMG(_src="/eden/static/img/plus.png",_alt="adds",_class="adds symbv",_title="Roster this position as an optional slot. A volunteer can be assigned.")}}
+                    {{=IMG(_src="/eden/static/img/minus.png",_alt="rems",_class="rems symbv",_title="Remove this position from the roster.")}}
                 </div> 
         {{pass}}
 
@@ -305,7 +305,7 @@ jQuery(document).ready(function(){
 </tr>
 {{pass}}
 
-<tr id='newrole'><td>
+<tr id="newrole"><td>
 <form enctype="multipart/form-data" id="roster_info_form" action="{{=URL(c='roster', f='add_role', args=[table_id, instance_id])}}" method="post">
 <select name="new_job_title" id="new_job_title">
 {{for x in range(len(job_titles)):}}<option value={{=x}}>{{=job_titles[x]}}</option>{{pass}}
@@ -313,10 +313,10 @@ jQuery(document).ready(function(){
 {{for x in range(len(time_dets)):}}<td></td>{{pass}}
 </tr>
 </table>
-{{=IMG(_src='/eden/static/img/plus.png',_alt='addrow',_id='addrow', _title='Add more rows to the table with a job title.')}}
+{{=IMG(_src="/eden/static/img/plus.png",_alt="addrow",_id="addrow", _title="Add more rows to the table with a job title.")}}
 <br/>
 <span style="position:absolute;left:500px;"> <div style="background:#2A2;height:15px;width:35px;"></div> Assigned </span> <span style="position:absolute;left:600px;"> <div style="background:#C22;height:15px;width:35px;"></div> Required </span> <span style="position:absolute;left:700px;"> <div style="background:#CCC;height:15px;width:35px;"></div> Optional </span><br/>
-<span> <input type="button" value="Save" id='save'/> </span> <span> <a href="{{=URL(c='roster', f='roster', args=[table_id, instance_id])}}" title="Cancel and return to the last saved state.">Cancel</a> </span> <span> <a href="{{=URL(c='roster', f='reset', args=[table_id, instance_id])}}" title="Clear the entire table of rosters.">Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
+<span> <input type="button" value="Save" id="save"/> </span> <span> <a href="{{=URL(c='roster', f='roster', args=[table_id, instance_id])}}" title="Cancel and return to the last saved state.">Cancel</a> </span> <span> <a href="{{=URL(c='roster', f='reset', args=[table_id, instance_id])}}" title="Clear the entire table of rosters.">Reset</a> </span> <!--<span> <a>Autofill</a> </span> --> <span style="position:relative;left:650px;background:#FF0" id="flash_message"></span>
 
 </div>
 </span>

@@ -1,4 +1,4 @@
-{{extend 'layout.html'}}
+{{extend "layout.html"}}
 <script>
   $(document).ready(function() {
     $("#start_date").datepicker(
@@ -6,8 +6,8 @@
     dateFormat: "yy-mm-dd"
     });
     $("#event").change(function(){
-       var url="{{=URL(c='roster', f='tables')}}/"+$("#event").val();
-     $(location).attr('href',url);
+       var url="{{=URL(c="roster", f="tables")}}/"+$("#event").val();
+     $(location).attr("href",url);
     });
   });
 </script>
@@ -20,7 +20,7 @@
     <div class="tooltip" title="Add a table|The event type, event and event start date to create a roster for.">
     </div>
         <label for="event">Event</label>
-            <select name='event' id='event' >
+            <select name="event" id="event" >
             {{for x in range(len(event)):}}
                 <option value={{=x}}
                     {{if defaults[0] and x == int(defaults[0]):}}
@@ -33,7 +33,7 @@
 <form enctype="multipart/form-data" id="table_info_form" method="post">
 <input type="hidden" value="{{if request.args:}}{{=int(defaults[0])}}{{else:}}0{{pass}}" name="event" />
         <label for="project_selector">Name</label>
-            <select name='project_selector' id='project_selector'>
+            <select name="project_selector" id="project_selector">
             {{for x in range(len(projects)):}}
                 <option value={{=projects[x][0]}}
                     {{if defaults[1] and x == int(defaults[1]):}}
