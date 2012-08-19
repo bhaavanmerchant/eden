@@ -110,9 +110,12 @@ class S3OptionsMenu(default.S3OptionsMenu):
                         M("Slots", f="slots"),
                     ),
                     M("People", f="hrm")(
-                        M("List"),
-                        M("Roles")
+                        M("Add job titles", c="hrm", f="job_title", args=["create"]),
+                        M("List job titles", c="hrm", f="job_title"),
+                        M("Add staff", c="hrm", f="staff", args=["create"]),
+                        M("List staff", c="hrm", f="staff"),
+                        M("Search", c="hrm", f="staff", args=["search"])
                     )
-                )
+            )
 
 # END =========================================================================

@@ -1,14 +1,14 @@
 {{extend 'layout.html'}}
 <script type="text/javascript">
-//$(function(){
-//  $("#slots").multiselect();
-//});
+$(function(){
+  $(".slots").multiselect({sortable: false, searchable: false, minWidth: 300});
+});
 </script>
 <div>
 <div class="tooltip" title="Roster Shifts|Each roster can have many shifts in a day. Each shift can be then rostered.">
 </div>
 <form enctype="multipart/form-data" method="post">
-<select multiple="multiple" id="slots" name="slots" >
+<select multiple="multiple" class="slots" name="slots" title="Select shifts.">
 {{for slot in slots:}}
 <option value={{=slot[0]}}>{{=slot[1]}}</option>
 {{pass}}
