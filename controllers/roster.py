@@ -25,7 +25,7 @@ def roster():
     """
     import datetime
     import dateutil
-
+    s3.scripts.append("/%s/static/scripts/S3/s3.roster.js" % appname)
     def string_to_date(string_date):
         """
             Convert a string date into datetime by exploding by '-'
