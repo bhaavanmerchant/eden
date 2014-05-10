@@ -188,7 +188,9 @@ class S3CampDataModel(S3Model):
 
         # -------------------------------------------------------------------------
         cr_shelter_opts = {1 : T("Closed"),
-                           2 : T("Open")
+                           2 : T("Open"),
+                           3 : T("Under Construction"),
+                           4 : T("Needs Furnishings")
                            }
 
         tablename = "cr_shelter"
